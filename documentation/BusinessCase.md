@@ -22,7 +22,7 @@ October 14, 2024
 The biggest problem in the ride-sharing market is the current monopoly that Uber has formed. A monopoly is not good for either the rider or driver as it lets Uber have 100% control over the prices. This leads to 3 key issues:
 
 1. **Ethical**:  
-   Uber controls prices; using an AI algorithm, it attempts to maximize prices to riders while minimizing payment to drivers. Thus, riders never know how much the drivers earn.
+   Uber controls prices; using an AI algorithm, it attempts to maximize prices to riders while minimizing payment to drivers. Thus, riders never know how much the drivers earn. It also uses this ambiguity to take an unknown cut of the drivers and riders' fares.
 
 2. **Legal**:  
    A legal contractor in the USA and Canada must be able to set their rates. Uber does not allow that yet considers drivers contractors. They are currently in litigation in multiple states regarding this issue.
