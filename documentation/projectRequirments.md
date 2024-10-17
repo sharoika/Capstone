@@ -25,6 +25,6 @@ A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoD
 - **Driver:** Accepts requests, sets prices, and rates riders.
 
 ## Milestones
-- January 2025: Initial MVP
-- February 2025: AppStore & AndroidStore Submission
-- March 2025: Testing & Refinement
+- January 2025: MVP 1, AppStore & AndroidStore Submission
+- February 2025: MVP 2, User Testing
+- March 2025: MVP 3, Testing & Refinement
