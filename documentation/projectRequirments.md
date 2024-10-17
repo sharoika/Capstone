@@ -23,6 +23,7 @@ A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoD
 ## User Roles
 - **Rider:** Requests rides and provides feedback.
 - **Driver:** Accepts requests, sets prices, and rates riders.
+- **Administrator:** Validates driver documents.
 
 ## Milestones
 - January 2025: MVP 1, AppStore & AndroidStore Submission
