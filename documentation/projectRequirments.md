@@ -1,7 +1,7 @@
 # Requirements
 
 ## Overview
-A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoDB**, featuring driver-driven pricing.
+A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoDB**, featuring driver-driven pricing. Hosted on DigitalOcean.
 
 ### Functional Requirements
 - User registration (drivers and riders).
@@ -23,6 +23,7 @@ A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoD
 ## User Roles
 - **Rider:** Requests rides and provides feedback.
 - **Driver:** Accepts requests, sets prices, and rates riders.
+- **Administrator:** Validates driver documents.
 
 ## Milestones
 - January 2025: MVP 1, AppStore & AndroidStore Submission
