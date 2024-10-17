@@ -8,7 +8,7 @@
 Project Lead/Full-Stack Developer
 
 **Responsibilities:**
-Outlining responsibilities along with ensuring tasks are being finished in a timely manner.             Developing the project in all aspects including frontend and backend.
+Outlining responsibilities along with ensuring tasks are being finished in a timely manner. Developing the project in all aspects including frontend and backend.
 
 ### Simran Brar
 **Role:**
@@ -22,5 +22,4 @@ Aiding development of the frontend and backend of the application.
 Documents Manager/Full-Stack Developer
 
 **Responsibilities:**
-Aiding development of the frontend and backend of the application.                                       
-Organization of Project GitHub documentation, etc. 
+Aiding development of the frontend and backend of the application. Organization of Project GitHub documentation, etc. 
