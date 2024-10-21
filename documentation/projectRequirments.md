@@ -1,5 +1,3 @@
-# Updated Requirements Document
-
 ## Overview
 A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoDB**, featuring driver-driven pricing. Hosted on DigitalOcean.
 
@@ -28,7 +26,23 @@ A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoD
     - **1000 Users:** 6 queries per user per minute (6000 total queries per minute).
     - **5000 Users:** 1.2 queries per user per minute (6000 total queries per minute).
 
-## User Roles
+### Infrastructure Costs: Monolithic vs. Microservices
+
+#### Monolithic Architecture:
+- **Cost Range**: $200 - $600/month
+- **Components**: Single Node.js server, single database (e.g., MongoDB on DigitalOcean or AWS), load balancer.
+- **Scalability**: Vertical scaling required (more powerful servers).
+- **Pros**: Easier to set up, lower initial cost.
+- **Cons**: Harder to scale, slower to develop and deploy changes.
+
+#### Microservices Architecture:
+- **Cost Range**: $300 - $1000/month
+- **Components**: Multiple services (e.g., separate services for GPS tracking, user management, and payments), containerization (Docker), API gateway, and multiple databases.
+- **Scalability**: Horizontal scaling (add more instances or services).
+- **Pros**: Scalable, faster deployments, more flexible.
+- **Cons**: Higher operational and infrastructure complexity.
+
+### User Roles
 - **Rider:** Requests rides and provides feedback.
 - **Driver:** Accepts requests, sets prices, and rates riders.
 - **Administrator:** Validates driver documents.
