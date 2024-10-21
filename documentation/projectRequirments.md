@@ -11,11 +11,12 @@ A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoD
 
 ### Non-Functional Requirements
 - High performance for concurrent users.
-- Secure data transmission and storage.
 - User-friendly interface.
-- **Performance Tuning**: Maintain a system where CPU usage does not exceed 50%, even with a high number of queries per minute, as shown in the load distribution for 100, 500, 1000, and 5000 users.
+
 
 ### Technical Requirements
+- Secure data transmission and storage.
+- **Performance Tuning**: Maintain a system where CPU usage does not exceed 50%, even with a high number of queries per minute, as shown in the load distribution for 100, 500, 1000, and 5000 users.
 - **Front-End:** React Native
 - **Back-End:** Node.js
 - **Database:** MongoDB
