@@ -77,4 +77,25 @@ Developing a ride-sharing mobile application using the **MERN-M stack with micro
 - **Operational Overhead:** Monitoring, logging, and securing each service independently adds additional costs and complexity.
 
 ## Recommendation
-We will focus on **MVP 1**, which is a working backend with a skeleton frontend, and aim to finish it by the end of January. Once **MVP 1** is complete, we aim to finish **MVP 2** by the end of February, which is a finished frontend with user testing once complete we will submit it to the AppStone and AndroidStore. Finally, for **MVP 3**, we will aim to **publish** the application on both iOS and Android stores, allowing for public access to the application.
+
+We recommend proceeding with **Option 1 (Monolithic Architecture)** for the initial development phase, focusing on delivering a functional and scalable **Minimum Viable Product (MVP)** quickly. This approach aligns with the following timeline:
+
+### **MVP 1: Backend Development with Skeleton Frontend**
+- **Target Completion Date:** End of January
+- **Focus:** Build a working backend with core ride-sharing features and a basic frontend interface. The monolithic architecture will allow faster development and integration, ensuring the application’s core functionalities are solid.
+  
+### **MVP 2: Completed Frontend with User Testing**
+- **Target Completion Date:** End of February
+- **Focus:** Complete the frontend design and conduct user testing. React Native will allow for compatibility across both iOS and Android platforms, and the monolithic structure will simplify changes based on user feedback. Once MVP 2 is finished, the app will be ready for submission to the App Store and Google Play.
+
+### **MVP 3: Public Launch**
+- **Target Completion Date:** March
+- **Focus:** Finalize the application for public release on both iOS and Android stores. With the monolithic architecture, deployment and final bug fixes will be more straightforward, ensuring a smooth release.
+
+**Why Monolithic Architecture for MVP?**
+- **Quicker Time to Market:** Monolithic architecture provides the speed needed to complete MVP 1 and MVP 2 by the target dates.
+- **Lower Upfront Costs:** Lower infrastructure complexity in the early phases, keeping the focus on delivering a working product without overcomplicating the architecture.
+- **Simplicity in Early Development:** A unified codebase will allow easier debugging, integration, and testing as we move from MVP 1 to MVP 3.
+
+Once the application gains traction and requires further scalability, we can consider transitioning to a **microservices architecture** in the future. This will allow the app to handle higher traffic and more complex functionalities as the user base grows.
+
