@@ -16,7 +16,6 @@ A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoD
 
 ### Technical Requirements
 - Secure data transmission and storage.
-- **Performance Tuning**: Maintain a system where CPU usage does not exceed 50%, even with a high number of queries per minute, as shown in the load distribution for 100, 500, 1000, and 5000 users.
 - **Front-End:** React Native
 - **Back-End:** Node.js
 - **Database:** MongoDB
@@ -26,6 +25,7 @@ A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoD
     - **500 Users:** 12 queries per user per minute (6000 total queries per minute).
     - **1000 Users:** 6 queries per user per minute (6000 total queries per minute).
     - **5000 Users:** 1.2 queries per user per minute (6000 total queries per minute).
+- **Performance Tuning**: Maintain a system where CPU usage does not exceed 50%, even with a high number of queries per minute, as shown in the load distribution for 100, 500, 1000, and 5000 users.
 
 ### Infrastructure Costs: Monolithic vs. Microservices
 
