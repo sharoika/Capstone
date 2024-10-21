@@ -2,13 +2,13 @@
 A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoDB**, featuring driver-driven pricing. Hosted on DigitalOcean.
 
 ### Functional Requirements
-- User-friendly interface.
-- User registration (drivers and riders).
-- Profile management for users.
-- Ride request and booking system.
-- Driver sets pricing for rides.
-- Payment processing between riders and drivers.
-- Performance adjustments based on the number of concurrent users and query load.
+- User-friendly interface. (A non first time user, will be able to book a ride within 3 clicks)
+- User registration for drivers and riders. (Collecting 0% metadata) 
+- Profile management for users. (Changing passwords, and payment methods)
+- Ride request and booking system. (Rebook previous drivers)
+- Driver sets pricing for rides. (No limit on prices set)
+- Payment processing between riders and drivers. (Credit/Debit card)
+- Performance adjustments based on the number of concurrent users and query load. (Listed below)
 
 ### Technical Requirements
 - Secure data transmission and storage by using SSL in 100% of our calls.
