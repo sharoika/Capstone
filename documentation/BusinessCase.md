@@ -41,8 +41,40 @@ Create a ride-sharing mobile application that can be on both iOS and Android. We
 Create a ride-sharing mobile application that can be on both iOS and Android. We would use the MERN-M tech stack in accordance with REST standards due to its features and the experience our team has with the stack. This will be a mobile application built using microservices architecture; React Native allows for both iOS and Android compatibility.
 
 ## Cost-Benefit Analysis
-**Option 1:**  
-Developing a ride-sharing application where the users get control of setting their fare price while also providing a high level of service will allow for a more satisfying experience for both customers and drivers. It will incentivize drivers due to the competitive 5% commission that Fleet will take, as opposed to the minimum 30% Uber takes per ride, while also delivering quality service. On the contrary, competing with a monopoly is extremely difficult. Our base logic is similar in ridesharing, but we differ where we allow drivers to be true contractors in setting their own prices as opposed to being given one by a monopolistic company.
+
+### **Option 1: Monolithic Architecture**
+
+**Overview:**  
+Developing a ride-sharing mobile application using the **MERN-M stack with monolithic architecture** will enable faster development and deployment. This architecture allows for a unified codebase, making the development process simpler and more manageable for smaller teams. The key advantage is **lower upfront costs** and quicker time to market, though scalability could become a challenge in the long term.
+
+#### **Benefits:**
+- **Faster Development:** Single codebase makes development more efficient, especially for smaller teams.
+- **Lower Initial Costs:** Simple infrastructure and deployment, with reduced hosting expenses.
+- **Quick Time to Market:** Allows faster testing and feedback, which is critical in a competitive market.
+- **Simplified Maintenance Early On:** Easier to manage updates and fixes in the early stages of the app.
+
+#### **Drawbacks:**
+- **Limited Scalability:** Vertical scaling (increasing server power) is required, which can become costly and inefficient.
+- **Increased Maintenance Complexity:** As the application grows, maintaining a monolithic codebase becomes more difficult.
+- **Downtime Risk:** Any bug or failure can bring down the entire system.
+- **Technical Debt:** Over time, the monolithic architecture may require re-architecture as user demand grows.
+
+### **Option 2: Microservices Architecture**
+
+**Overview:**  
+Developing a ride-sharing mobile application using the **MERN-M stack with microservices architecture** allows for better scalability and resilience. Each microservice is developed and deployed independently, making it easier to manage and scale the application. However, it comes with a higher upfront cost and operational complexity.
+
+#### **Benefits:**
+- **High Scalability:** Each service can scale independently, making it more cost-efficient and flexible in the long run.
+- **Resilience:** Failures in one service do not affect the entire system, improving uptime and fault tolerance.
+- **Team Autonomy:** Independent services allow teams to develop, test, and deploy new features faster once the architecture is set up.
+- **Future-Proofing:** Easier to add new services or features without impacting the rest of the system.
+
+#### **Drawbacks:**
+- **Higher Initial Costs:** Requires more advanced infrastructure (e.g., Docker, Kubernetes) and specialized tools for orchestration.
+- **Longer Development Time:** More time is needed to set up the architecture and handle service communication, making it slower to bring to market.
+- **Increased Complexity:** Managing multiple services requires more complex operational processes, such as inter-service communication, debugging, and security.
+- **Operational Overhead:** Monitoring, logging, and securing each service independently adds additional costs and complexity.
 
 ## Recommendation
 We will focus on **MVP 1**, which is a working backend with a skeleton frontend, and aim to finish it by the end of January. Once **MVP 1** is complete, we aim to finish **MVP 2** by the end of February, which is a finished frontend with user testing once complete we will submit it to the AppStone and AndroidStore. Finally, for **MVP 3**, we will aim to **publish** the application on both iOS and Android stores, allowing for public access to the application.
