@@ -34,7 +34,11 @@ The biggest problem in the ride-sharing market is the current monopoly that Uber
 Fleet will allow the driver to set their own rate while driving for longer or shorter distances. It will allow the driver to receive at least 95% of the fare while Fleet only keeps what it needs to facilitate the rides. Customers know they are getting a more ethical solution where the driver is making the majority of the fare price. Finally, customers will have the opportunity to request a desired driver, allowing them to create relationships for long-term service.
 
 ## Options
-Create a ride-sharing mobile application that can be on both iOS and Android. We would use the MERN-M tech stack in accordance with REST standards due to its features and the experience our team has with the stack. This will be a mobile application; React Native allows for both iOS and Android compatibility.
+**Option 1:**  
+Create a ride-sharing mobile application that can be on both iOS and Android. We would use the MERN-M tech stack in accordance with REST standards due to its features and the experience our team has with the stack. This will be a mobile application built using monolithic architecture; React Native allows for both iOS and Android compatibility.
+
+**Option 2:**  
+Create a ride-sharing mobile application that can be on both iOS and Android. We would use the MERN-M tech stack in accordance with REST standards due to its features and the experience our team has with the stack. This will be a mobile application built using microservices architecture; React Native allows for both iOS and Android compatibility.
 
 ## Cost-Benefit Analysis
 **Option 1:**  
