@@ -2,20 +2,16 @@
 A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoDB**, featuring driver-driven pricing. Hosted on DigitalOcean.
 
 ### Functional Requirements
-- User registration (drivers and riders).
-- Profile management for users.
-- Ride request and booking system.
-- Driver sets pricing for rides.
-- Payment processing between riders and drivers.
-- Performance adjustments based on the number of concurrent users and query load.
-
-### Non-Functional Requirements
-- High performance for concurrent users.
-- Secure data transmission and storage.
-- User-friendly interface.
-- **Performance Tuning**: Maintain a system where CPU usage does not exceed 50%, even with a high number of queries per minute, as shown in the load distribution for 100, 500, 1000, and 5000 users.
+- User-friendly interface. (A non first time user, will be able to book a ride within 3 clicks)
+- User registration for drivers and riders. (Collecting 0% metadata) 
+- Profile management for users. (Changing passwords, and payment methods)
+- Ride request and booking system. (Rebook previous drivers)
+- Driver sets pricing for rides. (No limit on prices set)
+- Payment processing between riders and drivers. (Credit/Debit card)
+- Performance adjustments based on the number of concurrent users and query load. (Listed below)
 
 ### Technical Requirements
+- Secure data transmission and storage by using SSL in 100% of our calls.
 - **Front-End:** React Native
 - **Back-End:** Node.js
 - **Database:** MongoDB
@@ -25,6 +21,7 @@ A ride-sharing application utilizing **React Native**, **Node.js**, and **MongoD
     - **500 Users:** 12 queries per user per minute (6000 total queries per minute).
     - **1000 Users:** 6 queries per user per minute (6000 total queries per minute).
     - **5000 Users:** 1.2 queries per user per minute (6000 total queries per minute).
+- **Performance Tuning**: Maintain a system where CPU usage does not exceed 50%, even with a high number of queries per minute, as shown in the load distribution for 100, 500, 1000, and 5000 users.
 
 ### Infrastructure Costs: Monolithic vs. Microservices
 
