@@ -59,6 +59,9 @@ Developing a ride-sharing mobile application using the **MERN-M stack with monol
 - **Downtime Risk:** Any bug or failure can bring down the entire system.
 - **Technical Debt:** Over time, the monolithic architecture may require re-architecture as user demand grows.
 
+#### **Estimated Cost:**
+- **Cost Range**: $200 - $600/month
+
 ### **Option 2: Microservices Architecture**
 
 **Overview:**  
@@ -75,6 +78,9 @@ Developing a ride-sharing mobile application using the **MERN-M stack with micro
 - **Longer Development Time:** More time is needed to set up the architecture and handle service communication, making it slower to bring to market.
 - **Increased Complexity:** Managing multiple services requires more complex operational processes, such as inter-service communication, debugging, and security.
 - **Operational Overhead:** Monitoring, logging, and securing each service independently adds additional costs and complexity.
+
+#### **Estimated Cost:**
+- **Cost Range**: $300 - $1000/month
 
 ## Recommendation
 
