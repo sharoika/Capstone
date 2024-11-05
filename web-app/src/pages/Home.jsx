@@ -1,11 +1,9 @@
 import React from 'react';
-import Header from '../components/Header';
 import backgroundImage from '../assets/home.png';
 
 const Home = () => {
     return (
         <>
-            <Header />
             <div className="image-section d-none d-md-block"
                 style={{
                     backgroundImage: `url(${backgroundImage})`,
