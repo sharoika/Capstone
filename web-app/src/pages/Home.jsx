@@ -1,16 +1,15 @@
 import React from 'react';
 import Navbar from '../components/Header'; 
 import homeImage from '../assets/home.jpg';
-import driverImage from '../assets/driver.jpg';
 import riderImage from '../assets/rider.jpg';
 import './Home.css';
 
 const Home = () => {
     return (
         <>
-            <Navbar /> {/* Navbar is shown at the top of the Home component */}
+            <Navbar />
             <div className="home-page">
-                {/* Sections for Home, Drivers, and Riders */}
+                {/* Home Section */}
                 <div id="home" className="home-section d-flex align-items-center" style={{ height: '92vh' }}>
                     <div className="container">
                         <div className="row align-items-center h-100">
@@ -26,17 +25,34 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Drivers Section */}
+                {/* Drivers Section with 3 Benefit Cards */}
                 <div id="drivers" className="drivers-section d-flex align-items-center" style={{ height: '92vh' }}>
                     <div className="container">
-                        <div className="row align-items-center h-100">
-                            <div className="col-md-6 text-section">
-                                <h1 className="display-1 font-weight-bold mb-4">Drivers</h1>
-                                <p className="lead mb-4">Join Fleet as a driver and be part of a fair and reliable ride-share experience. Earn more with flexible hours and a supportive community.</p>
-                                <a href="/apply" className="btn btn-primary btn-lg px-5 py-3" style={{ borderRadius: '30px' }}>Apply Now</a>
+                        <h1 className="display-1 font-weight-bold text-center mb-5">Why Drive with Us?</h1>
+                        <div className="row">
+                            <div className="col-md-4 mb-4">
+                                <div className="card h-100 shadow-sm">
+                                    <div className="card-body text-center">
+                                        <h5 className="card-title font-weight-bold">Flexible Hours</h5>
+                                        <p className="card-text">Work when you want, with the flexibility to choose your own schedule. Drive part-time, full-time, or whenever you’re available.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="col-md-6 image-section d-none d-md-block">
-                                <img src={driverImage} alt="Driver" className="img-fluid rounded" style={{ maxHeight: '80vh', objectFit: 'cover' }} />
+                            <div className="col-md-4 mb-4">
+                                <div className="card h-100 shadow-sm">
+                                    <div className="card-body text-center">
+                                        <h5 className="card-title font-weight-bold">Competitive Earnings</h5>
+                                        <p className="card-text">Earn more with competitive rates and incentives. Your hard work deserves fair compensation, with bonus opportunities available.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-4 mb-4">
+                                <div className="card h-100 shadow-sm">
+                                    <div className="card-body text-center">
+                                        <h5 className="card-title font-weight-bold">Supportive Community</h5>
+                                        <p className="card-text">Join a community of supportive drivers and a company that values your feedback. We’re here to support you on and off the road.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -61,3 +61,23 @@
         padding: 10px 0;
     }
 }
+
+.drivers-section {
+    background-color: #ffffff;
+    padding: 2rem 1rem;
+}
+
+.card-title {
+    color: #007bff; /* Example primary color for card titles */
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Adds a hover effect */
+}
+
