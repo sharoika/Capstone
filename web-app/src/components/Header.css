@@ -1,0 +1,42 @@
+
+/* Default state for desktop */
+.navbar-collapse {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    max-height: none; /* Remove max-height on desktop */
+    transition: none; /* No animation on desktop */
+  }
+  
+  /* Mobile-specific styles */
+  @media (max-width: 991px) {
+    .navbar-collapse {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s ease-out;
+        display: block;
+        flex-direction: column;
+    }
+  
+    /* When menu is open on mobile */
+    .navbar-collapse.slide-down {
+        max-height: 200px; /* Adjust this height based on content */
+    }
+  
+    /* When menu is closed on mobile */
+    .navbar-collapse.slide-up {
+        max-height: 0;
+    }
+  
+    /* Center navbar items in mobile view */
+    .navbar-nav {
+        text-align: center;
+        flex-direction: column;
+    }
+  
+    .nav-item {
+        width: 100%;
+    }
+  }

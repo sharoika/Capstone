@@ -1,0 +1,50 @@
+.home-page {
+    background-color: #f8f9fa; /* Light background color */
+    padding: 2rem 1rem; /* Add some padding to the overall container */
+}
+
+.text-section {
+    padding-right: 4rem; /* Increased padding to the right of the text section */
+}
+
+.text-section h1 {
+    color: #000;
+    font-size: 3.5rem; /* Slightly larger font size for the main title */
+    margin-bottom: 1rem; /* Add space below the title */
+}
+
+.text-section p {
+    font-size: 1.5rem; /* Increased font size for better readability */
+    color: #333;
+    padding: 10px 0 20px 0; /* Adds padding above and below the text */
+    line-height: 1.6; /* Improve readability with more line spacing */
+}
+
+.image-section img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds subtle shadow */
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+    /* Slightly reduce the right padding on medium-sized screens */
+    .text-section {
+        padding-right: 2rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .text-section {
+        padding-right: 0; /* Remove padding on mobile for a cleaner stack */
+    }
+
+    .text-section h1 {
+        font-size: 2.5rem; /* Adjust font size for mobile */
+    }
+
+    .text-section p {
+        font-size: 1.25rem;
+        padding: 10px 0; /* Slightly smaller padding on mobile */
+    }
+}

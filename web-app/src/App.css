@@ -36,3 +36,39 @@
     transform: rotate(360deg);
   }
 }
+
+.home-page .btn-primary {
+  background-color: #007bff;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.home-page .btn-primary:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .home-page h1 {
+      font-size: 3rem; /* Adjust font size on smaller screens */
+  }
+  
+  .home-page p {
+      font-size: 1.25rem;
+  }
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* For specific elements */
+.home-page h1 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700; /* Bold for h1 */
+}
+
+.home-page p {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; /* Normal weight for paragraphs */
+}
