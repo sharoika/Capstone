@@ -2,6 +2,9 @@ import React from 'react';
 import Navbar from '../components/Header'; 
 import homeImage from '../assets/home.jpg';
 import riderImage from '../assets/rider.jpg';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Import Bootstrap JS
+
 import './Home.css';
 
 const Home = () => {
@@ -60,15 +63,42 @@ const Home = () => {
 
                 {/* Riders Section */}
                 <div id="riders" className="riders-section d-flex align-items-center" style={{ height: '92vh' }}>
-                    <div className="container">
+                    <div className="container" style={{ backgroundColor: '#f8f9fa', padding: '2rem' }}>
                         <div className="row align-items-center h-100">
-                            <div className="col-md-6 text-section">
+                            <div className="col-md-12 image-section d-none d-md-block text-center">
                                 <h1 className="display-1 font-weight-bold mb-4">Riders</h1>
-                                <p className="lead mb-4">Discover a new way to travel with Fleet. Affordable, reliable, and safe rides whenever you need them.</p>
-                                <a href="/signup" className="btn btn-primary btn-lg px-5 py-3" style={{ borderRadius: '30px' }}>Join as a Rider</a>
+                                <img
+                                    src={riderImage}
+                                    alt="Rider experience"
+                                    className="img-fluid rounded"
+                                    style={{ maxHeight: '80vh', objectFit: 'cover' }}
+                                />
                             </div>
-                            <div className="col-md-6 image-section d-none d-md-block">
-                                <img src={riderImage} alt="Rider experience" className="img-fluid rounded" style={{ maxHeight: '80vh', objectFit: 'cover' }} />
+                            <div className="col-md-12 text-section text-center">
+                                <div id="carouselExampleSlidesOnly" className="carousel slide" data-bs-ride="carousel">
+                                    <div className="carousel-inner text-center">
+                                        <div className="carousel-item active text-center">
+                                            <p className="lead mb-4 ml-4">Discover a new way to travel with Fleet. Affordable, reliable, and safe rides whenever you need them.</p>
+                                        </div>
+                                        <div className="carousel-item text-center">
+                                            <p className="lead mb-4 ml-4">Enjoy a customized experience where you are in control.</p>
+                                        </div>
+                                        <div className="carousel-item text-center">
+                                            <p className="lead mb-4 ml-4">Have peace of mind that your driver is getting paid a fair wage.</p>
+                                        </div>
+                                    </div>
+                                    <a className="carousel-control-prev" href="#carouselExampleSlidesOnly" role="button" data-bs-slide="prev">
+                                        <span className="carousel-control-prev-icon mt-5" style={{ filter: 'invert(1)' }} aria-hidden="true"></span>
+                                    </a>
+                                    <a className="carousel-control-next" href="#carouselExampleSlidesOnly" role="button" data-bs-slide="next">
+                                        <span className="carousel-control-next-icon mt-5" style={{ filter: 'invert(1)' }} aria-hidden="true"></span>
+                                    </a>
+                                </div>
+                                <div className="d-flex justify-content-center mt-4">
+                                    <a href="/signup" className="btn btn-outline-primary btn-lg px-5 py-3" style={{ borderRadius: '30px' }}>
+                                        Join as a Rider
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
