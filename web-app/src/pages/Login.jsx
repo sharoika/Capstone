@@ -18,8 +18,10 @@ const Login = () => {
 
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, loginData, {
-                withCredentials: false,  // Include credentials (cookies)
-            });
+                headers: {
+                  Authorization: localStorage.getItem("token"),
+                },
+              });
 
             const data = response.data;
 
