@@ -8,6 +8,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Import Bootstrap JS
 import './Home.css';
 
 const Home = () => {
+
+    console.log(process.env.REACT_APP_API_URL);
+
     return (
         <>
             <Navbar />
