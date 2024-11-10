@@ -12,7 +12,7 @@ const cors = require('cors');
 app.use(express.json());
 
 const corsOptions = {
-    origin: ['https://ridefleet.ca', 'http://localhost:3000'],  // Frontend domains
+    origin: ['https://ridefleet.ca', 'http://ridefleet.ca', 'http://localhost:3000'],  // Frontend domains
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // HTTP methods
     credentials: true,  // Allow cookies/credentials
 };
@@ -26,7 +26,10 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { httpOnly: true }
+    cookie: {
+        httpOnly: true, // Keeps the cookie safe from JavaScript access
+        secure: process.env.NODE_ENV === 'production' // Ensures secure cookies only in production
+    }
 }));
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
