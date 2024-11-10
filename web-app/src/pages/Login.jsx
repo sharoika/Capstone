@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
 
 const Login = () => {
@@ -16,18 +17,14 @@ const Login = () => {
         };
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(loginData),
-                credentials: 'include',  // Ensure cookies are sent with the request (if necessary)
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, loginData, {
+                withCredentials: true,  // Include credentials (cookies)
             });
 
-            const data = await response.json();
+            const data = response.data;
 
-            if (response.ok) {
+            console.log(response);
+            if (response.status == 200) {
                 console.log('Login successful:', data);
                 // Store the token in localStorage
                 localStorage.setItem('token', data.token);
