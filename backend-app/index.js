@@ -12,12 +12,11 @@ const cors = require('cors');
 app.use(express.json());
 
 const corsOptions = {
-    origin: ['https://ridefleet.ca', 'http://ridefleet.ca', 'http://localhost:3000'],  // Frontend domains
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // HTTP methods
-    credentials: true,  // Allow cookies/credentials
+    origin: ['https://ridefleet.ca', 'http://ridefleet.ca', 'http://localhost:3000'],  // List of allowed origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,  // Allow cookies and credentials
 };
 
-app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 
 app.use(express.json());
