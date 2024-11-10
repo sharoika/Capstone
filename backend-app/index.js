@@ -11,11 +11,16 @@ const cors = require('cors');
 
 app.use(express.json());
 
-app.use(cors({
-    origin: '*',  // Allow requests from any origin
-    credentials: true,  // Allow cookies/credentials to be included in requests
-}));
+const corsOptions = {
+    origin: function (origin, callback) {
+      // Allow any origin (you can restrict this to a list of trusted origins if needed)
+      callback(null, true);  // This allows all origins
+    },
+    credentials: true,  // Allow credentials (cookies, headers)
+  };
 
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
