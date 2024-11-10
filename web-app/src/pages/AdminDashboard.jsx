@@ -22,6 +22,7 @@ const AdminDashboard = () => {
                     },
                 });
 
+
                 console.log(response.data); // Log the fetched users
                 setUsers(response.data); // Update the users state with the fetched data
             } catch (error) {
