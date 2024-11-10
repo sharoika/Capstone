@@ -12,15 +12,12 @@ const cors = require('cors');
 app.use(express.json());
 
 const corsOptions = {
-    origin: function (origin, callback) {
-      // Allow any origin (you can restrict this to a list of trusted origins if needed)
-      callback(null, true);  // This allows all origins
-    },
-    credentials: true,  // Allow credentials (cookies, headers)
+    origin: ['https://ridefleet.ca', 'http://localhost:3000'],  // Allow these domains
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allowed HTTP methods
+    credentials: true,  // Allow cookies or authentication headers (optional, only if needed)
   };
-
-  app.use(cors(corsOptions));
-  app.options('*', cors(corsOptions));
+  
+app.use(cors(corsOptions));
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
