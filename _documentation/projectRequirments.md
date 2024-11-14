@@ -55,4 +55,6 @@ To ensure optimal performance, the application must be designed to handle a vary
 - For 1000 users, each user should query every **10 seconds**.
 - For 5000 users, each user should query every **50 seconds**.
 
+### Potential Obstacles 
+- Getting GPS working within the time frame may be tricky due to our inexperience and knowledge with GPS services 
 This setup will ensure the application remains responsive while meeting both performance and efficiency targets.
