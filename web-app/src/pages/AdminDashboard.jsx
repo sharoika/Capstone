@@ -41,7 +41,7 @@ const AdminDashboard = () => {
             ) : (
                 <ul>
                     {users.map((user) => (
-                        <li key={user._id}>{user.username}</li>
+                        <li key={user._id}>{user.first_name} {user.last_name}</li>
                     ))}
                 </ul>
             )}

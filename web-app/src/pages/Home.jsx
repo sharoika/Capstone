@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from '../components/Header'; 
 import homeImage from '../assets/home.jpg';
-import riderImage from '../assets/rider.jpg';
+import riderImage from '../assets/newRider.jpg';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Import Bootstrap JS
 
@@ -63,41 +63,42 @@ const Home = () => {
                         </div>
                     </div>
                 </div>
-
                 {/* Riders Section */}
-                <div id="riders" className="riders-section d-flex align-items-center" style={{ height: '92vh' }}>
-                    <div className="container" style={{ backgroundColor: '#f8f9fa', padding: '2rem' }}>
-                        <div className="row align-items-center h-100">
-                            <div className="col-md-12 image-section d-none d-md-block text-center">
-                                <h1 className="display-1 font-weight-bold mb-4">Riders</h1>
+                <div id="riders" className="riders-section" style={{ backgroundColor: '#f8f9fa', padding: '4rem 0' }}>
+                    <div className="container" style={{ minHeight: '80vh' }}>
+                        <h1 className="display-4 font-weight-bold text-center mb-4">Riders</h1>
+                        <div className="row align-items-center">
+                            {/* Image Section */}
+                            <div className="col-lg-6 d-flex justify-content-center mb-4">
                                 <img
                                     src={riderImage}
                                     alt="Rider experience"
                                     className="img-fluid rounded"
-                                    style={{ maxHeight: '80vh', objectFit: 'cover' }}
+                                    style={{ maxWidth: '100%', maxHeight: '60vh', objectFit: 'cover' }}
                                 />
                             </div>
-                            <div className="col-md-12 text-section text-center">
+                            {/* Text Section with Carousel */}
+                            <div className="col-lg-6 text-center">
                                 <div id="carouselExampleSlidesOnly" className="carousel slide" data-bs-ride="carousel">
-                                    <div className="carousel-inner text-center">
-                                        <div className="carousel-item active text-center">
-                                            <p className="lead mb-4 ml-4">Discover a new way to travel with Fleet. Affordable, reliable, and safe rides whenever you need them.</p>
+                                    <div className="carousel-inner">
+                                        <div className="carousel-item active">
+                                            <p className="lead mb-4">Discover a new way to travel with Fleet. Affordable, reliable, and safe rides whenever you need them.</p>
                                         </div>
-                                        <div className="carousel-item text-center">
-                                            <p className="lead mb-4 ml-4">Enjoy a customized experience where you are in control.</p>
+                                        <div className="carousel-item">
+                                            <p className="lead mb-4">Enjoy a customized experience where you are in control.</p>
                                         </div>
-                                        <div className="carousel-item text-center">
-                                            <p className="lead mb-4 ml-4">Have peace of mind that your driver is getting paid a fair wage.</p>
+                                        <div className="carousel-item">
+                                            <p className="lead mb-4">Have peace of mind that your driver is getting paid a fair wage.</p>
                                         </div>
                                     </div>
-                                    <a className="carousel-control-prev" href="#carouselExampleSlidesOnly" role="button" data-bs-slide="prev">
-                                        <span className="carousel-control-prev-icon mt-5" style={{ filter: 'invert(1)' }} aria-hidden="true"></span>
-                                    </a>
-                                    <a className="carousel-control-next" href="#carouselExampleSlidesOnly" role="button" data-bs-slide="next">
-                                        <span className="carousel-control-next-icon mt-5" style={{ filter: 'invert(1)' }} aria-hidden="true"></span>
-                                    </a>
+                                    <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleSlidesOnly" data-bs-slide="prev">
+                                        <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    </button>
+                                    <button className="carousel-control-next" type="button" data-bs-target="#carouselExampleSlidesOnly" data-bs-slide="next">
+                                        <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                    </button>
                                 </div>
-                                <div className="d-flex justify-content-center mt-4">
+                                <div className="mt-4">
                                     <a href="/signup" className="btn btn-outline-primary btn-lg px-5 py-3" style={{ borderRadius: '30px' }}>
                                         Join as a Rider
                                     </a>

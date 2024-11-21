@@ -30,4 +30,32 @@ router.post('/login', async (req, res) => {
     res.json({ message: 'Login successful', token });
 });
 
+
+router.post('/register', async (req, res) => {
+    const { first_name, last_name, email, password, phone, address } = req.body;
+  
+    try {
+      // Hash the password for security
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Create a new user with the updated fields
+      const newUser = new User({
+        first_name,
+        last_name,
+        email,
+        password: hashedPassword, // Store the hashed password
+        phone,
+        address
+      });
+  
+      // Save the user to the database
+      await newUser.save();
+  
+      res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        console.error('Error during registration:', error.response?.data || error.message);
+        setError(error.response?.data?.message || 'An error occurred while registering.');
+    }
+    
+  });
 module.exports = router;
