@@ -48,7 +48,7 @@ const Home = () => {
                                 <div className="card h-100 shadow-sm">
                                     <div className="card-body text-center">
                                         <h5 className="card-title font-weight-bold">Competitive Earnings</h5>
-                                        <p className="card-text">Earn more with competitive rates and incentives. Your hard work deserves fair compensation, with bonus opportunities available.</p>
+                                        <p className="card-text">Earn more with competitive rates and incentives. Your hard work deserves fair compensation.</p>
                                     </div>
                                 </div>
                             </div>
