@@ -14,6 +14,39 @@ router.get('/users', authenticate, async (req, res) => {
     res.json(users);
 });
 
+router.get('/drivers', authenticate, async (req, res) => {
+    try {
+        const drivers = await Driver.find(); // Fetch all drivers from the Drivers table
+        res.json(drivers); // Send the drivers as a JSON response
+    } catch (error) {
+        console.error('Error fetching drivers:', error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Approve or reject a driver
+router.put('/drivers/:id/approval', authenticate, async (req, res) => {
+    const { id } = req.params; // Driver ID from URL params
+    const { approve } = req.body; // `approve` should be true or false
+
+    try {
+        // Find the driver by ID
+        const driver = await Driver.findById(id);
+        if (!driver) {
+            return res.status(404).json({ message: 'Driver not found' });
+        }
+
+        // Update the approval status
+        driver.applicationApproved = approve;
+        await driver.save();
+
+        res.json({ message: `Driver ${approve ? 'approved' : 'rejected'} successfully`, driver });
+    } catch (error) {
+        console.error('Error updating driver approval:', error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const admin = await Admin.findOne({ username });

@@ -24,7 +24,7 @@ const Login = () => {
             const data = response.data;
 
             console.log(response);
-            if (response.status == 200) {
+            if (response.status === 200) {
                 console.log('Login successful:', data);
                 // Store the token in localStorage
                 localStorage.setItem('token', data.token);
