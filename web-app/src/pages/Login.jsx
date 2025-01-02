@@ -1,62 +1,70 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate(); // Use useNavigate for redirection
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        const loginData = {
-            username: username, // Get the value from the input field
-            password: password, // Get the value from the input field
-        };
+        const loginData = { username, password };
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, loginData, {
-                withCredentials: false,  // Include credentials (cookies)
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/auth/login`,
+                loginData
+            );
 
             const data = response.data;
 
-            console.log(response);
             if (response.status === 200) {
-                console.log('Login successful:', data);
-                // Store the token in localStorage
                 localStorage.setItem('token', data.token);
-                // Redirect to the admin dashboard
-                navigate('/admin-dashboard');  // Use navigate() instead of history.push()
+                navigate('/admin-dashboard');
             } else {
-                console.error('Login failed:', data.message);
-                setError(data.message); // Show error if login failed
+                setError(data.message);
             }
         } catch (error) {
-            console.error('Error during login:', error);
-            setError('An error occurred while logging in.');
+            setError('An error occurred while logging in. Please try again.');
         }
     };
 
     return (
-        <div>
-            <h2>Admin Login</h2>
-            <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-            <button onClick={handleLogin}>Login</button>
-            {error && <div>{error}</div>}
+        <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+            <div className="card p-4 shadow" style={{ maxWidth: '400px', width: '100%' }}>
+                <h3 className="text-center mb-4">Admin Login</h3>
+                {error && <div className="alert alert-danger text-center" role="alert">{error}</div>}
+                <form onSubmit={handleLogin}>
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            className="form-control"
+                            placeholder="Enter your username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            className="form-control"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary w-100">Login</button>
+                </form>
+            </div>
         </div>
     );
 };
