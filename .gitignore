@@ -1,4 +1,5 @@
 
 /backend-app/node_modules
+mobile-app/Fleet/.env
 web-app/.env
 backend-app/.env
