@@ -3,11 +3,23 @@ import React, { useState } from 'react';
 import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+
+const saveToStorage = async (key: string, value: string) => {
+  if (Platform.OS === 'web') {
+    await AsyncStorage.setItem(key, value); // Use AsyncStorage for web
+  } else {
+    await SecureStore.setItemAsync(key, value); // Use SecureStore for native platforms
+  }
+};
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
 
   const handleLogin = async () => {
     // Basic validation
@@ -15,23 +27,26 @@ export default function LoginScreen() {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
     }
-
+  
     try {
       console.log('Email:', email, 'Password:', password);
-      const response = await axios.post(`http://ridefleet.ca/api/auth/login`, {
-        username: email,
+      const response = await axios.post(`http://localhost:5000/api/auth/rider/login`, {
+        email: email,
         password: password,
       });
-
+  
       console.log(response.data);
-      const { token, message } = response.data;
-
-      if (token) {
-        // Save token to localStorage or SecureStore if needed
+      const { token, user, message } = response.data;
+      if (token && user?.objectId) {
+        // Navigate first
+        router.push('/(tabs)/driverSelection');
         Alert.alert('Success', message);
-
-        // Navigate to home screen
-        
+      
+        // Save token and objectId asynchronously
+        await Promise.all([
+          saveToStorage('userToken', token),
+          saveToStorage('userObjectId', user.objectId),
+        ]);
       } else {
         Alert.alert('Error', 'Login failed. Please try again.');
       }
@@ -39,7 +54,6 @@ export default function LoginScreen() {
       console.error('Error during login:', error);
       Alert.alert('Error', 'Invalid email or password.');
     }
-    router.push('/(tabs)/home');
   };
 
   const handleRegister = () => {

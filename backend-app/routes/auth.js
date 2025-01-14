@@ -132,34 +132,43 @@ router.post('/rider/register', async (req, res) => {
 
 // Rider Login
 router.post('/rider/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-      // Find rider by email
+    const { email, password } = req.body;
+  
+    try {
+      // Find the rider by email
       const rider = await Rider.findOne({ email });
       if (!rider) {
-          return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(401).json({ message: 'Invalid email or password.' });
       }
-
-      // Compare passwords
-      const isPasswordValid = await bcrypt.compare(password, rider.password);
-      if (!isPasswordValid) {
-          return res.status(401).json({ message: 'Invalid credentials' });
+  
+      // Compare the provided password with the stored hashed password
+      const isMatch = await bcrypt.compare(password, rider.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid email or password.' });
       }
-
-      // Generate a token
+  
+      // Generate a JWT token
       const token = jwt.sign(
-          { id: rider._id, email: rider.email },
-          process.env.JWT_SECRET,
-          { expiresIn: '24h' }
+        { id: rider._id, email: rider.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
       );
-
-      res.json({ message: 'Login successful', token });
-  } catch (error) {
-      console.error('Error during rider login:', error.message);
-      res.status(500).json({ message: 'Server error' });
-  }
-});
+  
+      // Send back the token, user info, and success message
+      return res.status(200).json({
+        token,
+        user: {
+          objectId: rider._id, // MongoDB ObjectId
+          email: rider.email,
+          name: rider.name, // Include any other necessary fields
+        },
+        message: 'Login successful',
+      });
+    } catch (error) {
+      console.error('Error during login:', error.message);
+      return res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+  });
 
 // Driver Registration
 router.post('/driver/register', async (req, res) => {

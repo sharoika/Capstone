@@ -1,4 +1,3 @@
-// app/(auth)/register.tsx
 import React, { useState } from 'react';
 import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -6,12 +5,12 @@ import { useRouter } from 'expo-router';
 export default function RegisterScreen() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     phone: '',
-    address: '',
+    homeLocation: '',
   });
 
   const handleInputChange = (name: string, value: string) => {
@@ -19,27 +18,27 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
-    const { first_name, last_name, email, password, phone, address } = formData;
+    const { firstName, lastName, email, password, phone, homeLocation } = formData;
 
     // Basic validation
-    if (!first_name || !last_name || !email || !password) {
+    if (!firstName || !lastName || !email || !password) {
       Alert.alert('Error', 'Please fill out all required fields.');
       return;
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
+      const response = await fetch(`http://localhost:5000/api/auth/rider/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          first_name,
-          last_name,
+          firstName,
+          lastName,
           email,
-          password,
           phone,
-          address,
+          password,
+          homeLocation,
         }),
       });
 
@@ -51,25 +50,26 @@ export default function RegisterScreen() {
       const responseData = await response.json();
       Alert.alert('Success', responseData.message);
       router.push('/(auth)/login'); // Navigate to login screen after successful registration
-    } catch (error) {
-      console.error('Error during registration:', error);
+    } catch (error: any) {
+      console.error('Error during registration:', error.message);
+      Alert.alert('Error', error.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Rider Registration</Text>
       <TextInput
         style={styles.input}
         placeholder="First Name"
-        value={formData.first_name}
-        onChangeText={(value) => handleInputChange('first_name', value)}
+        value={formData.firstName}
+        onChangeText={(value) => handleInputChange('firstName', value)}
       />
       <TextInput
         style={styles.input}
         placeholder="Last Name"
-        value={formData.last_name}
-        onChangeText={(value) => handleInputChange('last_name', value)}
+        value={formData.lastName}
+        onChangeText={(value) => handleInputChange('lastName', value)}
       />
       <TextInput
         style={styles.input}
@@ -95,9 +95,9 @@ export default function RegisterScreen() {
       />
       <TextInput
         style={styles.input}
-        placeholder="Address (optional)"
-        value={formData.address}
-        onChangeText={(value) => handleInputChange('address', value)}
+        placeholder="Home Location (optional)"
+        value={formData.homeLocation}
+        onChangeText={(value) => handleInputChange('homeLocation', value)}
       />
       <Button title="Register" onPress={handleRegister} />
     </View>
