@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
+import { FaUser, FaLock } from 'react-icons/fa';
+import './Login.css';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -33,40 +36,51 @@ const Login = () => {
     };
 
     return (
-        <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-            <div className="card p-4 shadow" style={{ maxWidth: '400px', width: '100%' }}>
-                <h3 className="text-center mb-4">Admin Login</h3>
-                {error && <div className="alert alert-danger text-center" role="alert">{error}</div>}
-                <form onSubmit={handleLogin}>
-                    <div className="mb-3">
-                        <label htmlFor="username" className="form-label">Username</label>
-                        <input
-                            type="text"
-                            id="username"
-                            className="form-control"
-                            placeholder="Enter your username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="password" className="form-label">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            className="form-control"
-                            placeholder="Enter your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="btn btn-primary w-100">Login</button>
-                </form>
-            </div>
-        </div>
+        <Container fluid className="login-container d-flex justify-content-center align-items-center">
+            <Card className="login-card">
+                <Card.Body>
+                    <h2 className="text-center mb-4">Admin Login</h2>
+                    {error && <Alert variant="danger">{error}</Alert>}
+                    <Form onSubmit={handleLogin}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Username</Form.Label>
+                            <div className="input-group">
+                                <span className="input-group-text">
+                                    <FaUser />
+                                </span>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter your username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Password</Form.Label>
+                            <div className="input-group">
+                                <span className="input-group-text">
+                                    <FaLock />
+                                </span>
+                                <Form.Control
+                                    type="password"
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </Form.Group>
+                        <Button variant="primary" type="submit" className="w-100">
+                            Login
+                        </Button>
+                    </Form>
+                </Card.Body>
+            </Card>
+        </Container>
     );
 };
 
 export default Login;
+

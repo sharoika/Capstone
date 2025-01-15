@@ -1,0 +1,75 @@
+.admin-dashboard {
+    padding: 2rem 0;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-title {
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.dashboard-card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.dashboard-card .card-header {
+    font-weight: 600;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f1f3f5;
+}
+
+.form-select {
+    font-weight: 600;
+}
+
+.form-select option {
+    font-weight: normal;
+}
+
+.user-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.user-list li {
+    flex: 1 1 calc(25% - 0.5rem);
+    min-width: 150px;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .user-list li {
+        flex-basis: calc(50% - 0.5rem);
+    }
+}
+
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+

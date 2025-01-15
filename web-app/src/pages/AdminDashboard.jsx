@@ -1,29 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Container, Row, Col, Card, Table, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-    const [users, setUsers] = useState([]); // State to store fetched users
-    const [drivers, setDrivers] = useState([]); // State to store fetched drivers
+    const [users, setUsers] = useState([]);
+    const [drivers, setDrivers] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const token = localStorage.getItem('token'); // Get token from localStorage
-
+                const token = localStorage.getItem('token');
                 if (!token) {
                     throw new Error('No authentication token found');
                 }
-
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/users`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Pass token in Authorization header
+                        'Authorization': `Bearer ${token}`,
                     },
                 });
-
-                setUsers(response.data); // Update the users state with the fetched data
+                setUsers(response.data);
             } catch (error) {
                 console.error('Error fetching users:', error);
             }
@@ -31,43 +30,37 @@ const AdminDashboard = () => {
 
         const fetchDrivers = async () => {
             try {
-                const token = localStorage.getItem('token'); // Get token from localStorage
-
+                const token = localStorage.getItem('token');
                 if (!token) {
                     throw new Error('No authentication token found');
                 }
-
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/drivers`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Pass token in Authorization header
+                        'Authorization': `Bearer ${token}`,
                     },
                 });
-
-                setDrivers(response.data); // Update the drivers state with the fetched data
+                setDrivers(response.data);
             } catch (error) {
                 console.error('Error fetching drivers:', error);
             }
         };
 
-        fetchUsers(); // Fetch users
-        fetchDrivers(); // Fetch drivers
+        fetchUsers();
+        fetchDrivers();
     }, [navigate]);
 
     const handleApprovalChange = async (id, value) => {
         try {
-            const token = localStorage.getItem('token'); // Get token from localStorage
-
+            const token = localStorage.getItem('token');
             await axios.put(
                 `${process.env.REACT_APP_API_URL}/api/auth/drivers/${id}/approval`,
-                { approve: value === 'true' }, // Convert string to boolean
+                { approve: value === 'true' },
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Pass token in Authorization header
+                        'Authorization': `Bearer ${token}`,
                     },
                 }
             );
-
-            // Update the driver's approval status in the UI
             setDrivers((prevDrivers) =>
                 prevDrivers.map((driver) =>
                     driver._id === id ? { ...driver, applicationApproved: value === 'true' } : driver
@@ -79,68 +72,93 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <h2 className="text-center mb-4">Admin Dashboard</h2>
+        <div className="admin-dashboard">
+            <Container className="dashboard-container">
+                <Row className="mb-4">
+                    <Col>
+                        <h1 className="text-center dashboard-title">Admin Dashboard</h1>
+                    </Col>
+                </Row>
 
-            {/* Users Section */}
-            <section className="mb-5">
-                <h3>Users</h3>
-                {users.length === 0 ? (
-                    <p>No users found</p>
-                ) : (
-                    <ul className="list-group">
-                        {users.map((user) => (
-                            <li key={user._id} className="list-group-item">
-                                {user.first_name} {user.last_name}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </section>
+                <Row className="mb-4">
+                    <Col>
+                        <Card className="dashboard-card">
+                            <Card.Header as="h5" className="bg-primary text-white">
+                                Users
+                            </Card.Header>
+                            <Card.Body>
+                                {users.length === 0 ? (
+                                    <p>No users found</p>
+                                ) : (
+                                    <ul className="list-unstyled user-list">
+                                        {users.map((user) => (
+                                            <li key={user._id}>
+                                                <i className="fas fa-user me-2"></i>
+                                                {user.first_name} {user.last_name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
 
-            {/* Drivers Section */}
-            <section>
-                <h3>Drivers</h3>
-                {drivers.length === 0 ? (
-                    <p>No drivers found</p>
-                ) : (
-                    <table className="table table-striped table-bordered">
-                        <thead className="table-dark">
-                            <tr>
-                                <th>Driver ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Vehicle</th>
-                                <th>Application Approved</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {drivers.map((driver) => (
-                                <tr key={driver._id}>
-                                    <td>{driver.driverID}</td>
-                                    <td>{driver.firstName} {driver.lastName}</td>
-                                    <td>{driver.email}</td>
-                                    <td>{driver.phone}</td>
-                                    <td>{driver.vehicleMake} {driver.vehicleModel}</td>
-                                    <td>
-                                        <select
-                                            className="form-select"
-                                            value={driver.applicationApproved ? 'true' : 'false'}
-                                            onChange={(e) => handleApprovalChange(driver._id, e.target.value)}
-                                        >
-                                            <option value="true">True</option>
-                                            <option value="false">False</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </section>
+                <Row>
+                    <Col>
+                        <Card className="dashboard-card">
+                            <Card.Header as="h5" className="bg-success text-white">
+                                Drivers
+                            </Card.Header>
+                            <Card.Body>
+                                {drivers.length === 0 ? (
+                                    <p>No drivers found</p>
+                                ) : (
+                                    <div className="table-responsive">
+                                        <Table striped bordered hover>
+                                            <thead>
+                                                <tr>
+                                                    <th>Driver ID</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Phone</th>
+                                                    <th>Vehicle</th>
+                                                    <th>Application Approved</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {drivers.map((driver) => (
+                                                    <tr key={driver._id}>
+                                                        <td>{driver.driverID}</td>
+                                                        <td>{driver.firstName} {driver.lastName}</td>
+                                                        <td>{driver.email}</td>
+                                                        <td>{driver.phone}</td>
+                                                        <td>{driver.vehicleMake} {driver.vehicleModel}</td>
+                                                        <td>
+                                                            <Form.Select
+                                                                size="sm"
+                                                                value={driver.applicationApproved ? 'true' : 'false'}
+                                                                onChange={(e) => handleApprovalChange(driver._id, e.target.value)}
+                                                                className={driver.applicationApproved ? 'bg-success text-white' : 'bg-danger text-white'}
+                                                            >
+                                                                <option value="true">Approved</option>
+                                                                <option value="false">Not Approved</option>
+                                                            </Form.Select>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                )}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
         </div>
     );
 };
 
 export default AdminDashboard;
+
