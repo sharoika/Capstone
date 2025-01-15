@@ -1,42 +1,39 @@
+.navbar {
+  background-color: #ffffff !important;
+}
 
-/* Default state for desktop */
-.navbar-collapse {
-    display: flex !important;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 1rem;
-    max-height: none; /* Remove max-height on desktop */
-    transition: none; /* No animation on desktop */
-  }
-  
-  /* Mobile-specific styles */
-  @media (max-width: 991px) {
-    .navbar-collapse {
-        overflow: hidden;
-        max-height: 0;
-        transition: max-height 0.3s ease-out;
-        display: block;
-        flex-direction: column;
-    }
-  
-    /* When menu is open on mobile */
-    .navbar-collapse.slide-down {
-        max-height: 200px; /* Adjust this height based on content */
-    }
-  
-    /* When menu is closed on mobile */
-    .navbar-collapse.slide-up {
-        max-height: 0;
-    }
-  
-    /* Center navbar items in mobile view */
-    .navbar-nav {
-        text-align: center;
-        flex-direction: column;
-    }
-  
-    .nav-item {
-        width: 100%;
-    }
-  }
+.navbar-light .navbar-nav .nav-link {
+  color: #333333;
+}
+
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-light .navbar-nav .nav-link:focus {
+  color: #007bff;
+}
+
+.dropdown-menu {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+}
+
+.dropdown-item {
+  color: #333333;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #f8f9fa;
+  color: #16181b;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+

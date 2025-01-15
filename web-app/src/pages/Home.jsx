@@ -21,7 +21,7 @@ const Home = () => {
                             <div className="col-lg-6 text-section">
                                 <h1 className="display-3 font-weight-bold mb-4">Fleet</h1>
                                 <p className="lead mb-4">A fair ride-share alternative. Experience reliable and affordable rides with Fleet.</p>
-                                <a href="/signup" className="btn btn-primary btn-lg px-5 py-3 rounded-pill">Get Started</a>
+                                <a href="/register" className="btn btn-primary btn-lg px-5 py-3 rounded-pill">Get Started</a>
                             </div>
                             <div className="col-lg-6 image-section d-none d-lg-block">
                                 <img src={homeImage || "/placeholder.svg"} alt="Fleet" className="img-fluid rounded shadow" />
@@ -86,7 +86,7 @@ const Home = () => {
                                         </div>
                                     ))}
                                     <div className="text-center">
-                                        <a href="/signup" className="btn btn-primary rounded-pill">
+                                        <a href="/register" className="btn btn-primary rounded-pill">
                                             Join as a Rider
                                         </a>
                                     </div>
