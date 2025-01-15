@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 
 export default function RegisterScreen() {
@@ -20,7 +20,6 @@ export default function RegisterScreen() {
   const handleRegister = async () => {
     const { firstName, lastName, email, password, phone, homeLocation } = formData;
 
-    // Basic validation
     if (!firstName || !lastName || !email || !password) {
       Alert.alert('Error', 'Please fill out all required fields.');
       return;
@@ -49,7 +48,7 @@ export default function RegisterScreen() {
 
       const responseData = await response.json();
       Alert.alert('Success', responseData.message);
-      router.push('/(auth)/login'); // Navigate to login screen after successful registration
+      router.push('/(auth)/login');
     } catch (error: any) {
       console.error('Error during registration:', error.message);
       Alert.alert('Error', error.message);
@@ -57,74 +56,143 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Rider Registration</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="First Name"
-        value={formData.firstName}
-        onChangeText={(value) => handleInputChange('firstName', value)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Last Name"
-        value={formData.lastName}
-        onChangeText={(value) => handleInputChange('lastName', value)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={formData.email}
-        onChangeText={(value) => handleInputChange('email', value)}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={formData.password}
-        onChangeText={(value) => handleInputChange('password', value)}
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Phone (optional)"
-        value={formData.phone}
-        onChangeText={(value) => handleInputChange('phone', value)}
-        keyboardType="phone-pad"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Home Location (optional)"
-        value={formData.homeLocation}
-        onChangeText={(value) => handleInputChange('homeLocation', value)}
-      />
-      <Button title="Register" onPress={handleRegister} />
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Image 
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Fleet</Text>
+        </View>
+
+        <View style={styles.formContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="First Name"
+            placeholderTextColor="#8E8E93"
+            value={formData.firstName}
+            onChangeText={(value) => handleInputChange('firstName', value)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Last Name"
+            placeholderTextColor="#8E8E93"
+            value={formData.lastName}
+            onChangeText={(value) => handleInputChange('lastName', value)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#8E8E93"
+            value={formData.email}
+            onChangeText={(value) => handleInputChange('email', value)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#8E8E93"
+            value={formData.password}
+            onChangeText={(value) => handleInputChange('password', value)}
+            secureTextEntry
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Phone (optional)"
+            placeholderTextColor="#8E8E93"
+            value={formData.phone}
+            onChangeText={(value) => handleInputChange('phone', value)}
+            keyboardType="phone-pad"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Home Location (optional)"
+            placeholderTextColor="#8E8E93"
+            value={formData.homeLocation}
+            onChangeText={(value) => handleInputChange('homeLocation', value)}
+          />
+          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+            <Text style={styles.registerButtonText}>Register</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.loginText}>Already have an account?</Text>
+          <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+            <Text style={styles.loginLink}>Login</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+  },
+  header: {
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f9f9f9',
+    marginTop: 60,
+    marginBottom: 40,
+  },
+  logo: {
+    width: 48,
+    height: 48,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 28,
+    fontWeight: '600',
+    color: '#173252',
+    marginBottom: 0,
+  },
+  formContainer: {
+    width: '100%',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 20,
-    width: '100%',
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    height: 48,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    marginBottom: 16,
+    color: '#000000',
+  },
+  registerButton: {
+    backgroundColor: '#39C9C2',
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  registerButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  footer: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  loginText: {
+    fontSize: 14,
+    color: '#6D6D6D',
+    marginBottom: 8,
+  },
+  loginLink: {
+    fontSize: 16,
+    color: '#39C9C2',
+    fontWeight: '600',
   },
 });
+

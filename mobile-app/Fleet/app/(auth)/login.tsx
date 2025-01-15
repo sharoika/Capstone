@@ -1,6 +1,5 @@
-// app/(auth)/login.tsx
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
@@ -9,9 +8,9 @@ import { Platform } from 'react-native';
 
 const saveToStorage = async (key: string, value: string) => {
   if (Platform.OS === 'web') {
-    await AsyncStorage.setItem(key, value); // Use AsyncStorage for web
+    await AsyncStorage.setItem(key, value);
   } else {
-    await SecureStore.setItemAsync(key, value); // Use SecureStore for native platforms
+    await SecureStore.setItemAsync(key, value);
   }
 };
 
@@ -20,29 +19,23 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-
   const handleLogin = async () => {
-    // Basic validation
     if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
     }
   
     try {
-      console.log('Email:', email, 'Password:', password);
       const response = await axios.post(`http://localhost:5000/api/auth/rider/login`, {
-        email: email,
-        password: password,
+        email,
+        password,
       });
   
-      console.log(response.data);
       const { token, user, message } = response.data;
       if (token && user?.objectId) {
-        // Navigate first
         router.push('/(tabs)/driverSelection');
         Alert.alert('Success', message);
       
-        // Save token and objectId asynchronously
         await Promise.all([
           saveToStorage('userToken', token),
           saveToStorage('userObjectId', user.objectId),
@@ -57,31 +50,48 @@ export default function LoginScreen() {
   };
 
   const handleRegister = () => {
-    router.push('/(auth)/register'); // Navigate to the register screen
+    router.push('/(auth)/register');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <Button title="Login" onPress={handleLogin} />
-      <View style={styles.registerContainer}>
+      <View style={styles.header}>
+        <Image 
+          source={require('../../assets/images/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Fleet</Text>
+      </View>
+
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#8E8E93"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#8E8E93"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.footer}>
         <Text style={styles.registerText}>Don't have an account?</Text>
-        <Button title="Register" onPress={handleRegister} />
+        <TouchableOpacity onPress={handleRegister}>
+          <Text style={styles.registerLink}>Register</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -90,32 +100,65 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+  },
+  header: {
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f9f9f9',
+    marginTop: 80,
+    marginBottom: 60,
+  },
+  logo: {
+    width: 48,
+    height: 48,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 28,
+    fontWeight: '600',
+    color: '#173252',
+    marginBottom: 0,
+  },
+  formContainer: {
+    width: '100%',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 20,
-    width: '100%',
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    height: 48,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    marginBottom: 16,
+    color: '#000000',
   },
-  registerContainer: {
-    marginTop: 20,
+  loginButton: {
+    backgroundColor: '#39C9C2',
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 40,
+    left: 24,
+    right: 24,
     alignItems: 'center',
   },
   registerText: {
+    fontSize: 14,
+    color: '#6D6D6D',
+    marginBottom: 8,
+  },
+  registerLink: {
     fontSize: 16,
-    marginBottom: 10,
+    color: '#39C9C2',
+    fontWeight: '600',
   },
 });
