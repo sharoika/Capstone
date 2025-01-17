@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Table, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import DriversTable from '../components/DriversTable';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminDashboard.css';
 
@@ -11,42 +12,32 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchData = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+
             try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    throw new Error('No authentication token found');
-                }
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/users`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-                setUsers(response.data);
+                const [usersResponse, driversResponse] = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/auth/users`, {
+                        headers: { 'Authorization': `Bearer ${token}` },
+                    }),
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/auth/drivers`, {
+                        headers: { 'Authorization': `Bearer ${token}` },
+                    })
+                ]);
+
+                setUsers(usersResponse.data);
+                setDrivers(driversResponse.data);
             } catch (error) {
-                console.error('Error fetching users:', error);
+                console.error('Error fetching data:', error);
+                // Handle error (e.g., show error message to user)
             }
         };
 
-        const fetchDrivers = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    throw new Error('No authentication token found');
-                }
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/drivers`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-                setDrivers(response.data);
-            } catch (error) {
-                console.error('Error fetching drivers:', error);
-            }
-        };
-
-        fetchUsers();
-        fetchDrivers();
+        fetchData();
     }, [navigate]);
 
     const handleApprovalChange = async (id, value) => {
@@ -55,11 +46,7 @@ const AdminDashboard = () => {
             await axios.put(
                 `${process.env.REACT_APP_API_URL}/api/auth/drivers/${id}/approval`,
                 { approve: value === 'true' },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                }
+                { headers: { 'Authorization': `Bearer ${token}` } }
             );
             setDrivers((prevDrivers) =>
                 prevDrivers.map((driver) =>
@@ -68,6 +55,7 @@ const AdminDashboard = () => {
             );
         } catch (error) {
             console.error('Error updating approval status:', error);
+            // Handle error (e.g., show error message to user)
         }
     };
 
@@ -77,9 +65,7 @@ const AdminDashboard = () => {
             const response = await axios.get(
                 `${process.env.REACT_APP_API_URL}/api/auth/drivers/documents/${driverId}/${docType}`,
                 {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: { 'Authorization': `Bearer ${token}` },
                     responseType: 'blob'
                 }
             );
@@ -140,62 +126,11 @@ const AdminDashboard = () => {
                                 {drivers.length === 0 ? (
                                     <p>No drivers found</p>
                                 ) : (
-                                    <div className="table-responsive">
-                                        <Table striped bordered hover>
-                                            <thead>
-                                                <tr>
-                                                    <th>Driver ID</th>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Phone</th>
-                                                    <th>Vehicle</th>
-                                                    <th>Status</th>
-                                                    <th>Documents</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {drivers.map((driver) => (
-                                                    <tr key={driver._id}>
-                                                        <td>{driver.driverID}</td>
-                                                        <td>{driver.firstName} {driver.lastName}</td>
-                                                        <td>{driver.email}</td>
-                                                        <td>{driver.phone}</td>
-                                                        <td>{driver.vehicleMake} {driver.vehicleModel}</td>
-                                                        <td>
-                                                            <Form.Select
-                                                                size="sm"
-                                                                value={driver.applicationApproved ? 'true' : 'false'}
-                                                                onChange={(e) => handleApprovalChange(driver._id, e.target.value)}
-                                                                className={driver.applicationApproved ? 'bg-success text-white' : 'bg-danger text-white'}
-                                                            >
-                                                                <option value="true">Approved</option>
-                                                                <option value="false">Not Approved</option>
-                                                            </Form.Select>
-                                                        </td>
-                                                        <td>
-                                                            <div className="d-flex gap-2">
-                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'license')}>
-                                                                    License
-                                                                </Button>
-                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'abstract')}>
-                                                                    Abstract
-                                                                </Button>
-                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'criminal')}>
-                                                                    Criminal Record
-                                                                </Button>
-                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'registration')}>
-                                                                    Registration
-                                                                </Button>
-                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'safety')}>
-                                                                    Safety
-                                                                </Button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    </div>
+                                    <DriversTable 
+                                        drivers={drivers}
+                                        onApprovalChange={handleApprovalChange}
+                                        onDocumentDownload={handleDocumentDownload}
+                                    />
                                 )}
                             </Card.Body>
                         </Card>
@@ -207,4 +142,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
