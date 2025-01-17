@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Table, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Form, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminDashboard.css';
 
@@ -71,6 +71,32 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleDocumentDownload = async (driverId, docType) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(
+                `${process.env.REACT_APP_API_URL}/api/auth/drivers/documents/${driverId}/${docType}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    responseType: 'blob'
+                }
+            );
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${docType}-${driverId}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error('Error downloading document:', error);
+            alert('Error downloading document');
+        }
+    };
+
     return (
         <div className="admin-dashboard">
             <Container className="dashboard-container">
@@ -123,7 +149,8 @@ const AdminDashboard = () => {
                                                     <th>Email</th>
                                                     <th>Phone</th>
                                                     <th>Vehicle</th>
-                                                    <th>Application Approved</th>
+                                                    <th>Status</th>
+                                                    <th>Documents</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -144,6 +171,25 @@ const AdminDashboard = () => {
                                                                 <option value="true">Approved</option>
                                                                 <option value="false">Not Approved</option>
                                                             </Form.Select>
+                                                        </td>
+                                                        <td>
+                                                            <div className="d-flex gap-2">
+                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'license')}>
+                                                                    License
+                                                                </Button>
+                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'abstract')}>
+                                                                    Abstract
+                                                                </Button>
+                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'criminal')}>
+                                                                    Criminal Record
+                                                                </Button>
+                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'registration')}>
+                                                                    Registration
+                                                                </Button>
+                                                                <Button size="sm" onClick={() => handleDocumentDownload(driver._id, 'safety')}>
+                                                                    Safety
+                                                                </Button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))}

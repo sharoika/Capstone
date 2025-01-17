@@ -1,13 +1,30 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const Admin = require('../models/Admin');
-const User = require('../models/User');
-const Rider = require('../models/Rider');
-const Driver = require('../models/Driver');
-const Token = require('../models/Token');
-const { authenticate } = require('../middlewares/auth');
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const Admin = require("../models/Admin");
+const User = require("../models/User");
+const Rider = require("../models/Rider");
+const Driver = require("../models/Driver");
+const Token = require("../models/Token");
+const { authenticate } = require("../middlewares/auth");
 const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({ storage: storage });
+
 
 router.get('/users', authenticate, async (req, res) => {
     const users = await User.find();
@@ -171,53 +188,84 @@ router.post('/rider/login', async (req, res) => {
   });
 
 // Driver Registration
-router.post('/driver/register', async (req, res) => {
-  const {
+router.post('/driver/register', upload.fields([
+  { name: 'licenseDoc', maxCount: 1 },
+  { name: 'abstractDoc', maxCount: 1 },
+  { name: 'criminalRecordCheckDoc', maxCount: 1 },
+  { name: 'vehicleRegistrationDoc', maxCount: 1 },
+  { name: 'safetyInspectionDoc', maxCount: 1 },
+]), async (req, res) => {
+  try {
+    console.log('Received registration request:', req.body);
+    console.log('Received files:', req.files);
+
+    // Check if all required files are present
+    const requiredFiles = ['licenseDoc', 'abstractDoc', 'criminalRecordCheckDoc', 
+                          'vehicleRegistrationDoc', 'safetyInspectionDoc'];
+    const missingFiles = requiredFiles.filter(file => !req.files[file]);
+    
+    if (missingFiles.length > 0) {
+      return res.status(400).json({ 
+        message: `Missing required files: ${missingFiles.join(', ')}` 
+      });
+    }
+
+    const {
       firstName,
       lastName,
       email,
       phone,
       password,
-      licenseDoc,
       vehicleMake,
       vehicleModel,
-      vehicleRegistrationDoc,
-      safetyInspectionDoc,
-  } = req.body;
+    } = req.body;
 
-  try {
-      // Check if email already exists
-      const existingDriver = await Driver.findOne({ email });
-      if (existingDriver) {
-          return res.status(400).json({ message: 'Email already in use' });
+    // Check if email already exists
+    const existingDriver = await Driver.findOne({ email });
+    if (existingDriver) {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new driver with all fields
+    const newDriver = new Driver({
+      firstName,
+      lastName,
+      email,
+      phone,
+      password: hashedPassword,
+      vehicleMake,
+      vehicleModel,
+      applicationApproved: false, // Default to false for new registrations
+      licenseDoc: req.files.licenseDoc[0].path,
+      abstractDoc: req.files.abstractDoc[0].path,
+      criminalRecordCheckDoc: req.files.criminalRecordCheckDoc[0].path,
+      vehicleRegistrationDoc: req.files.vehicleRegistrationDoc[0].path,
+      safetyInspectionDoc: req.files.safetyInspectionDoc[0].path,
+    });
+    // Save the driver to the database
+    await newDriver.save();
+
+    res.status(201).json({ 
+      message: 'Driver registered successfully. Pending approval.',
+      driver: {
+        id: newDriver._id,
+        email: newDriver.email,
+        firstName: newDriver.firstName,
+        lastName: newDriver.lastName
       }
-
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Create a new driver
-      const newDriver = new Driver({
-          firstName,
-          lastName,
-          email,
-          phone,
-          password: hashedPassword,
-          licenseDoc,
-          vehicleMake,
-          vehicleModel,
-          vehicleRegistrationDoc,
-          safetyInspectionDoc,
-      });
-
-      // Save the driver to the database
-      await newDriver.save();
-
-      res.status(201).json({ message: 'Driver registered successfully' });
+    });
   } catch (error) {
-      console.error('Error during driver registration:', error.message);
-      res.status(500).json({ message: 'Server error' });
+    console.error('Error during driver registration:', error);
+    res.status(500).json({ 
+      message: 'Server error during registration', 
+      error: error.message 
+    });
   }
 });
+
 
 // Driver Login
 router.post('/driver/login', async (req, res) => {
@@ -250,5 +298,34 @@ router.post('/driver/login', async (req, res) => {
   }
 });
 
+// Add this route to handle file downloads
+router.get('/drivers/documents/:driverId/:docType', authenticate, async (req, res) => {
+  try {
+    const { driverId, docType } = req.params;
+    const driver = await Driver.findById(driverId);
+    
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    const documentMap = {
+      'license': driver.licenseDoc,
+      'abstract': driver.abstractDoc,
+      'criminal': driver.criminalRecordCheckDoc,
+      'registration': driver.vehicleRegistrationDoc,
+      'safety': driver.safetyInspectionDoc
+    };
+
+    const filePath = documentMap[docType];
+    if (!filePath) {
+      return res.status(404).json({ message: 'Document not found' });
+    }
+
+    res.download(filePath);
+  } catch (error) {
+    console.error('Error downloading document:', error);
+    res.status(500).json({ message: 'Error downloading document' });
+  }
+});
 
 module.exports = router;

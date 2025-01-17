@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const DriverSchema = new mongoose.Schema({
+const driverSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -11,6 +11,7 @@ const DriverSchema = new mongoose.Schema({
         coordinates: { type: [Number], default: [0, 0] }, // Longitude, Latitude
     },
     completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],
+    driverID: { type: String, unique: true, sparse: true },
     licenseDoc: { type: String },
     abstractDoc: { type: String },
     criminalRecordCheckDoc: { type: String },
@@ -19,8 +20,18 @@ const DriverSchema = new mongoose.Schema({
     vehicleRegistrationDoc: { type: String },
     safetyInspectionDoc: { type: String },
     applicationApproved: { type: Boolean, default: false},
-}, { collection: 'Drivers' }); // Explicitly set the collection name
+}, { collection: 'Drivers' });
 
-DriverSchema.index({ currentLocation: '2dsphere' }); // For geospatial queries
+// Drop the existing index if it exists
+mongoose.connection.once('open', async () => {
+    try {
+        await mongoose.connection.collections.Drivers.dropIndex('driverID_1');
+    } catch (err) {
+        // Index might not exist, that's okay
+    }
+});
 
-module.exports = mongoose.model('Driver', DriverSchema);
+driverSchema.index({ currentLocation: '2dsphere' });
+driverSchema.index({ driverID: 1 }, { sparse: true });
+
+module.exports = mongoose.model('Driver', driverSchema);

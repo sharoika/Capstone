@@ -4,6 +4,8 @@ const session = require('express-session');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
 const rideRoutes = require('./routes/rides');
+const path = require('path');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -41,6 +43,15 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 
 app.use('/api/auth', authRoutes);
 app.use('/api/rides', rideRoutes);
+
+// Create uploads directory if it doesn't exist
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.listen(process.env.PORT || 5000, () => {
     console.log('Server is running');
 });
