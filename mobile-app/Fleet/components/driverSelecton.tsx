@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, ActivityIndicator, Picker } from 'react-native';
+import { View, Text, Picker, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Platform} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
 
 const ConfirmTripScreen = ({ rideID }) => {
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
+  // Function to fetch the token securely
   const getItemAsync = async (key) => {
     return Platform.OS === 'web'
       ? localStorage.getItem(key)
       : SecureStore.getItemAsync(key);
   };
 
+  // Fetch list of available drivers
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
@@ -38,14 +38,13 @@ const ConfirmTripScreen = ({ rideID }) => {
       } catch (error) {
         console.error('Error fetching drivers:', error);
         Alert.alert('Error', 'An error occurred while fetching drivers');
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchDrivers();
   }, []);
 
+  // Handle trip confirmation
   const handleConfirm = async () => {
     if (!selectedDriver) {
        
@@ -83,88 +82,48 @@ const ConfirmTripScreen = ({ rideID }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.header}>Select a Driver</Text>
-        {isLoading ? (
-          <ActivityIndicator size="large" color="#39C9C2" />
-        ) : drivers.length > 0 ? (
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={selectedDriver}
-              onValueChange={(value) => setSelectedDriver(value)}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select a driver" value="" />
-              {drivers.map((driver) => (
-                <Picker.Item
-                  key={driver._id}
-                  label={`${driver.name} (ID: ${driver._id})`}
-                  value={driver._id}
-                />
-              ))}
-            </Picker>
-          </View>
-        ) : (
-          <Text style={styles.noDriversText}>No drivers available</Text>
-        )}
-        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-          <Text style={styles.confirmButtonText}>Confirm Trip</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+    <View style={styles.container}>
+      <Text style={styles.header}>Select a Driver</Text>
+      {drivers.length > 0 ? (
+        <Picker
+          selectedValue={selectedDriver}
+          onValueChange={(value) => setSelectedDriver(value)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Select a driver" value="" />
+          {drivers.map((driver) => (
+            <Picker.Item
+              key={driver._id}
+              label={`${driver.name} (ID: ${driver._id})`}
+              value={driver._id}
+            />
+          ))}
+        </Picker>
+      ) : (
+        <Text>Loading drivers...</Text>
+      )}
+      <Button title="Confirm Trip" onPress={handleConfirm} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#FFFFFF',
+    padding: 20,
   },
   header: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#173252',
-    marginBottom: 24,
-  },
-  pickerContainer: {
-    width: '100%',
-    marginBottom: 24,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E1E1E1',
-    overflow: 'hidden',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   picker: {
     width: '100%',
     height: 50,
-    color: '#173252',
-  },
-  noDriversText: {
-    fontSize: 16,
-    color: '#6D6D6D',
-    marginBottom: 24,
-  },
-  confirmButton: {
-    backgroundColor: '#39C9C2',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    width: '100%',
-    alignItems: 'center',
-  },
-  confirmButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
+    marginBottom: 20,
   },
 });
 
 export default ConfirmTripScreen;
-

@@ -61,8 +61,18 @@ export default function HomeScreen() {
       });
 
       if (response.ok) {
-        console.log('Ride created successfully');
-        router.push('/(tabs)/driverSelection');
+        const data = await response.json(); // Assuming the response contains the rideID
+        const { rideID } = data; // Replace with actual key for rideID from the server response
+        console.log('Ride created successfully, ID:', rideID);
+  
+        // Save rideID to SecureStore or localStorage
+        if (Platform.OS === 'web') {
+          localStorage.setItem('rideID', rideID); // Use localStorage for web
+        } else {
+          await SecureStore.setItemAsync('rideID', rideID); // SecureStore for mobile
+        }
+  
+        router.push('/(tabs)/driverSelection'); // Navigate to next screen
       } else {
         const errorText = await response.text();
         console.error('Failed to create ride:', errorText);

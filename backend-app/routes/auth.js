@@ -64,6 +64,15 @@ router.put('/drivers/:id/approval', authenticate, async (req, res) => {
     }
 });
 
+router.get('/drivers/list', async (req, res) => {
+    try {
+        const drivers = await Driver.find(); // Fetch all drivers from the Drivers table
+        res.json(drivers); // Send the drivers as a JSON response
+    } catch (error) {
+        console.error('Error fetching drivers:', error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const admin = await Admin.findOne({ username });
