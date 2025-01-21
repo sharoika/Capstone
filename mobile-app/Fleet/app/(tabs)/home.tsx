@@ -1,188 +1,110 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Image } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, StyleSheet, Alert } from 'react-native';
+import RideForm from '../../components/RideForm';
+import DriverSelection from '../../components/DriverSelection';
+import StartRide from '../../components/StartRide';
+import RideInProgress from '../../components/RideInProgress';
+import RideSummary from '../../components/RideSummary'; // New component for the summary page
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
-export default function HomeScreen() {
-  const [start, setStart] = useState('');
-  const [end, setEnd] = useState('');
-  const [fare, setFare] = useState('');
-  const [riderID, setRiderID] = useState('');
-  const router = useRouter();
+// Utility function to get item (token or riderID) from SecureStore (mobile) or localStorage (web)
+const getItemAsync = async (key: string): Promise<string | null> => {
+  if (Platform.OS === 'web') {
+    return localStorage.getItem(key);
+  } else {
+    return await SecureStore.getItemAsync(key);
+  }
+};
 
-  const getItemAsync = async (key) => {
-    if (Platform.OS === 'web') {
-      return localStorage.getItem(key);
-    }
-    return SecureStore.getItemAsync(key);
-  };
+const HomeScreen: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [rideID, setRideID] = useState('');
+  const [token, setToken] = useState<string>('');
+  const [riderID, setRiderID] = useState<string>('');
+  const [rideDetails, setRideDetails] = useState<any>(null); // To store ride details for the summary
 
   useEffect(() => {
-    const fetchRiderID = async () => {
+    const fetchTokenAndRiderID = async () => {
       try {
-        const id = await getItemAsync('userObjectId');
-        if (id) {
-          setRiderID(id);
+        const storedToken = await getItemAsync('userToken');
+        const storedRiderID = await getItemAsync('userObjectId');
+
+        if (storedToken && storedRiderID) {
+          setToken(storedToken);
+          setRiderID(storedRiderID);
         } else {
-          console.error('Rider ID not found in storage.');
-          Alert.alert('Error', 'Unable to retrieve user information. Please log in again.');
-          router.push('/(auth)/login');
+          Alert.alert('Error', 'Token or Rider ID not found. Please log in again.');
         }
       } catch (error) {
-        console.error('Error fetching Rider ID:', error);
+        console.error('Error fetching token or riderID:', error);
       }
     };
 
-    fetchRiderID();
+    fetchTokenAndRiderID();
   }, []);
 
-  const handleRidePress = async () => {
-    if (!start || !end || !fare) {
-      Alert.alert('Error', 'Please fill out all fields');
-      return;
-    }
-
-    try {
-      const token = await getItemAsync('userToken');
-      console.log(token);
-      const response = await fetch('http://localhost:5000/api/rides/ride/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          riderID,
-          start,
-          end,
-          fare: parseFloat(fare),
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json(); // Assuming the response contains the rideID
-        const { rideID } = data; // Replace with actual key for rideID from the server response
-        console.log('Ride created successfully, ID:', rideID);
-  
-        // Save rideID to SecureStore or localStorage
-        if (Platform.OS === 'web') {
-          localStorage.setItem('rideID', rideID); // Use localStorage for web
-        } else {
-          await SecureStore.setItemAsync('rideID', rideID); // SecureStore for mobile
-        }
-  
-        router.push('/(tabs)/driverSelection'); // Navigate to next screen
-      } else {
-        const errorText = await response.text();
-        console.error('Failed to create ride:', errorText);
-        Alert.alert('Error', 'Failed to create ride');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      Alert.alert('Error', 'An error occurred while creating the ride');
-    }
-  };
+  if (!token || !riderID) {
+    return null; // or show a loading spinner
+  }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Image 
-            source={require('../../assets/images/logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.welcomeText}>Welcome to Fleet</Text>
-          <Text style={styles.subText}>Book Your Ride Below</Text>
-        </View>
-
-        <View style={styles.formContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Start Location"
-            placeholderTextColor="#8E8E93"
-            value={start}
-            onChangeText={setStart}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="End Location"
-            placeholderTextColor="#8E8E93"
-            value={end}
-            onChangeText={setEnd}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Fare (e.g., 20.50)"
-            placeholderTextColor="#8E8E93"
-            value={fare}
-            onChangeText={setFare}
-            keyboardType="numeric"
-          />
-
-          <TouchableOpacity style={styles.rideButton} onPress={handleRidePress}>
-            <Text style={styles.rideButtonText}>Request Ride</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+    <View style={styles.container}>
+      {currentStep === 1 && (
+        <RideForm
+          token={token}
+          riderID={riderID}
+          onRideCreated={(id: string) => {
+            setRideID(id);
+            setCurrentStep(2);
+          }}
+        />
+      )}
+      {currentStep === 2 && (
+        <DriverSelection
+          rideID={rideID}
+          token={token}
+          onDriverConfirmed={() => {
+            setCurrentStep(3); // Move to StartRide step
+          }}
+        />
+      )}
+      {currentStep === 3 && (
+        <StartRide
+          rideID={rideID}
+          token={token}
+          onRideStarted={() => {
+            setCurrentStep(4); // Move to RideInProgress step
+          }}
+        />
+      )}
+      {currentStep === 4 && (
+        <RideInProgress
+          rideID={rideID}
+          token={token}
+          onRideFinished={(details: any) => {
+            console.log('Ride finished', details);
+            setRideDetails(details); // Store ride details for the summary
+            setCurrentStep(5); // Move to RideSummary step
+          }}
+        />
+      )}
+      {currentStep === 5 && (
+        <RideSummary
+          rideDetails={rideDetails}
+          onReturnHome={() => {
+            setCurrentStep(1); // Return to the home screen
+            setRideID('');
+            setRideDetails(null); // Reset ride details
+          }}
+        />
+      )}
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    padding: 24,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logo: {
-    width: 60,
-    height: 60,
-    marginBottom: 16,
-  },
-  welcomeText: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#173252',
-    marginBottom: 8,
-  },
-  subText: {
-    fontSize: 16,
-    color: '#6D6D6D',
-    marginBottom: 24,
-  },
-  formContainer: {
-    width: '100%',
-  },
-  input: {
-    width: '100%',
-    height: 48,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    fontSize: 16,
-    color: '#173252',
-  },
-  rideButton: {
-    backgroundColor: '#39C9C2',
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 24,
-  },
-  rideButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-  },
+  container: { flex: 1, padding: 24, backgroundColor: '#fff' },
 });
 
+export default HomeScreen;

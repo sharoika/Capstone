@@ -39,7 +39,13 @@ router.post('/ride', authenticate, async (req, res) => {
         });
 
         await ride.save();
-        res.status(201).json({ message: 'Ride created successfully', ride });
+        
+        // Send back the rideID as part of the response
+        res.status(201).json({ 
+            message: 'Ride created successfully', 
+            ride: ride,         // Full ride object
+            rideID: ride._id    // Send back the ride's unique ID
+        });
     } catch (error) {
         console.error('Error creating ride:', error.message);
         res.status(500).json({ message: 'Server error' });
@@ -124,7 +130,37 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+// Get details of a ride by its ID
+router.get('/rides/:rideID', authenticate, async (req, res) => {
+    const { rideID } = req.params;
 
+    try {
+        // Fetch the ride by ID
+        const ride = await Ride.findById(rideID)
+            .populate('riderID')   // Populate rider details
+
+        if (!ride) {
+            return res.status(404).json({ message: 'Ride not found' });
+        }
+
+        // Return ride details along with rider and driver information
+        res.json({
+            rideID: ride._id,
+            start: ride.start,
+            end: ride.end,
+            fare: ride.fare,
+            rideBooked: ride.rideBooked,
+            rideInProgress: ride.rideInProgress,
+            rideFinished: ride.rideFinished,
+            rider: ride.riderID, // Rider details
+            driverSelected: ride.driverSelected,
+            cancellationStatus: ride.cancellationStatus,
+        });
+    } catch (error) {
+        console.error('Error fetching ride details:', error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 // Cancel a trip
 router.post('/rides/:rideID/cancel', authenticate, async (req, res) => {
     const { rideID } = req.params;

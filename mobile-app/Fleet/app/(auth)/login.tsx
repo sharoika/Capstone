@@ -26,18 +26,19 @@ export default function LoginScreen() {
     }
   
     try {
-      const response = await axios.post(`http://localhost:5000/api/auth/rider/login`, {
+      const response = await axios.post(`http://10.0.2.2:5000/api/auth/rider/login`, {
         email,
         password,
       });
   
       const { token, user, message } = response.data;
       if (token && user?.objectId) {
-        router.push('/(tabs)/driverSelection');
+        router.push('/(tabs)/home');
         Alert.alert('Success', message);
-      
+        console.log(token);
         await Promise.all([
           saveToStorage('userToken', token),
+          
           saveToStorage('userObjectId', user.objectId),
         ]);
       } else {
