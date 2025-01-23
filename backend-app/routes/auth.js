@@ -43,23 +43,25 @@ router.get('/drivers', authenticate, async (req, res) => {
 
 // Approve or reject a driver
 router.put('/drivers/:id/approval', authenticate, async (req, res) => {
-    const { id } = req.params; // Driver ID from URL params
-    const { approve } = req.body; // `approve` should be true or false
+    const { id } = req.params;
+    const { approve } = req.body;
 
     try {
-        // Find the driver by ID
         const driver = await Driver.findById(id);
         if (!driver) {
             return res.status(404).json({ message: 'Driver not found' });
         }
 
-        // Update the approval status
-        driver.applicationApproved = approve;
+        // Convert approve to boolean explicitly
+        driver.applicationApproved = approve === true || approve === "true";
         await driver.save();
 
-        res.json({ message: `Driver ${approve ? 'approved' : 'rejected'} successfully`, driver });
+        res.json({ 
+            message: `Driver ${driver.applicationApproved ? 'approved' : 'rejected'} successfully`,
+            driver 
+        });
     } catch (error) {
-        console.error('Error updating driver approval:', error.message);
+        console.error('Error updating driver approval:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
