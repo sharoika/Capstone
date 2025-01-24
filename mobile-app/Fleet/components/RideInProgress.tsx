@@ -15,7 +15,7 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
   useEffect(() => {
     const fetchRideDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/rides/rides/${rideID}`, {
+        const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -42,7 +42,7 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
 
   const handleFinishRide = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/rides/rides/${rideID}/finish`, {
+      const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}/finish`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

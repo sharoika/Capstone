@@ -197,29 +197,11 @@ router.post('/rider/login', async (req, res) => {
   });
 
 // Driver Registration
-router.post('/driver/register', upload.fields([
-  { name: 'licenseDoc', maxCount: 1 },
-  { name: 'abstractDoc', maxCount: 1 },
-  { name: 'criminalRecordCheckDoc', maxCount: 1 },
-  { name: 'vehicleRegistrationDoc', maxCount: 1 },
-  { name: 'safetyInspectionDoc', maxCount: 1 },
-]), async (req, res) => {
+router.post('/driver/register', async (req, res) => {
   try {
     console.log('Received registration request:', req.body);
-    console.log('Received files:', req.files);
-
-    // Check if all required files are present
-    const requiredFiles = ['licenseDoc', 'abstractDoc', 'criminalRecordCheckDoc', 
-                          'vehicleRegistrationDoc', 'safetyInspectionDoc'];
-    const missingFiles = requiredFiles.filter(file => !req.files[file]);
-    
-    if (missingFiles.length > 0) {
-      return res.status(400).json({ 
-        message: `Missing required files: ${missingFiles.join(', ')}` 
-      });
-    }
-
-    const {
+   
+     const {
       firstName,
       lastName,
       email,
@@ -248,11 +230,6 @@ router.post('/driver/register', upload.fields([
       vehicleMake,
       vehicleModel,
       applicationApproved: false, // Default to false for new registrations
-      licenseDoc: req.files.licenseDoc[0].path,
-      abstractDoc: req.files.abstractDoc[0].path,
-      criminalRecordCheckDoc: req.files.criminalRecordCheckDoc[0].path,
-      vehicleRegistrationDoc: req.files.vehicleRegistrationDoc[0].path,
-      safetyInspectionDoc: req.files.safetyInspectionDoc[0].path,
     });
     // Save the driver to the database
     await newDriver.save();
@@ -277,6 +254,7 @@ router.post('/driver/register', upload.fields([
 
 
 // Driver Login
+// Driver Login
 router.post('/driver/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -300,7 +278,12 @@ router.post('/driver/login', async (req, res) => {
           { expiresIn: '24h' }
       );
 
-      res.json({ message: 'Login successful', token });
+      // Send response with token and driverID
+      res.json({
+        message: 'Login successful',
+        token,
+        driverID: driver._id, // Add driverID to the response
+      });
   } catch (error) {
       console.error('Error during driver login:', error.message);
       res.status(500).json({ message: 'Server error' });
@@ -336,5 +319,28 @@ router.get('/drivers/documents/:driverId/:docType', authenticate, async (req, re
     res.status(500).json({ message: 'Error downloading document' });
   }
 });
+
+
+// Update driver status to online
+router.put('/drivers/:id/online', authenticate, async (req, res) => {
+  const { id } = req.params; // Extract the driver ID from the URL
+
+  try {
+      // Find the driver by ID
+      const driver = await Driver.findById(id);
+      if (!driver) {
+          return res.status(404).json({ message: 'Driver not found' });
+      }
+
+      // Update the `isOnline` field to true
+      driver.isOnline = true;
+      await driver.save();
+
+      res.json({ message: 'Driver status updated to online', driver });
+  } catch (error) {
+      console.error('Error updating driver status:', error.message);
+      res.status(500).json({ message: 'Server error' });
+  }
+})
 
 module.exports = router;

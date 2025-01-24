@@ -19,7 +19,8 @@ const driverSchema = new mongoose.Schema({
     vehicleModel: { type: String, required: false },
     vehicleRegistrationDoc: { type: String },
     safetyInspectionDoc: { type: String },
-    applicationApproved: { type: Boolean, default: false},
+    applicationApproved: { type: Boolean, default: false },
+    isOnline: { type: Boolean, default: false }, // New field added
 }, { collection: 'Drivers' });
 
 // Drop the existing index if it exists

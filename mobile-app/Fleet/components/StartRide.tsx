@@ -16,7 +16,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     // Fetch ride details on component mount
     const fetchRideDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/rides/rides/${rideID}`, {
+        const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -43,7 +43,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
 
   const handleStartRide = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/rides/rides/${rideID}/start`, {
+      const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}/start`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

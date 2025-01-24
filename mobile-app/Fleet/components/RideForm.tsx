@@ -133,7 +133,41 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#fdfcf8" }] },
     { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#c9c9c9" }] },
   ];
+  const handleConfirmRide = async () => {
+    if (!start || !end || !fare) {
+      Alert.alert('Error', 'Please fill in all the fields.');
+      return;
+    }
 
+    try {
+      const response = await fetch('http://10.0.2.2:5000/api/rides/ride', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Pass the token for authentication
+        },
+        body: JSON.stringify({
+          riderID,
+          start,
+          end,
+          fare: parseFloat(fare), // Ensure fare is sent as a number
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        Alert.alert('Success', 'Ride created successfully!');
+        onRideCreated(data.rideID); // Move to the next step using the rideID
+      } else {
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        Alert.alert('Error', errorData.message || 'Failed to create ride.');
+      }
+    } catch (error) {
+      console.error('Error creating ride:', error);
+      Alert.alert('Error', 'An error occurred while creating the ride.');
+    }
+  };
   return (
     <View style={styles.container}>
       <Text>Start Location:</Text>
@@ -198,7 +232,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
       <View style={styles.bottomCard}>
         <Text>Estimated Time: 15 mins</Text>
         <Text>Fare: $15.00</Text>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleConfirmRide}>
           <Text style={styles.buttonText}>Confirm Ride</Text>
         </TouchableOpacity>
       </View>

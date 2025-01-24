@@ -29,7 +29,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
         // Log rideID to ensure it's being passed correctly
         console.log('Fetching drivers for rideID:', rideID);
 
-        const response = await fetch('http://localhost:5000/api/auth/drivers/list', {
+        const response = await fetch('http://10.0.2.2:5000/api/auth/drivers/list', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
 
       // Ensure the rideID is being used correctly in the URL
       const response = await fetch(
-        `http://localhost:5000/api/rides/rides/${rideID}/confirm`,
+        `http://10.0.2.2:5000/api/rides/rides/${rideID}/confirm`,
         {
           method: 'POST',
           headers: {

@@ -14,7 +14,7 @@ const saveToStorage = async (key: string, value: string) => {
   }
 };
 
-export default function LoginScreen() {
+export default function DriverLoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,22 +24,19 @@ export default function LoginScreen() {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
     }
-  
+
     try {
-      const response = await axios.post(`http://10.0.2.2:5000/api/auth/rider/login`, {
+      const response = await axios.post(`http://10.0.2.2:5000/api/auth/driver/login`, {
         email,
         password,
       });
-  
-      const { token, user, message } = response.data;
-      if (token && user?.objectId) {
-        router.push('/(tabs)/home');
+
+      const { token, driverID, message } = response.data;
+      if (token && driverID) {
+        await saveToStorage('driverToken', token);
+        await saveToStorage('driverID', driverID);
+        router.push('/(tabs)/driverHome');
         Alert.alert('Success', message);
-        console.log(token);
-        await Promise.all([
-          saveToStorage('userToken', token),
-          saveToStorage('userObjectId', user.objectId),
-        ]);
       } else {
         Alert.alert('Error', 'Login failed. Please try again.');
       }
@@ -50,22 +47,18 @@ export default function LoginScreen() {
   };
 
   const handleRegister = () => {
-    router.push('/(auth)/register');
-  };
-
-  const handleDriverLogin = () => {
-    router.push('/(auth)/driverLogin');
+    router.push('/(auth)/driverRegister');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image 
+        <Image
           source={require('../../assets/images/logo.png')}
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Fleet</Text>
+        <Text style={styles.title}>Driver Login</Text>
       </View>
 
       <View style={styles.formContainer}>
@@ -95,10 +88,6 @@ export default function LoginScreen() {
         <Text style={styles.registerText}>Don't have an account?</Text>
         <TouchableOpacity onPress={handleRegister}>
           <Text style={styles.registerLink}>Register</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.driverButton} onPress={handleDriverLogin}>
-          <Text style={styles.driverButtonText}>Driver Login</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -167,20 +156,6 @@ const styles = StyleSheet.create({
   registerLink: {
     fontSize: 16,
     color: '#39C9C2',
-    fontWeight: '600',
-  },
-  driverButton: {
-    marginTop: 16,
-    backgroundColor: '#173252',
-    height: 48,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  driverButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
     fontWeight: '600',
   },
 });
