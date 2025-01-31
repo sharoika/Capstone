@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Dropdown, Button } from 'react-bootstrap';
+import { Table, Dropdown } from 'react-bootstrap';
 
 const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload }) => {
   return (
@@ -22,13 +22,14 @@ const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload }) => {
             <td>{driver.phone}</td>
             <td>{driver.vehicleMake} {driver.vehicleModel}</td>
             <td>
-              <Button
-                variant={driver.applicationApproved ? "success" : "danger"}
-                size="sm"
-                onClick={() => onApprovalChange(driver._id, !driver.applicationApproved)}
+              <select
+                className={`form-select ${driver.applicationApproved ? 'bg-success' : 'bg-danger'}`}
+                value={driver.applicationApproved.toString()}
+                onChange={(e) => onApprovalChange(driver._id, e.target.value)}
               >
-                {driver.applicationApproved ? 'Approved' : 'Not Approved'} ▼
-              </Button>
+                <option value="true">Approved</option>
+                <option value="false">Not Approved</option>
+              </select>
             </td>
             <td>
               <Dropdown>

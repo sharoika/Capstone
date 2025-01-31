@@ -45,17 +45,27 @@ const AdminDashboard = () => {
             const token = localStorage.getItem('token');
             await axios.put(
                 `${process.env.REACT_APP_API_URL}/api/auth/drivers/${id}/approval`,
-                { approve: value === 'true' },
+                { approve: value === "true" },
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
+            
             setDrivers((prevDrivers) =>
                 prevDrivers.map((driver) =>
-                    driver._id === id ? { ...driver, applicationApproved: value === 'true' } : driver
+                    driver._id === id 
+                        ? { ...driver, applicationApproved: value === "true" }
+                        : driver
                 )
             );
         } catch (error) {
             console.error('Error updating approval status:', error);
-            // Handle error (e.g., show error message to user)
+            setDrivers((prevDrivers) =>
+                prevDrivers.map((driver) =>
+                    driver._id === id 
+                        ? { ...driver, applicationApproved: !driver.applicationApproved }
+                        : driver
+                )
+            );
+            alert('Error updating approval status');
         }
     };
 
