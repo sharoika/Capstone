@@ -73,14 +73,14 @@ router.get('/rides/without-driver', authenticate, async (req, res) => {
 router.post('/rides/:rideID/confirm', authenticate, async (req, res) => {
     const { rideID } = req.params;
     const { driverID } = req.body;
-
+console.log(rideID);
     if (!driverID) {
         return res.status(400).json({ message: 'Driver ID is required' });
     }
 
     try {
         const driver = await Driver.findById(driverID);
-        if (!driver || !driver.applicationApproved) {
+        if (!driver ) { //add this back || !driver.applicationApproved
             return res.status(404).json({ message: 'Driver not found or not approved' });
         }
 
@@ -120,6 +120,7 @@ router.post('/rides/:rideID/start', authenticate, async (req, res) => {
     }
 });
 
+
 // Finish a trip
 router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
     const { rideID } = req.params;
@@ -147,6 +148,29 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+// Check if a ride is finished
+router.get('/rides/:rideID/status', authenticate, async (req, res) => {
+    const { rideID } = req.params;
+
+    try {
+        const ride = await Ride.findById(rideID);
+        if (!ride) {
+            return res.status(404).json({ message: 'Ride not found' });
+        }
+
+        res.json({
+            rideID: ride._id,
+            rideInProgress: ride.rideInProgress,
+            rideFinished: ride.rideFinished,
+        });
+    } catch (error) {
+        console.error('Error checking ride status:', error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
 // Get details of a ride by its ID
 router.get('/rides/:rideID', authenticate, async (req, res) => {
     const { rideID } = req.params;

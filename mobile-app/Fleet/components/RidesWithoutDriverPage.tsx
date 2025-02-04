@@ -1,74 +1,90 @@
-// RidesWithoutDriverStep.tsx
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import { Picker } from '@react-native-picker/picker';
 
 interface RidesWithoutDriverStepProps {
   token: string;
   driverID: string;
+  onRideClaimed: (rideID: string) => void; // Callback to move to next step
 }
 
-const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, driverID }) => {
+const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, driverID, onRideClaimed }) => {
   const [ridesWithoutDriver, setRidesWithoutDriver] = useState<any[]>([]);
+  const [selectedRide, setSelectedRide] = useState<string>('');
 
   useEffect(() => {
-    // Fetch rides without a driver every 5 seconds
-    const interval = setInterval(() => {
-      fetchRidesWithoutDriver();
-    }, 5000); // Poll every 5 seconds
-
-    // Clean up the interval when the component is unmounted
+    const interval = setInterval(fetchRidesWithoutDriver, 5000);
     return () => clearInterval(interval);
   }, [token, driverID]);
 
   const fetchRidesWithoutDriver = async () => {
     try {
-      const response = await axios.get('http://10.0.2.2:5000/api/rides/rides/without-driver', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await fetch('http://10.0.2.2:5000/api/rides/rides/without-driver', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      const rides = response.data.rides;
-      setRidesWithoutDriver(rides); // Update state with the fetched rides
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setRidesWithoutDriver(data.rides);
     } catch (error) {
-      console.error('Error fetching rides without a driver:', error.response?.data || error.message);
+      console.error('Error fetching rides:', error);
     }
   };
 
-  const handleClaimRide = (rideID: string) => {
-    // Handle claiming a ride by the driver
-    console.log(`Driver ${driverID} is claiming ride with ID: ${rideID}`);
-    // You can call an API to confirm the ride and assign it to the driver here
+  const handleClaimRide = async () => {
+    if (!selectedRide) {
+      Alert.alert('Error', 'Please select a ride');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${selectedRide}/confirm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ driverID }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Success', 'Ride claimed successfully');
+        onRideClaimed(selectedRide); // Navigate to TravelToRideStep
+      } else {
+        Alert.alert('Error', data.message || 'Failed to claim ride');
+      }
+    } catch (error) {
+      console.error('Error claiming ride:', error);
+      Alert.alert('Error', 'An error occurred while claiming the ride');
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Rides Without a Driver</Text>
       {ridesWithoutDriver.length === 0 ? (
-        <Text>No rides without a driver at the moment.</Text>
+        <Text>No rides available at the moment.</Text>
       ) : (
-        <FlatList
-          data={ridesWithoutDriver}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.rideItem}>
-              <Text style={styles.rideText}>Start: {item.start}</Text>
-              <Text style={styles.rideText}>End: {item.end}</Text>
-              <Text style={styles.rideText}>Fare: ${item.fare}</Text>
-              <TouchableOpacity
-                style={styles.claimButton}
-                onPress={() => handleClaimRide(item._id)}
-              >
-                <Text style={styles.claimButtonText}>Claim Ride</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        />
+        <Picker selectedValue={selectedRide} onValueChange={setSelectedRide} style={styles.picker}>
+          <Picker.Item label="Select a ride" value="" />
+          {ridesWithoutDriver.map((ride) => (
+            <Picker.Item key={ride._id} label={`Start: ${ride.start}, End: ${ride.end}`} value={ride._id} />
+          ))}
+        </Picker>
       )}
+      <TouchableOpacity style={styles.claimButton} onPress={handleClaimRide}>
+        <Text style={styles.claimButtonText}>Claim Ride</Text>
+      </TouchableOpacity>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -81,24 +97,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  rideItem: {
-    backgroundColor: '#f8f8f8',
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-  },
-  rideText: {
-    fontSize: 16,
-    marginBottom: 5,
+  picker: {
+    width: '100%',
+    height: 50,
+    marginBottom: 20,
   },
   claimButton: {
     backgroundColor: '#007bff',
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
     alignItems: 'center',
   },
   claimButtonText: {

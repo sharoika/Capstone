@@ -1,9 +1,11 @@
-// DriverHome.tsx
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, Platform } from 'react-native';
 import GoOnlineStep from '../../components/GoOnlineStep';
+import RidesWithoutDriverStep from '../../components/RidesWithoutDriverPage';
+import TravelToRideStep from '../../components/TravelToRideStep';
+import DriverInProgressStep from '../../components/DriverInProgressStep';
+import RideFinishedStep from '../../components/RideFinishedStep';
 import * as SecureStore from 'expo-secure-store';
-import RidesWithoutDriverStep from '../../components/RidesWithoutDriverPage'; // Import the new component
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getItemAsync = async (key: string): Promise<string | null> => {
@@ -18,6 +20,7 @@ const DriverHome: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [token, setToken] = useState<string | null>(null);
   const [driverID, setDriverID] = useState<string | null>(null);
+  const [rideID, setRideID] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCredentials = async () => {
@@ -49,11 +52,40 @@ const DriverHome: React.FC = () => {
         <GoOnlineStep
           token={token}
           driverID={driverID}
-          onNextStep={() => setCurrentStep(2)} // Proceed to Step 2
+          onNextStep={() => setCurrentStep(2)}
         />
       )}
       {currentStep === 2 && token && driverID && (
-        <RidesWithoutDriverStep token={token} driverID={driverID} />
+        <RidesWithoutDriverStep
+          token={token}
+          driverID={driverID}
+          onRideClaimed={(ride) => {
+            setRideID(ride);
+            setCurrentStep(3);
+          }}
+        />
+      )}
+      {currentStep === 3 && rideID && (
+        <TravelToRideStep
+          rideID={rideID}
+          driverID={driverID}
+          onRideStarted={() => setCurrentStep(4)} // Move to next step when ride starts
+        />
+      )}
+      {currentStep === 4 && rideID && (
+        <DriverInProgressStep
+          rideID={rideID}
+          driverID={driverID}
+          onRideCompleted={() => setCurrentStep(5)} // Move to Ride Finished Step
+          token={token}        />
+      )}
+      {currentStep === 5 && (
+        <RideFinishedStep
+          onGoHome={() => {
+            setRideID(null);
+            setCurrentStep(1); // Reset to home screen
+          }}
+        />
       )}
     </View>
   );
