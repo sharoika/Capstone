@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Button, Modal, Form } from 'react-bootstrap';
+import ConfigModal from '../modals/ConfigModal';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card } from 'react-bootstrap';
@@ -9,6 +11,8 @@ import './AdminDashboard.css';
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [drivers, setDrivers] = useState([]);
+    const [showConfigModal, setShowConfigModal] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -48,10 +52,10 @@ const AdminDashboard = () => {
                 { approve: value === "true" },
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
-            
+
             setDrivers((prevDrivers) =>
                 prevDrivers.map((driver) =>
-                    driver._id === id 
+                    driver._id === id
                         ? { ...driver, applicationApproved: value === "true" }
                         : driver
                 )
@@ -60,7 +64,7 @@ const AdminDashboard = () => {
             console.error('Error updating approval status:', error);
             setDrivers((prevDrivers) =>
                 prevDrivers.map((driver) =>
-                    driver._id === id 
+                    driver._id === id
                         ? { ...driver, applicationApproved: !driver.applicationApproved }
                         : driver
                 )
@@ -96,9 +100,15 @@ const AdminDashboard = () => {
     return (
         <div className="admin-dashboard">
             <Container className="dashboard-container">
-                <Row className="mb-4">
+
+                <Row className="mt-4">
                     <Col>
                         <h1 className="text-center dashboard-title">Admin Dashboard</h1>
+                    </Col>
+                    <Col className="text-center">
+                        <Button variant="warning" onClick={() => setShowConfigModal(true)}>
+                            Edit Configuration
+                        </Button>
                     </Col>
                 </Row>
 
@@ -136,7 +146,7 @@ const AdminDashboard = () => {
                                 {drivers.length === 0 ? (
                                     <p>No drivers found</p>
                                 ) : (
-                                    <DriversTable 
+                                    <DriversTable
                                         drivers={drivers}
                                         onApprovalChange={handleApprovalChange}
                                         onDocumentDownload={handleDocumentDownload}
@@ -147,6 +157,7 @@ const AdminDashboard = () => {
                     </Col>
                 </Row>
             </Container>
+            <ConfigModal show={showConfigModal} handleClose={() => setShowConfigModal(false)} />
         </div>
     );
 };
