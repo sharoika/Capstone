@@ -24,16 +24,18 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
 
   const mapRef = useRef<MapView>(null);
 
-  const GOOGLE_API_KEY = 'AIzaSyBjVIyhPrpbB4CNHRI6UdGCBzeRyaWEAgM'; // Replace with your actual API key
+  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; // Replace with your actual API key
 
   useEffect(() => {
-    Geocoder.init(GOOGLE_API_KEY); // Initialize the Geocoding API
+    Geocoder.init(GOOGLE_API_KEY); 
+    console.log('Geolocation API');
     (async () => {
       try {
         const response = await fetch(
           `https://www.googleapis.com/geolocation/v1/geolocate?key=${GOOGLE_API_KEY}`,
           { method: 'POST' }
         );
+        console.log('Geolocation API Response:', response);
         if (response.ok) {
           const data = await response.json();
           const { location } = data;
@@ -125,14 +127,110 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     return points;
   };
 
-  const customMapStyle = [
-    { "elementType": "geometry", "stylers": [{ "color": "#ebe3cd" }] },
-    { "elementType": "labels.text.fill", "stylers": [{ "color": "#523735" }] },
-    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#f5f1e6" }] },
-    { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#f5f1e6" }] },
-    { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#fdfcf8" }] },
-    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#c9c9c9" }] },
-  ];
+  const customMapStyle = [ // these maps themes were sources from https://snazzymaps.com/style/91/muted-monotone
+    {
+        "stylers": [
+            {
+                "visibility": "on"
+            },
+            {
+                "saturation": -100
+            },
+            {
+                "gamma": 0.54
+            }
+        ]
+    },
+    {
+        "featureType": "road",
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "water",
+        "stylers": [
+            {
+                "color": "#FFFFFF"
+            }
+        ]
+    },
+    {
+        "featureType": "poi",
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "poi",
+        "elementType": "labels.text",
+        "stylers": [
+            {
+                "visibility": "simplified"
+            }
+        ]
+    },
+    {
+        "featureType": "road",
+        "elementType": "geometry.fill",
+        "stylers": [
+            {
+                "color": "#ffffff"
+            }
+        ]
+    },
+    {
+        "featureType": "road.local",
+        "elementType": "labels.text",
+        "stylers": [
+            {
+                "visibility": "simplified"
+            }
+        ]
+    },
+    {
+        "featureType": "water",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#ffffff"
+            }
+        ]
+    },
+    {
+        "featureType": "transit.line",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "gamma": 0.48
+            }
+        ]
+    },
+    {
+        "featureType": "transit.station",
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "road",
+        "elementType": "geometry.stroke",
+        "stylers": [
+            {
+                "gamma": 7.18
+            }
+        ]
+    }
+];
   const handleConfirmRide = async () => {
     if (!start || !end || !fare) {
       Alert.alert('Error', 'Please fill in all the fields.');

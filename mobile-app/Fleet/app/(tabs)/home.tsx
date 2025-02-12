@@ -4,7 +4,7 @@ import RideForm from '../../components/RideForm';
 import DriverSelection from '../../components/DriverSelection';
 import StartRide from '../../components/StartRide';
 import RideInProgress from '../../components/RideInProgress';
-import RideSummary from '../../components/RideSummary'; // New component for the summary page
+import RideSummary from '../../components/RideSummary'; 
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
@@ -22,7 +22,7 @@ const HomeScreen: React.FC = () => {
   const [rideID, setRideID] = useState('');
   const [token, setToken] = useState<string>('');
   const [riderID, setRiderID] = useState<string>('');
-  const [rideDetails, setRideDetails] = useState<any>(null); // To store ride details for the summary
+  const [rideDetails, setRideDetails] = useState<any>(null); 
 
   useEffect(() => {
     const fetchTokenAndRiderID = async () => {

@@ -345,4 +345,37 @@ router.put('/drivers/:id/online', authenticate, async (req, res) => {
   }
 })
 
+router.get('/riders/:id', authenticate, async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+      const rider = await Rider.findById(id);
+      if (!rider) {
+          return res.status(404).json({ message: 'Rider not found' });
+      }
+
+      res.json(rider);
+  } catch (error) {
+      console.error('Error fetching rider info:', error.message);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.get('/drivers/:id', authenticate, async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+      const driver = await Driver.findById(id);
+      if (!driver) {
+          return res.status(404).json({ message: 'Driver not found' });
+      }
+
+      res.json(driver);
+  } catch (error) {
+      console.error('Error fetching driver info:', error.message);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 module.exports = router;
