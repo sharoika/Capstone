@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
+const configRoutes = require('./routes/config');
 const rideRoutes = require('./routes/rides');
 const path = require('path');
 const fs = require('fs');
@@ -42,6 +43,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     .catch((err) => console.log('MongoDB connection error:', err));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/configuration', configRoutes)
 app.use('/api/rides', rideRoutes);
 
 // Create uploads directory if it doesn't exist
