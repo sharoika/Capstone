@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 interface RideFormProps {
   token: string;
@@ -269,19 +270,43 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
   return (
     <View style={styles.container}>
       <Text>Start Location:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Start Location"
-        value={start}
-        onChangeText={setStart}
+      <GooglePlacesAutocomplete
+        placeholder="Enter start location"
+        onPress={(data, details = null) => {
+          setStart(data.description);
+          console.log('Selected Start Location:', data.description);
+        }}
+        query={{
+          key: GOOGLE_API_KEY,
+          language: 'en',
+        }}
+        styles={{
+          container: { flex: 0 },
+          textInput: styles.input,
+        }}
+        fetchDetails={true}
+        debounce={300}
       />
+
       <Text>End Location:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="End Location"
-        value={end}
-        onChangeText={setEnd}
+      <GooglePlacesAutocomplete
+        placeholder="Enter end location"
+        onPress={(data, details = null) => {
+          setEnd(data.description);
+          console.log('Selected End Location:', data.description);
+        }}
+        query={{
+          key: GOOGLE_API_KEY,
+          language: 'en',
+        }}
+        styles={{
+          container: { flex: 0 },
+          textInput: styles.input,
+        }}
+        fetchDetails={true}
+        debounce={300}
       />
+
       <Text>Fare:</Text>
       <TextInput
         style={styles.input}
@@ -350,6 +375,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 16,
     paddingLeft: 8,
+    fontSize: 16,
   },
   button: {
     backgroundColor: '#39C9C2',
