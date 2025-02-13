@@ -19,7 +19,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
   token,
   onDriverConfirmed,
 }) => {
-  const [drivers, setDrivers] = useState<{ _id: string; name: string }[]>([]);
+  const [drivers, setDrivers] = useState<{ _id: string; firstName: string; lastName: string }[]>([]);
   const [selectedDriver, setSelectedDriver] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -106,7 +106,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
             {drivers.map((driver) => (
               <Picker.Item
                 key={driver._id}
-                label={`${driver.name} (ID: ${driver._id})`}
+                label={`${driver.firstName} ${driver.lastName}`}
                 value={driver._id}
               />
             ))}

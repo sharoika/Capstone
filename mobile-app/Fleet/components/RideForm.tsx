@@ -22,6 +22,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     longitudeDelta: 0.01,
   });
   const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [estimatedTime, setEstimatedTime] = useState<string>('');
 
   const mapRef = useRef<MapView>(null);
 
@@ -82,6 +83,12 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
       if (directionsData.routes.length) {
         const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
         setRouteCoordinates(points);
+
+        // Get and format the estimated time
+        const durationInSeconds = directionsData.routes[0].legs[0].duration.value;
+        const durationText = directionsData.routes[0].legs[0].duration.text;
+        setEstimatedTime(durationText);
+
         mapRef.current?.animateToRegion({
           latitude: startCoords.lat,
           longitude: startCoords.lng,
@@ -353,8 +360,8 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
       )}
 
       <View style={styles.bottomCard}>
-        <Text>Estimated Time: 15 mins</Text>
-        <Text>Fare: $15.00</Text>
+        <Text>Estimated Time: {estimatedTime || 'Calculate route to see estimate'}</Text>
+        <Text>Fare: ${fare || '0.00'}</Text>
         <TouchableOpacity style={styles.button} onPress={handleConfirmRide}>
           <Text style={styles.buttonText}>Confirm Ride</Text>
         </TouchableOpacity>
