@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-    const [users, setUsers] = useState([]);
+    const [riders, setRiders] = useState([]);
     const [drivers, setDrivers] = useState([]);
     const [showConfigModal, setShowConfigModal] = useState(false);
 
@@ -33,7 +33,7 @@ const AdminDashboard = () => {
                     })
                 ]);
 
-                setUsers(ridersResponse.data);
+                setRiders(ridersResponse.data);
                 setDrivers(driversResponse.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -116,17 +116,17 @@ const AdminDashboard = () => {
                     <Col>
                         <Card className="dashboard-card">
                             <Card.Header as="h5" className="bg-primary text-white">
-                                Users
+                                Riders
                             </Card.Header>
                             <Card.Body>
-                                {users.length === 0 ? (
-                                    <p>No users found</p>
+                                {riders.length === 0 ? (
+                                    <p>No riders found</p>
                                 ) : (
                                     <ul className="list-unstyled user-list">
-                                        {users.map((user) => (
-                                            <li key={user._id}>
+                                        {riders.map((rider) => (
+                                            <li key={rider._id}>
                                                 <i className="fas fa-user me-2"></i>
-                                                {user.first_name} {user.last_name}
+                                                {rider.firstName} {rider.lastName}
                                             </li>
                                         ))}
                                     </ul>
