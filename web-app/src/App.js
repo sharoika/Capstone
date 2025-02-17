@@ -11,21 +11,12 @@ import AdminPayments from './pages/AdminPayments';
 import AdminStripePlayground from './pages/AdminStripePlayground';
 import './App.css';
 import Register from './pages/Register';
+import { Navigate } from 'react-router-dom';
 
-import { Navigate, useLocation } from 'react-router-dom';
-
-const PrivateRoute = ({ children }) => {
-  const location = useLocation();
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  return children;
-};
 
 function App() {
+  var token = localStorage.getItem('token');
+
   return (
     <BrowserRouter>
       <Routes>
@@ -33,14 +24,32 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/driver-registration" element={<DriverRegistration />} />
-        <Route element={<PrivateRoute />}>
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/riders" element={<AdminRiders />} />
-          <Route path="/admin/drivers" element={<AdminDrivers />} />
-          <Route path="/admin/live-tracker" element={<AdminLiveTracker />} />
-          <Route path="/admin/payments" element={<AdminPayments />} />
-          <Route path="/admin/stripe" element={<AdminStripePlayground />} />
-        </Route>
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin"
+          element={token ? <AdminDashboard /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/riders"
+          element={token ? <AdminRiders /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/drivers"
+          element={token ? <AdminDrivers /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/live-tracker"
+          element={token ? <AdminLiveTracker /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/payments"
+          element={token ? <AdminPayments /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/stripe"
+          element={token ? <AdminStripePlayground /> : <Navigate to="/login" replace />}
+        />
       </Routes>
     </BrowserRouter>
   );
