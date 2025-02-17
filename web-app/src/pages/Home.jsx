@@ -96,6 +96,7 @@ const Home = () => {
                     </div>
                 </section>
             </div>
+            <Navbar />
         </>
     );
 };

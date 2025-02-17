@@ -25,10 +25,10 @@ const AdminDashboard = () => {
 
             try {
                 const [usersResponse, driversResponse] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/api/auth/users`, {
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/admin/riders`, {
                         headers: { 'Authorization': `Bearer ${token}` },
                     }),
-                    axios.get(`${process.env.REACT_APP_API_URL}/api/auth/drivers`, {
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/admin/drivers`, {
                         headers: { 'Authorization': `Bearer ${token}` },
                     })
                 ]);

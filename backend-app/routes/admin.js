@@ -1,4 +1,10 @@
 const express = require("express")
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const Admin = require("../models/Admin");
+const Rider= require("../models/Rider");
+const Driver = require("../models/Driver");
 
 const { adminAuthenticate } = require("../middlewares/auth");
 
@@ -9,7 +15,6 @@ router.post('/login', async (req, res) => {
 
     try {
         const admin = await Admin.findOne({ username });
-
         if (!admin || await !bcrypt.compare(password, admin.password)) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
@@ -41,8 +46,8 @@ router.post('/register', adminAuthenticate, async (req, res) => {
     }
 });
 
-router.get('/users', adminAuthenticate, async (req, res) => {
-    const users = await User.find();
+router.get('/riders', adminAuthenticate, async (req, res) => {
+    const users = await Rider.find();
     res.json(users);
 });
 
