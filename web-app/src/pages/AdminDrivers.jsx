@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DriversTable from '../components/DriversTable';
 import DriverEditModal from '../components/DriverEditModal';
+import AdminHeader from '../components/AdminHeader';
 
 const AdminDrivers = () => {
     const [drivers, setDrivers] = useState([]);
@@ -87,26 +88,24 @@ const AdminDrivers = () => {
     };
 
     return (
-        <Container className="py-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1>Drivers Management</h1>
-                <Button variant="secondary" onClick={() => navigate('/admin')}>Back</Button>
-            </div>
-
-            <DriversTable 
-                drivers={drivers} 
-                onApprovalChange={handleApprovalChange}
-                onDriverClick={handleDriverClick}
-                onDocumentDownload={handleDocumentDownload}
-            />
-
-            <DriverEditModal
-                show={showEditModal}
-                onHide={() => setShowEditModal(false)}
-                driver={selectedDriver}
-                onUpdate={handleDriverUpdate}
-            />
-        </Container>
+        <div>
+            <AdminHeader title="Admin Panel: Drivers" />
+            <Container className="py-4">
+                <DriversTable 
+                    drivers={drivers} 
+                    onApprovalChange={handleApprovalChange}
+                    onDriverClick={handleDriverClick}
+                    onDocumentDownload={handleDocumentDownload}
+                />
+                
+                <DriverEditModal
+                    show={showEditModal}
+                    onHide={() => setShowEditModal(false)}
+                    driver={selectedDriver}
+                    onUpdate={handleDriverUpdate}
+                />
+            </Container>
+        </div>
     );
 };
 

@@ -5,6 +5,7 @@ import { Container, Row, Col, Card } from 'react-bootstrap';
 import ConfigModal from '../components/ConfigModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminDashboard.css';
+import AdminHeader from '../components/AdminHeader';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -25,12 +26,9 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-dashboard">
-            <Container className="dashboard-container">
-                <Row className="mt-4 mb-4">
-                    <Col>
-                        <h1 className="text-center dashboard-title">Admin Panel</h1>
-                    </Col>
-                </Row>
+            <AdminHeader title="Admin Panel" />
+            <Container className="py-4">
+
 
                 {/* Maintenance Section */}
                 <Row className="mb-4">
@@ -110,29 +108,6 @@ const AdminDashboard = () => {
                                 </Button>
                             </Card.Body>
                         </Card>
-                    </Col>
-                </Row>
-
-                {/* Back and Logout Buttons */}
-                <Row className="mt-4">
-                    <Col className="d-flex justify-content-between">
-                        <Button 
-                            variant="secondary" 
-                            style={buttonStyle}
-                            onClick={() => navigate(-1)}
-                        >
-                            Back
-                        </Button>
-                        <Button 
-                            variant="danger" 
-                            style={buttonStyle}
-                            onClick={() => {
-                                localStorage.removeItem('token');
-                                navigate('/login');
-                            }}
-                        >
-                            Logout
-                        </Button>
                     </Col>
                 </Row>
 
