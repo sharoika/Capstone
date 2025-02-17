@@ -46,24 +46,6 @@ router.post('/ride', authenticate, async (req, res) => {
     }
 });
 
-router.get('/rides/without-driver', authenticate, async (req, res) => {
-    try {
-        // Find rides that do not have a driver assigned (driverID is null or undefined)
-        const ridesWithoutDriver = await Ride.find({ driverID: { $exists: false } })
-            .populate('riderID') // Optionally populate rider details
-            .exec();
-
-        if (ridesWithoutDriver.length === 0) {
-            return res.status(404).json({ message: 'No rides without a driver found' });
-        }
-
-        // Return all the rides without a driver
-        res.json({ rides: ridesWithoutDriver });
-    } catch (error) {
-        console.error('Error fetching rides without a driver:', error.message);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
 // Confirm a trip (Driver accepts a ride)
 router.post('/rides/:rideID/confirm', authenticate, async (req, res) => {
     const { rideID } = req.params;
