@@ -8,7 +8,6 @@ import { useStripe, useElements, CardElement, Elements } from '@stripe/react-str
 const stripePromise = loadStripe('pk_test_51QtMoYJyF40wM9B0Se1fgklXHRop2iczcT3HjYwnp8sJ6Si5MJaPzNHjlm06TXbPLR23RJZYFKA1XvQoy7HQFcfE00IXRjG8RP');
 
 const AdminStripePlayground = () => {
-    const navigate = useNavigate();
     const [amount, setAmount] = useState('');
     const [currency, setCurrency] = useState('usd');
     const [email, setEmail] = useState('');
