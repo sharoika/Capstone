@@ -5,13 +5,13 @@ const ChatSchema = new mongoose.Schema({
     chatID: { type: String, required: true, unique: true },
     participant1: {
       type: mongoose.Schema.Types.ObjectId,
-      refPath: 'participant1Model', // Either Rider or Driver
+      refPath: 'participant1Model',
       required: true
     },
     participant1Model: { type: String, enum: ['Rider', 'Driver'], required: true },
     participant2: {
       type: mongoose.Schema.Types.ObjectId,
-      refPath: 'participant2Model', // Either Admin or Driver
+      refPath: 'participant2Model',
       required: true
     },
     participant2Model: { type: String, enum: ['Admin', 'Driver'], required: true },
