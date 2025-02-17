@@ -24,7 +24,7 @@ const AdminDashboard = () => {
             }
 
             try {
-                const [usersResponse, driversResponse] = await Promise.all([
+                const [ridersResponse, driversResponse] = await Promise.all([
                     axios.get(`${process.env.REACT_APP_API_URL}/api/admin/riders`, {
                         headers: { 'Authorization': `Bearer ${token}` },
                     }),
@@ -33,7 +33,7 @@ const AdminDashboard = () => {
                     })
                 ]);
 
-                setUsers(usersResponse.data);
+                setUsers(ridersResponse.data);
                 setDrivers(driversResponse.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
