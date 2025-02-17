@@ -12,6 +12,19 @@ import AdminStripePlayground from './pages/AdminStripePlayground';
 import './App.css';
 import Register from './pages/Register';
 
+import { Navigate, useLocation } from 'react-router-dom';
+
+const PrivateRoute = ({ children }) => {
+  const location = useLocation();
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
 function App() {
   return (
     <BrowserRouter>
@@ -20,12 +33,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/driver-registration" element={<DriverRegistration />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/riders" element={<AdminRiders />} />
-        <Route path="/admin/drivers" element={<AdminDrivers />} />
-        <Route path="/admin/live-tracker" element={<AdminLiveTracker />} />
-        <Route path="/admin/payments" element={<AdminPayments />} />
-        <Route path="/admin/stripe" element={<AdminStripePlayground />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/riders" element={<AdminRiders />} />
+          <Route path="/admin/drivers" element={<AdminDrivers />} />
+          <Route path="/admin/live-tracker" element={<AdminLiveTracker />} />
+          <Route path="/admin/payments" element={<AdminPayments />} />
+          <Route path="/admin/stripe" element={<AdminStripePlayground />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
