@@ -81,4 +81,66 @@ router.put('/drivers/:id/approval', adminAuthenticate, async (req, res) => {
     }
 });
 
+router.put('/riders/:id', adminAuthenticate, async (req, res) => {
+    const { id } = req.params;
+    const { firstName, lastName, email, phone, homeLocation } = req.body;
+
+    try {
+        const rider = await Rider.findById(id);
+        if (!rider) {
+            return res.status(404).json({ message: 'Rider not found' });
+        }
+
+        // Update fields if they exist in request
+        if (firstName) rider.firstName = firstName;
+        if (lastName) rider.lastName = lastName;
+        if (email) rider.email = email;
+        if (phone) rider.phone = phone;
+        if (homeLocation) rider.homeLocation = homeLocation;
+
+        await rider.save();
+        res.json({ message: 'Rider updated successfully', rider });
+    } catch (error) {
+        console.error('Error updating rider:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.put('/drivers/:id', adminAuthenticate, async (req, res) => {
+    const { id } = req.params;
+    const { 
+        firstName, 
+        lastName, 
+        email, 
+        phone,
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        vehiclePlate
+    } = req.body;
+
+    try {
+        const driver = await Driver.findById(id);
+        if (!driver) {
+            return res.status(404).json({ message: 'Driver not found' });
+        }
+
+        // Update fields if they exist in request
+        if (firstName) driver.firstName = firstName;
+        if (lastName) driver.lastName = lastName;
+        if (email) driver.email = email;
+        if (phone) driver.phone = phone;
+        if (vehicleMake) driver.vehicleMake = vehicleMake;
+        if (vehicleModel) driver.vehicleModel = vehicleModel;
+        if (vehicleYear) driver.vehicleYear = vehicleYear;
+        if (vehiclePlate) driver.vehiclePlate = vehiclePlate;
+
+        await driver.save();
+        res.json({ message: 'Driver updated successfully', driver });
+    } catch (error) {
+        console.error('Error updating driver:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;

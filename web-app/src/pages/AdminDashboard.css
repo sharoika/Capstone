@@ -1,126 +1,134 @@
 css .admin-dashboard {
-    padding: 2rem;
-    background-color: #f8f9fa;
     min-height: 100vh;
-  }
-  
-  .dashboard-container {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  
-  .dashboard-title {
-    color: #1a1a1a;
+    padding: 2rem 0;
+    background-color: #f8f9fa;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+}
+
+.dashboard-title {
+    color: #333;
     font-weight: 600;
     margin-bottom: 2rem;
-  }
-  
-  .dashboard-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-  }
-  
-  .dashboard-card .card-header {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .dashboard-card .card-header.bg-success {
-    background-color: #059669 !important;
-  }
-  
-  .table {
+}
+
+.dashboard-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table {
     margin-bottom: 0;
     border-collapse: separate;
     border-spacing: 0;
-  }
-  
-  .table th {
+}
+
+.table th {
     font-weight: 500;
     color: #4b5563;
     background-color: #f9fafb;
     padding: 0.75rem 1rem;
     border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .table td {
+}
+
+.table td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid #e5e7eb;
     vertical-align: middle;
-  }
-  
-  .table tr:hover {
+}
+
+.table tr:hover {
     background-color: #f9fafb;
-  }
-  
-  .form-select {
+}
+
+.form-select {
     font-weight: 500;
     padding: 0.375rem 0.75rem;
     border-radius: 0.375rem;
-  }
-  
-  .form-select.bg-success {
+}
+
+.form-select.bg-success {
     background-color: #ecfdf5 !important;
     color: #059669 !important;
     border-color: #059669;
-  }
-  
-  .form-select.bg-danger {
+}
+
+.form-select.bg-danger {
     background-color: #fef2f2 !important;
     color: #dc2626 !important;
     border-color: #dc2626;
-  }
-  
-  .user-list {
+}
+
+.user-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
     padding: 1rem;
-  }
-  
-  .user-list li {
+}
+
+.user-list li {
     background-color: #f9fafb;
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
     border: 1px solid #e5e7eb;
-  }
-  
-  .table-responsive {
+}
+
+.table-responsive {
     max-height: 600px;
     overflow-y: auto;
     border-radius: 0.75rem;
-  }
-  
-  .dropdown-toggle.btn-primary {
+}
+
+.dropdown-toggle.btn-primary {
     background-color: #2563eb;
     border-color: #2563eb;
     padding: 0.375rem 1rem;
     font-weight: 500;
     border-radius: 0.375rem;
-  }
-  
-  .dropdown-toggle.btn-primary:hover {
+}
+
+.dropdown-toggle.btn-primary:hover {
     background-color: #1d4ed8;
     border-color: #1d4ed8;
-  }
-  
-  @media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
     .admin-dashboard {
-      padding: 1rem;
+        padding: 1rem;
     }
-  
+
     .dashboard-card {
-      border-radius: 0.5rem;
+        border-radius: 0.5rem;
     }
-  
+
     .table th,
     .table td {
-      padding: 0.5rem;
+        padding: 0.5rem;
     }
-  }
+}
   
   
