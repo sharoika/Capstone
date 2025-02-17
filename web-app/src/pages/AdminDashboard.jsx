@@ -48,7 +48,7 @@ const AdminDashboard = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `${process.env.REACT_APP_API_URL}/api/auth/drivers/${id}/approval`,
+                `${process.env.REACT_APP_API_URL}/api/admin/drivers/${id}/approval`,
                 { approve: value === "true" },
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
