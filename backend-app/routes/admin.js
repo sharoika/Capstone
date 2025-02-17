@@ -6,10 +6,11 @@ const router = express.Router();
 
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const admin = await Admin.findOne({ username });
 
     try {
-        if (!admin || await bcrypt.compare(password, admin.password)) {
+        const admin = await Admin.findOne({ username });
+
+        if (!admin || await !bcrypt.compare(password, admin.password)) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
@@ -26,6 +27,11 @@ router.post('/register', adminAuthenticate, async (req, res) => {
     const { username, password } = req.body;
 
     try {
+        const existingAdmin = await Admin.findOne({ username });
+        if (existingAdmin) {
+            return res.status(400).json({ message: 'Username already taken' });
+        }
+
         const newAdmin = new Admin({ username, password });
         await newAdmin.save();
         res.status(201).json({ message: 'Admin registered successfully' });
@@ -53,16 +59,13 @@ router.get('/drivers', adminAuthenticate, async (req, res) => {
 router.put('/drivers/:id/approval', adminAuthenticate, async (req, res) => {
     const { id } = req.params;
     const { approve } = req.body;
-
     try {
         const driver = await Driver.findById(id);
         if (!driver) {
             return res.status(404).json({ message: 'Driver not found' });
         }
-
         driver.applicationApproved = approve === true || approve === "true";
         await driver.save();
-
         res.json({
             message: `Driver ${driver.applicationApproved ? 'approved' : 'rejected'} successfully`,
             driver

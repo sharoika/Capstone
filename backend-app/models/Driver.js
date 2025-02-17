@@ -31,7 +31,14 @@ mongoose.connection.once('open', async () => {
     }
 });
 
-driverSchema.index({ currentLocation: '2dsphere' });
-driverSchema.index({ driverID: 1 }, { sparse: true });
+driverSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+});
+
+driverSchema.methods.comparePassword = async function (password) {
+    return bcrypt.compare(password, this.password);
+};
 
 module.exports = mongoose.model('Driver', driverSchema);

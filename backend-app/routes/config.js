@@ -1,10 +1,10 @@
 const express = require('express');
-const { authenticate } = require("../middlewares/auth");
+const { adminAuthenticate, authenticate } = require("../middlewares/auth");
 const Configuration = require('../models/Configuration');
 
 const router = express.Router();
 
-router.post('/', authenticate, async (req, res) => {
+router.post('/', adminAuthenticate, async (req, res) => {
     try {
         const { maintenanceMode, locationFrequency } = req.body;
 
