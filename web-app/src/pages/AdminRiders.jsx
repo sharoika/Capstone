@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button } from 'react-bootstrap';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import RiderEditModal from '../components/RiderEditModal';
 import AdminHeader from '../components/AdminHeader';
 
@@ -9,7 +8,6 @@ const AdminRiders = () => {
     const [riders, setRiders] = useState([]);
     const [selectedRider, setSelectedRider] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchRiders();

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import DriversTable from '../components/DriversTable';
 import DriverEditModal from '../components/DriverEditModal';
 import AdminHeader from '../components/AdminHeader';
@@ -10,7 +9,6 @@ const AdminDrivers = () => {
     const [drivers, setDrivers] = useState([]);
     const [selectedDriver, setSelectedDriver] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchDrivers();
