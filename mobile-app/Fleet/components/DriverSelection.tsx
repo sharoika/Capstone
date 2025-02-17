@@ -6,10 +6,12 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  FlatList,
+  Image,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+
 interface DriverSelectionProps {
-  rideID: string;  // Ensure this is correctly passed from parent component
+  rideID: string;
   token: string;
   onDriverConfirmed: () => void;
 }
@@ -19,17 +21,17 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
   token,
   onDriverConfirmed,
 }) => {
-  const [drivers, setDrivers] = useState<{ _id: string; firstName: string; lastName: string }[]>([]);
+  const [drivers, setDrivers] = useState<{ _id: string; firstName: string; lastName: string; profilePicture: string; fare: string }[]>([]);
+  const [rideDetails, setRideDetails] = useState<{ distance: number }>({ distance: 0 });
   const [selectedDriver, setSelectedDriver] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDrivers = async () => {
+    const fetchData = async () => {
       try {
-        // Log rideID to ensure it's being passed correctly
-        console.log('Fetching drivers for rideID:', rideID);
+        console.log('Fetching drivers for ride ID:', rideID);
 
-        const response = await fetch('http://10.0.2.2:5000/api/auth/drivers/list', {
+        const rideResponse = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -37,21 +39,35 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
           },
         });
 
-        if (response.ok) {
-          const driverList = await response.json();
+        if (rideResponse.ok) {
+          const rideData = await rideResponse.json();
+          setRideDetails({ distance: parseFloat(rideData.distance) });
+        } else {
+          Alert.alert('Error', 'Failed to fetch ride details');
+        }
+        const driverResponse = await fetch('http://10.0.2.2:5000/api/auth/drivers/list', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (driverResponse.ok) {
+          const driverList = await driverResponse.json();
           setDrivers(driverList);
         } else {
           Alert.alert('Error', 'Failed to fetch drivers');
         }
       } catch (error) {
-        console.error('Error fetching drivers:', error);
-        Alert.alert('Error', 'An error occurred while fetching drivers');
+        console.error('Error fetching data:', error);
+        Alert.alert('Error', 'An error occurred while fetching data');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchDrivers();
+    fetchData();
   }, [token, rideID]);
 
   const handleConfirm = async () => {
@@ -61,10 +77,8 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
     }
 
     try {
-      // Log the rideID and selectedDriver to ensure they are correct
       console.log(`Confirming ride with ID: ${rideID} and Driver ID: ${selectedDriver}`);
 
-      // Ensure the rideID is being used correctly in the URL
       const response = await fetch(
         `http://10.0.2.2:5000/api/rides/rides/${rideID}/confirm`,
         {
@@ -96,35 +110,70 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
       {isLoading ? (
         <ActivityIndicator size="large" color="#39C9C2" />
       ) : (
-        <>
-          <Picker
-            selectedValue={selectedDriver}
-            onValueChange={(value: React.SetStateAction<string>) => setSelectedDriver(value)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select a driver" value="" />
-            {drivers.map((driver) => (
-              <Picker.Item
-                key={driver._id}
-                label={`${driver.firstName} ${driver.lastName}`}
-                value={driver._id}
-              />
-            ))}
-          </Picker>
-          <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-            <Text style={styles.buttonText}>Confirm Trip</Text>
-          </TouchableOpacity>
-        </>
+        <FlatList
+          data={drivers}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => {
+            const totalFare = parseFloat(item.fare) * rideDetails.distance;
+            return (
+              <TouchableOpacity
+                style={[styles.card, selectedDriver === item._id && styles.selectedCard]}
+                onPress={() => setSelectedDriver(item._id)}
+              >
+                <Image source={{ uri: item.profilePicture }} style={styles.profileImage} />
+                <Text style={styles.driverName}>{`${item.firstName} ${item.lastName}`}</Text>
+                <Text style={styles.driverDetails}>{`Fare: ${item.fare}`}</Text>
+                <Text style={styles.driverDetails}>{`Distance: ${rideDetails.distance}`}</Text>
+                <Text style={styles.driverDetails}>{`Total Fare: ${totalFare.toFixed(2)}`}</Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
       )}
+      <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+        <Text style={styles.buttonText}>Confirm Trip</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { marginTop: 24 },
-  picker: { marginBottom: 16, height: 50 },
-  button: { padding: 16, backgroundColor: '#39C9C2', borderRadius: 8 },
-  buttonText: { color: '#fff', textAlign: 'center', fontWeight: '600' },
+  container: { marginTop: 24, padding: 16 },
+  card: {
+    padding: 16,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  selectedCard: {
+    backgroundColor: '#39C9C2',
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginBottom: 8,
+  },
+  driverName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  driverDetails: {
+    fontSize: 14,
+    color: '#555',
+  },
+  button: {
+    padding: 16,
+    backgroundColor: '#39C9C2',
+    borderRadius: 8,
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
 });
 
 export default DriverSelection;

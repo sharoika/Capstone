@@ -22,11 +22,16 @@ const authenticate = (req, res, next) => {
 
 // Create a trip
 router.post('/ride', authenticate, async (req, res) => {
-   
-    const { riderID, start, end, fare } = req.body;
+    const { riderID, start, end, distance } = req.body;
 
-    if (!riderID || !start || !end || !fare) {
+    if (!riderID || !start || !end || !distance) {
         return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const numericDistance = parseFloat(distance.replace(/[^\d.-]/g, ''));
+
+    if (isNaN(numericDistance)) {
+        return res.status(400).json({ message: 'Invalid distance' });
     }
 
     try {
@@ -34,23 +39,24 @@ router.post('/ride', authenticate, async (req, res) => {
             riderID,
             start,
             end,
-            fare,
+            distance: numericDistance, 
             rideBooked: true,
         });
 
         await ride.save();
-        
-        // Send back the rideID as part of the response
+
         res.status(201).json({ 
             message: 'Ride created successfully', 
-            ride: ride,         // Full ride object
-            rideID: ride._id    // Send back the ride's unique ID
+            ride: ride,      
+            rideID: ride._id, 
+            distance: numericDistance  
         });
     } catch (error) {
         console.error('Error creating ride:', error.message);
         res.status(500).json({ message: 'Server error' });
     }
 });
+
 router.get('/rides/without-driver', authenticate, async (req, res) => {
     try {
         // Find rides that do not have a driver assigned (driverID is null or undefined)
@@ -149,6 +155,26 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
     }
 });
 
+router.get('/riders/:riderID/recent-ride', authenticate, async (req, res) => {
+    const { riderID } = req.params;
+
+    try {
+        const rider = await Rider.findById(riderID).populate({
+            path: 'completedRides',
+            options: { sort: { _id: -1 }, limit: 1 }
+        });
+
+        if (!rider || rider.completedRides.length === 0) {
+            return res.status(404).json({ message: 'No completed rides found' });
+        }
+
+        res.json({ recentRide: rider.completedRides[0] });
+    } catch (error) {
+        console.error('Error fetching recent ride:', error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Check if a ride is finished
 router.get('/rides/:rideID/status', authenticate, async (req, res) => {
     const { rideID } = req.params;
@@ -190,10 +216,11 @@ router.get('/rides/:rideID', authenticate, async (req, res) => {
             start: ride.start,
             end: ride.end,
             fare: ride.fare,
+            distance: ride.distance,
             rideBooked: ride.rideBooked,
             rideInProgress: ride.rideInProgress,
             rideFinished: ride.rideFinished,
-            rider: ride.riderID, // Rider details
+            rider: ride.riderID,
             driverSelected: ride.driverSelected,
             cancellationStatus: ride.cancellationStatus,
         });

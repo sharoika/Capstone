@@ -1,48 +1,79 @@
-import type React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface RideSummaryProps {
-  rideDetails: any
-  onReturnHome: () => void
+  rideID: string;
+  token: string;
+  onReturnHome: () => void;
 }
 
-const RideSummary: React.FC<RideSummaryProps> = ({ rideDetails, onReturnHome }) => {
+const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }) => {
+  const [rideDetails, setRideDetails] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRideDetails = async () => {
+      try {
+        const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch ride details");
+        }
+
+        const data = await response.json();
+        setRideDetails(data);
+      } catch (err) {
+        setError("Error fetching ride details");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRideDetails();
+  }, [rideID, token]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.headerText}>Ride Summary</Text>
-        {rideDetails ? (
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : rideDetails ? (
           <View style={styles.summaryCard}>
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Ride ID</Text>
-              <Text style={styles.infoText}>{rideDetails._id}</Text>
+              <Text style={styles.infoText}>{rideDetails.rideID}</Text>
             </View>
-
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Start Location</Text>
               <Text style={styles.infoText}>{rideDetails.start}</Text>
             </View>
-
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>End Location</Text>
               <Text style={styles.infoText}>{rideDetails.end}</Text>
             </View>
-
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Distance</Text>
               <Text style={styles.infoText}>{rideDetails.distance} km</Text>
             </View>
-
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Total Fare</Text>
               <Text style={styles.fareText}>${rideDetails.fare}</Text>
             </View>
           </View>
         ) : (
-          <View style={styles.summaryCard}>
-            <Text style={styles.noDataText}>No ride details available</Text>
-          </View>
+          <Text style={styles.noDataText}>No ride details available</Text>
         )}
 
         <TouchableOpacity style={styles.returnButton} onPress={onReturnHome} activeOpacity={0.8}>
@@ -50,8 +81,8 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideDetails, onReturnHome }) 
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -102,6 +133,11 @@ const styles = StyleSheet.create({
     color: "#6d6d6d",
     textAlign: "center",
   },
+  errorText: {
+    fontSize: 14,
+    color: "red",
+    textAlign: "center",
+  },
   returnButton: {
     backgroundColor: "#39c9c2",
     borderRadius: 12,
@@ -118,7 +154,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});
 
-export default RideSummary
-
+export default RideSummary;

@@ -13,7 +13,6 @@ interface RideFormProps {
 const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) => {
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
-  const [fare, setFare] = useState('');
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [region, setRegion] = useState({
     latitude: 37.7749, // Default coordinates
@@ -23,6 +22,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
   });
   const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
   const [estimatedTime, setEstimatedTime] = useState<string>('');
+  const [distance, setDistance] = useState<string>('');
 
   const mapRef = useRef<MapView>(null);
 
@@ -88,7 +88,8 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
         const durationInSeconds = directionsData.routes[0].legs[0].duration.value;
         const durationText = directionsData.routes[0].legs[0].duration.text;
         setEstimatedTime(durationText);
-
+        const distance = directionsData.routes[0].legs[0].distance.text; 
+        setDistance(distance);
         mapRef.current?.animateToRegion({
           latitude: startCoords.lat,
           longitude: startCoords.lng,
@@ -240,7 +241,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     }
 ];
   const handleConfirmRide = async () => {
-    if (!start || !end || !fare) {
+    if (!start || !end ) {
       Alert.alert('Error', 'Please fill in all the fields.');
       return;
     }
@@ -256,7 +257,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
           riderID,
           start,
           end,
-          fare: parseFloat(fare), // Ensure fare is sent as a number
+          distance,
         }),
       });
 
@@ -314,14 +315,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
         debounce={300}
       />
 
-      <Text>Fare:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Fare (e.g., 20.50)"
-        value={fare}
-        onChangeText={setFare}
-        keyboardType="numeric"
-      />
+
       <TouchableOpacity style={styles.button} onPress={fetchCoordinatesAndRoute}>
         <Text style={styles.buttonText}>Show Route</Text>
       </TouchableOpacity>
@@ -341,19 +335,25 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
               strokeColor="#00f"
             />
           )}
-          <Marker
-            coordinate={{
-              latitude: location.latitude,
-              longitude: location.longitude,
-            }}
-            title="Your Location"
-            description="This is your current location"
-          >
-            <Image
-              source={require('../assets/images/favicon.png')}
-              style={{ width: 40, height: 40 }}
-            />
-          </Marker>
+      <Marker
+  coordinate={{
+    latitude: location.latitude,
+    longitude: location.longitude,
+  }}
+  title="Your Location"
+  description="This is your current location"
+>
+  <View
+    style={{
+      width: 40,
+      height: 40,
+      backgroundColor: 'blue',
+      borderRadius: 20, 
+      borderWidth: 2,
+      borderColor: 'white',
+    }}
+  />
+</Marker>
         </MapView>
       ) : (
         <Text>Loading map...</Text>
@@ -361,7 +361,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
 
       <View style={styles.bottomCard}>
         <Text>Estimated Time: {estimatedTime || 'Calculate route to see estimate'}</Text>
-        <Text>Fare: ${fare || '0.00'}</Text>
+        <Text>Distance: {distance || 'Calculate route to see distance'}</Text>
         <TouchableOpacity style={styles.button} onPress={handleConfirmRide}>
           <Text style={styles.buttonText}>Confirm Ride</Text>
         </TouchableOpacity>

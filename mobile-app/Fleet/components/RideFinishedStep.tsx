@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface RideFinishedStepProps {
-  onGoHome: () => void; // Callback to reset the flow
+  onGoHome: () => void; 
 }
 
 const RideFinishedStep: React.FC<RideFinishedStepProps> = ({ onGoHome }) => {

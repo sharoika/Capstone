@@ -1,7 +1,9 @@
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
+import MapView, { Marker, Polyline } from 'react-native-maps';
+import Geocoder from 'react-native-geocoding';
 
 interface StartRideProps {
   rideID: string
@@ -13,6 +15,43 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   const [rideDetails, setRideDetails] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [region, setRegion] = useState<any>(null);
+  const mapRef = useRef<MapView | null>(null);
+  const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
+
+  useEffect(() => {
+    const fetchCoordinates = async () => {
+      if (!rideDetails?.start || !rideDetails?.end) return;
+  
+      try {
+        const startResponse = await Geocoder.from(rideDetails.start);
+        const endResponse = await Geocoder.from(rideDetails.end);
+  
+        const startLocation = startResponse.results[0].geometry.location;
+        const endLocation = endResponse.results[0].geometry.location;
+  
+        const newCoordinates = [
+          { latitude: startLocation.lat, longitude: startLocation.lng },
+          { latitude: endLocation.lat, longitude: endLocation.lng },
+        ];
+  
+        setRouteCoordinates(newCoordinates);
+        setRegion({
+          latitude: startLocation.lat,
+          longitude: startLocation.lng,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        });
+  
+      } catch (error) {
+        console.error("Error geocoding addresses:", error);
+        Alert.alert("Error", "Failed to retrieve route coordinates.");
+      }
+    };
+  
+    fetchCoordinates();
+  }, [rideDetails]);
 
   useEffect(() => {
     const fetchRideDetails = async () => {
@@ -41,6 +80,45 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
 
     fetchRideDetails()
   }, [rideID, token])
+
+  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch(
+          `https://www.googleapis.com/geolocation/v1/geolocate?key=${GOOGLE_API_KEY}`,
+          { method: 'POST' }
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          const { location } = data;
+          
+          if (location && location.lat != null && location.lng != null) {
+            setLocation({ latitude: location.lat, longitude: location.lng });
+          } else {
+            Alert.alert('Error', 'Location data is invalid or missing.');
+          }
+        } else {
+          Alert.alert('Error', 'Failed to fetch location.');
+        }
+      } catch (error) {
+        console.error('Error fetching location:', error);
+        Alert.alert('Error', 'An error occurred while fetching location.');
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (routeCoordinates.length > 0) {
+      setRegion({
+        latitude: routeCoordinates[0].latitude,
+        longitude: routeCoordinates[0].longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    }
+  }, [routeCoordinates]);
 
   const handleStartRide = async () => {
     try {
@@ -85,7 +163,8 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.headerText}>Start Ride</Text>
+        <Text style={styles.headerText}>Driver is Enroute</Text>
+        <Text style={styles.infoText}>When driver arrives press start ride</Text>
         {rideDetails && (
           <View style={styles.rideInfoCard}>
             <View style={styles.infoSection}>
@@ -124,10 +203,47 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
               </View>
             </View>
 
+            {location ? (
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          region={region}
+          onRegionChangeComplete={setRegion}
+        >
+          {routeCoordinates.length > 0 && (
+            <Polyline
+              coordinates={routeCoordinates}
+              strokeWidth={4}
+              strokeColor="#00f"
+            />
+          )}
+<Marker
+  coordinate={{
+    latitude: location.latitude,
+    longitude: location.longitude,
+  }}
+  title="Your Location"
+  description="This is your current location"
+>
+  <View
+    style={{
+      width: 40,
+      height: 40,
+      backgroundColor: 'blue',
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: 'white',
+    }}
+  />
+</Marker>
+        </MapView>
+      ) : (
+        <Text>Loading map...</Text>
+      )}
             {rideDetails.rider && (
               <View style={styles.infoSection}>
                 <Text style={styles.infoLabel}>Rider</Text>
-                <Text style={styles.infoText}>{rideDetails.rider.name}</Text>
+                <Text style={styles.infoText}>{rideDetails.rider.firstName}</Text>
               </View>
             )}
           </View>
@@ -154,6 +270,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#173252",
     marginBottom: 12,
+  },
+  map: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10
   },
   rideInfoCard: {
     backgroundColor: "#ffffff",

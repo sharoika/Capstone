@@ -6,6 +6,7 @@ const driverSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: false },
     password: { type: String, required: true },
+    rate: { type: String, required: false },
     currentLocation: {
         type: { type: String, default: 'Point' },
         coordinates: { type: [Number], default: [0, 0] }, // Longitude, Latitude

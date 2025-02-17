@@ -36,6 +36,7 @@ export default function DriverLoginScreen() {
         console.log("Token received:", token);
         await saveToStorage('driverToken', token);
         await saveToStorage('driverID', driverID);
+        await saveToStorage('userType', 'driver');
         router.push('/(tabs)/driverHome');
         Alert.alert('Success', message);
       } else {

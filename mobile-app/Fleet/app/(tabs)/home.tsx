@@ -92,6 +92,8 @@ const HomeScreen: React.FC = () => {
       {currentStep === 5 && (
         <RideSummary
           rideDetails={rideDetails}
+          rideID={rideID}
+          token={token}
           onReturnHome={() => {
             setCurrentStep(1); // Return to the home screen
             setRideID('');

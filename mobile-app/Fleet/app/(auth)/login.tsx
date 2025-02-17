@@ -39,7 +39,9 @@ export default function LoginScreen() {
         await Promise.all([
           saveToStorage('userToken', token),
           saveToStorage('userObjectId', user.objectId),
+          saveToStorage('userType', "rider"),
         ]);
+        console.log("usertype saved");
       } else {
         Alert.alert('Error', 'Login failed. Please try again.');
       }
