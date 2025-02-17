@@ -8,19 +8,8 @@ const Ride = require('../models/Ride');
 const Driver = require('../models/Driver');
 const Token = require('../models/Token');
 const router = express.Router();
+const { authenticate } = require("../middlewares/auth");
 
-// Middleware to authenticate using JWT
-const authenticate = (req, res, next) => {
-    const token = req.header('Authorization');
-    if (!token) {
-        return res.status(401).json({ message: 'No token provided' });
-    }
-
-        next();
-  
-};
-
-// Create a trip
 router.post('/ride', authenticate, async (req, res) => {
     const { riderID, start, end, distance } = req.body;
 
@@ -126,8 +115,6 @@ router.post('/rides/:rideID/start', authenticate, async (req, res) => {
     }
 });
 
-
-// Finish a trip
 router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
     const { rideID } = req.params;
 
@@ -257,5 +244,4 @@ router.post('/rides/:rideID/cancel', authenticate, async (req, res) => {
     }
 });
 
-// Export the router
 module.exports = router;

@@ -2,11 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const dotenv = require('dotenv');
-const authRoutes = require('./routes/auth');
-const configRoutes = require('./routes/config');
-const rideRoutes = require('./routes/rides');
 const path = require('path');
 const fs = require('fs');
+
+const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin')
+const userRoutes = require('./routes/user')
+const configRoutes = require('./routes/config');
+const rideRoutes = require('./routes/ride');
 
 dotenv.config();
 
@@ -16,12 +19,11 @@ const cors = require('cors');
 app.use(express.json());
 
 const corsOptions = {
-    origin: ['https://ridefleet.ca', 'http://ridefleet.ca', 'http://localhost:3000', 'http://localhost:8081'],  // Allowed origins
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Allowed HTTP methods
-    credentials: true,  // Allow cookies and credentials
-    allowedHeaders: ['Content-Type', 'Authorization', 'Origin'],  // Allowed headers
+    origin: ['https://ridefleet.ca', 'http://ridefleet.ca', 'http://localhost:3000', 'http://localhost:8081'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin'],
 };
-
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
@@ -33,8 +35,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        httpOnly: true, // Keeps the cookie safe from JavaScript access
-        secure: process.env.NODE_ENV === 'production' // Ensures secure cookies only in production
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production'
     }
 }));
 
@@ -43,15 +45,15 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
     .catch((err) => console.log('MongoDB connection error:', err));
 
 app.use('/api/auth', authRoutes);
-app.use('/api/configuration', configRoutes)
-app.use('/api/rides', rideRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/config', configRoutes)
+app.use('/api/ride', rideRoutes);
 
-// Create uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {
     fs.mkdirSync('uploads');
 }
 
-// Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.listen(process.env.PORT || 5000, () => {
