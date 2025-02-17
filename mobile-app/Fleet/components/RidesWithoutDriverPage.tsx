@@ -19,7 +19,7 @@ const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, 
 
   const fetchRidesWithoutDriver = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/rides/rides/without-driver', {
+      const response = await fetch('http://10.0.2.2:5000/api/ride/rides/without-driver', {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -42,7 +42,7 @@ const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, 
     }
 
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${selectedRide}/confirm`, {
+      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${selectedRide}/confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

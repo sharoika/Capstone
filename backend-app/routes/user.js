@@ -1,5 +1,5 @@
 const express = require("express")
-
+const Driver = require('../models/Driver');
 const { authenticate } = require("../middlewares/auth");
 
 const router = express.Router();

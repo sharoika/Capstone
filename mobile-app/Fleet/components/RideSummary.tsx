@@ -16,7 +16,7 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
   useEffect(() => {
     const fetchRideDetails = async () => {
       try {
-        const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}`, {
+        const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${rideID}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

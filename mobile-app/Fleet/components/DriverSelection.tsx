@@ -31,7 +31,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
       try {
         console.log('Fetching drivers for ride ID:', rideID);
 
-        const rideResponse = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}`, {
+        const rideResponse = await fetch(`http://10.0.2.2:5000/api/ride/rides/${rideID}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
         } else {
           Alert.alert('Error', 'Failed to fetch ride details');
         }
-        const driverResponse = await fetch('http://10.0.2.2:5000/api/auth/drivers/list', {
+        const driverResponse = await fetch('http://10.0.2.2:5000/api/user/drivers', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
       console.log(`Confirming ride with ID: ${rideID} and Driver ID: ${selectedDriver}`);
 
       const response = await fetch(
-        `http://10.0.2.2:5000/api/rides/rides/${rideID}/confirm`,
+        `http://10.0.2.2:5000/api/ride/rides/${rideID}/confirm`,
         {
           method: 'POST',
           headers: {

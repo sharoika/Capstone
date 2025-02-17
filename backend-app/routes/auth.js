@@ -87,13 +87,13 @@ router.post('/driver/login', async (req, res) => {
 
   try {
     const driver = await Driver.findOne({ email });
-
-    if (!driver || !(await bcrypt.compare(password, driver.password))) {
+    
+      if (!driver || !(await bcrypt.compare(password, driver.password))) {
       return res.status(401).json({
         message: 'Invalid credentials',
       });
     }
-
+    
     const token = jwt.sign(
       { 
         id: driver._id, 
@@ -102,7 +102,7 @@ router.post('/driver/login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
-
+    console.log("here");
     return res.status(200).json({
       message: 'Login successful',
       token: token,

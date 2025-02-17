@@ -26,7 +26,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
 
   const mapRef = useRef<MapView>(null);
 
-  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; // Replace with your actual API key
+  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
 
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY); 
@@ -247,7 +247,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     }
 
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/rides/ride', {
+      const response = await fetch('http://10.0.2.2:5000/api/ride/ride', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

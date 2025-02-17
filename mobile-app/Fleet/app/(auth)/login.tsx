@@ -24,21 +24,21 @@ export default function LoginScreen() {
       Alert.alert('Error', 'Please enter both email and password.');
       return;
     }
-  
+    console.log("here");
     try {
       const response = await axios.post(`http://10.0.2.2:5000/api/auth/rider/login`, {
         email,
         password,
       });
-  
+      console.log(response.data);
       const { token, user, message } = response.data;
-      if (token && user?.objectId) {
+      if (token && user?.id) {
         router.push('/(tabs)/home');
         Alert.alert('Success', message);
         console.log(token);
         await Promise.all([
           saveToStorage('userToken', token),
-          saveToStorage('userObjectId', user.objectId),
+          saveToStorage('userObjectId', user.id),
           saveToStorage('userType', "rider"),
         ]);
         console.log("usertype saved");
