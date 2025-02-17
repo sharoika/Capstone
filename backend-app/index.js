@@ -8,6 +8,7 @@ const fs = require('fs');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin')
 const userRoutes = require('./routes/user')
+const paymentRoutes = require('./routes/payment')
 const configRoutes = require('./routes/config');
 const rideRoutes = require('./routes/ride');
 
@@ -47,6 +48,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/payment', paymentRoutes);
 app.use('/api/config', configRoutes)
 app.use('/api/ride', rideRoutes);
 

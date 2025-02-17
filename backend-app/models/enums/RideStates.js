@@ -1,4 +1,4 @@
-const ContractStates = Object.freeze({
+const RideStates = Object.freeze({
     PROPOSED: 'proposed',
     REJECTED: 'rejected',
     ACCEPTED: 'accepted',
@@ -6,4 +6,4 @@ const ContractStates = Object.freeze({
     CANCELLED: 'cancelled'
   });
   
-  module.exports = ContractStates;
+  module.exports = RideStates;

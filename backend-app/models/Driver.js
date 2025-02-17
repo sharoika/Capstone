@@ -6,13 +6,13 @@ const driverSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: false },
     password: { type: String, required: true },
-    rate: { type: String, required: false },
+    rate: { type: String, required: false }, // switch to pricingDetails
     currentLocation: {
         type: { type: String, default: 'Point' },
         coordinates: { type: [Number], default: [0, 0] },
     },
-    completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],
-    driverID: { type: String, unique: true, sparse: true },
+    completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }], // dont need, instead query rides with driverId
+    driverID: { type: String, unique: true, sparse: true }, // prob can remove
     licenseDoc: { type: String },
     abstractDoc: { type: String },
     criminalRecordCheckDoc: { type: String },
@@ -21,6 +21,7 @@ const driverSchema = new mongoose.Schema({
     vehicleRegistrationDoc: { type: String },
     safetyInspectionDoc: { type: String },
     applicationApproved: { type: Boolean, default: false },
+    // need to add expiry date, i.e when the newest doc will expire
     isOnline: { type: Boolean, default: false },
 }, { collection: 'Drivers' });
 

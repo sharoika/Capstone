@@ -1,17 +1,102 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Card, Form, Button, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import { useStripe, useElements, CardElement, Elements } from '@stripe/react-stripe-js';
+
+// Make sure to load your Stripe public key here
+const stripePromise = loadStripe('pk_test_51QtMoYJyF40wM9B0Se1fgklXHRop2iczcT3HjYwnp8sJ6Si5MJaPzNHjlm06TXbPLR23RJZYFKA1XvQoy7HQFcfE00IXRjG8RP');
 
 const AdminStripePlayground = () => {
     const navigate = useNavigate();
     const [amount, setAmount] = useState('');
     const [currency, setCurrency] = useState('usd');
-    const [description, setDescription] = useState('');
+    const [email, setEmail] = useState('');
+    const [paymentMethodId, setPaymentMethodId] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [customerId, setCustomerId] = useState(null);  // Added state to store the customerId
 
-    const handleCreateCharge = async (e) => {
+    const stripe = useStripe();
+    const elements = useElements();
+
+    // Handle creating customer and associating payment method
+    const handleCreateCustomer = async (e) => {
         e.preventDefault();
-        // TODO: Implement Stripe charge creation
-        alert('Stripe integration coming soon!');
+        if (!stripe || !elements) return;
+
+        setIsLoading(true);
+
+        const cardElement = elements.getElement(CardElement);
+
+        // Create a payment method with Stripe's CardElement
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+        });
+
+        if (error) {
+            setError(error.message);
+            setIsLoading(false);
+            return;
+        }
+
+        console.log("payment method");
+        console.log(paymentMethod.id);
+        setPaymentMethodId(paymentMethod.id);
+
+        // Send payment method and email to backend to create customer
+        try {
+            console.log(paymentMethod.id);
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/payment/create-customer`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ paymentMethodId: paymentMethod.id, email }),
+            });
+
+            const data = await response.json();
+
+            if (data.customerId) {
+                alert('Customer created successfully!');
+                setCustomerId(data.customerId);  // Store the customerId for later use
+            }
+        } catch (error) {
+            console.error('Error creating customer:', error);
+            setIsLoading(false);
+        }
+    };
+
+    // Handle charge (payment) on button click
+    const handleCreateCharge = async () => {
+        if (!customerId || !paymentMethodId) {
+            alert("Customer or Payment Method is missing.");
+            return;
+        }
+
+        // Fake amount for testing
+        const fakeAmount = 10; // 10 USD for this example
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/payment/create-charge`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ customerId, paymentMethodId, amount: fakeAmount }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Fake charge processed successfully!');
+                navigate('/admin');  // Navigate to the admin page or wherever you'd like after success
+            } else {
+                alert('Payment failed');
+            }
+        } catch (error) {
+            console.error('Error creating charge:', error);
+        }
     };
 
     return (
@@ -26,58 +111,40 @@ const AdminStripePlayground = () => {
             <Row>
                 <Col md={6}>
                     <Card>
-                        <Card.Header as="h5">Create Payment</Card.Header>
+                        <Card.Header as="h5">Create Customer</Card.Header>
                         <Card.Body>
-                            <Form onSubmit={handleCreateCharge}>
+                            <Form onSubmit={handleCreateCustomer}>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Amount</Form.Label>
+                                    <Form.Label>Email</Form.Label>
                                     <Form.Control
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        placeholder="Enter amount"
-                                        min="0.50"
-                                        step="0.01"
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Enter email"
                                         required
                                     />
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Currency</Form.Label>
-                                    <Form.Select
-                                        value={currency}
-                                        onChange={(e) => setCurrency(e.target.value)}
-                                    >
-                                        <option value="usd">USD</option>
-                                        <option value="eur">EUR</option>
-                                        <option value="gbp">GBP</option>
-                                        <option value="cad">CAD</option>
-                                    </Form.Select>
+                                    <Form.Label>Card Details</Form.Label>
+                                    <div>
+                                        <CardElement />
+                                    </div>
                                 </Form.Group>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Description</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        placeholder="Payment description"
-                                    />
-                                </Form.Group>
+                                {error && <p className="text-danger">{error}</p>}
 
-                                <Button variant="primary" type="submit">
-                                    Create Payment
+                                <Button variant="primary" type="submit" disabled={isLoading}>
+                                    {isLoading ? 'Creating Customer...' : 'Create Customer and Save Payment Method'}
                                 </Button>
                             </Form>
-                        </Card.Body>
-                    </Card>
-                </Col>
 
-                <Col md={6}>
-                    <Card>
-                        <Card.Header as="h5">Recent Transactions</Card.Header>
-                        <Card.Body>
-                            <p className="text-muted">No transactions yet</p>
+                            {/* Display charge button after customer is created */}
+                            {customerId && (
+                                <Button variant="success" onClick={handleCreateCharge} className="mt-3">
+                                    Create Charge
+                                </Button>
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>
@@ -86,4 +153,11 @@ const AdminStripePlayground = () => {
     );
 };
 
-export default AdminStripePlayground; 
+// Wrap the component with Elements provider
+const AdminStripePlaygroundWrapper = () => (
+    <Elements stripe={stripePromise}>
+        <AdminStripePlayground />
+    </Elements>
+);
+
+export default AdminStripePlaygroundWrapper;
