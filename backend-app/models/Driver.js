@@ -9,7 +9,7 @@ const driverSchema = new mongoose.Schema({
     rate: { type: String, required: false },
     currentLocation: {
         type: { type: String, default: 'Point' },
-        coordinates: { type: [Number], default: [0, 0] }, // Longitude, Latitude
+        coordinates: { type: [Number], default: [0, 0] },
     },
     completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],
     driverID: { type: String, unique: true, sparse: true },
@@ -21,15 +21,13 @@ const driverSchema = new mongoose.Schema({
     vehicleRegistrationDoc: { type: String },
     safetyInspectionDoc: { type: String },
     applicationApproved: { type: Boolean, default: false },
-    isOnline: { type: Boolean, default: false }, // New field added
+    isOnline: { type: Boolean, default: false },
 }, { collection: 'Drivers' });
 
-// Drop the existing index if it exists
 mongoose.connection.once('open', async () => {
     try {
         await mongoose.connection.collections.Drivers.dropIndex('driverID_1');
     } catch (err) {
-        // Index might not exist, that's okay
     }
 });
 

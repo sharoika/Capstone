@@ -1,12 +1,5 @@
 const mongoose = require('mongoose');
-const ContractStates = require('./path/to/contract_states'); // Adjust the path as needed
-
-const pricingDetailsSchema = new mongoose.Schema({
-  initialPrice: { type: Number, required: true },
-  perKmPrice: { type: Number, required: true }
-});
-
-const PricingDetails = mongoose.model('PricingDetails', pricingDetailsSchema);
+const ContractStates = require('./path/to/contract_states');
 
 const contactSchema = new mongoose.Schema({
   riderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

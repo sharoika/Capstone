@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Define Ride Schema
 const RideSchema = new mongoose.Schema({
     riderID: { type: mongoose.Schema.Types.ObjectId, ref: 'Rider', required: true },
     start: { type: String, required: true },
@@ -15,4 +14,4 @@ const RideSchema = new mongoose.Schema({
     tipAmount: { type: Number, default: 0 },
 });
 
-module.exports = mongoose.model('Ride', RideSchema); // Export the model
+module.exports = mongoose.model('Ride', RideSchema);
