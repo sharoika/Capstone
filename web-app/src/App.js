@@ -3,13 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
-import DriverRegistration from './pages/DriverRegistration';
 import AdminRiders from './pages/AdminRiders';
 import AdminDrivers from './pages/AdminDrivers';
 import AdminLiveTracker from './pages/AdminLiveTracker';
 import AdminPayments from './pages/AdminPayments';
 import './App.css';
-import Register from './pages/Register';
 import { Navigate } from 'react-router-dom';
 import './styles/AdminStyles.css';
 
@@ -22,8 +20,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/driver-registration" element={<DriverRegistration />} />
 
         {/* Admin Routes */}
         <Route
