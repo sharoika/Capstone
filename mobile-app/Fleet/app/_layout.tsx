@@ -17,6 +17,7 @@ export default function MainLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>  {/* Disable header for this layout */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="(pages)" options={{ headerShown: false }} />
     </Stack>
   );
 }
