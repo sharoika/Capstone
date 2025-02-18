@@ -44,10 +44,3 @@ driverSchema.methods.comparePassword = async function (password) {
 };
 
 module.exports = mongoose.model('Driver', driverSchema);
-
-const mongoose = require('mongoose');
-
-const pricingDetailsSchema = new mongoose.Schema({
-    initialPrice: { type: Number, required: true },
-    perKmPrice: { type: Number, required: true }
-});
