@@ -9,7 +9,9 @@ const RiderSchema = new mongoose.Schema({
   password: { type: String, required: true },
   homeLocation: { type: String },
   riderID: { type: String, required: false, unique: true },
-  completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }]
+  completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],
+  stripeCustomerId: { type: String, required: false},
+  stripePaymentMethodId:{ type: String, required: false}
 });
 
 RiderSchema.pre('save', async function (next) {

@@ -5,12 +5,10 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const router = express.Router();
 
-// Step 1: Create a Customer and Save Payment Method
 router.post('/create-customer', async (req, res) => {
     try {
         const { paymentMethodId, email } = req.body;
 
-        // Create a customer
         const customer = await stripe.customers.create({
             email: email,
             payment_method: paymentMethodId,
@@ -26,7 +24,6 @@ router.post('/create-customer', async (req, res) => {
     }
 });
 
-// Step 2: Create a Fake Payment (Charge)
 router.post('/create-charge', async (req, res) => {
     try {
         const { customerId, amount } = req.body;
@@ -34,9 +31,8 @@ router.post('/create-charge', async (req, res) => {
         console.log(req.body);
         console.log(req.body.paymentMethodId);
 
-        // Create a fake charge
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount * 100, // Amount in the smallest currency unit (e.g., cents)
+            amount: amount * 100,
             currency: 'usd',
             customer: customerId,
             description: 'Fake charge for test purposes',
