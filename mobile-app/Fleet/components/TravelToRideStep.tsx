@@ -21,7 +21,7 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
 
   const checkRideStatus = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${rideID}/status`, {
+      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}/status`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -14,7 +14,7 @@ const AdminPayments = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/api/admin/rides`,
+                `${process.env.API_URL}/api/admin/rides`,
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
             setRides(response.data);

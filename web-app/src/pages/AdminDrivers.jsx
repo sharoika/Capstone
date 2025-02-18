@@ -18,7 +18,7 @@ const AdminDrivers = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/api/admin/drivers`,
+                `${process.env.API_URL}/api/admin/drivers`,
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
             setDrivers(response.data);
@@ -32,7 +32,7 @@ const AdminDrivers = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `${process.env.REACT_APP_API_URL}/api/admin/drivers/${id}/approval`,
+                `${process.env.API_URL}/api/admin/drivers/${id}/approval`,
                 { approve: value === "true" },
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
@@ -65,7 +65,7 @@ const AdminDrivers = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/api/auth/drivers/documents/${driverId}/${docType}`,
+                `${process.env.API_URL}/api/auth/drivers/documents/${driverId}/${docType}`,
                 {
                     headers: { 'Authorization': `Bearer ${token}` },
                     responseType: 'blob'
@@ -90,7 +90,7 @@ const AdminDrivers = () => {
             try {
                 const token = localStorage.getItem('token');
                 await axios.delete(
-                    `${process.env.REACT_APP_API_URL}/api/admin/drivers/${id}`,
+                    `${process.env.API_URL}/api/admin/drivers/${id}`,
                     { headers: { 'Authorization': `Bearer ${token}` } }
                 );
                 setDrivers(drivers.filter(driver => driver._id !== id));

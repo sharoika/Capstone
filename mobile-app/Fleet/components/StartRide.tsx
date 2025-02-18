@@ -56,7 +56,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   useEffect(() => {
     const fetchRideDetails = async () => {
       try {
-        const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${rideID}`, {
+        const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -122,7 +122,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
 
   const handleStartRide = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${rideID}/start`, {
+      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}/start`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

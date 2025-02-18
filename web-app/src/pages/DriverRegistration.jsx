@@ -62,7 +62,7 @@ const DriverRegistration = () => {
     try {
       console.log('Submitting form data:', Object.fromEntries(data.entries()));
       
-      const response = await axios.post("http://localhost:5000/api/auth/driver/register", data, {
+      const response = await axios.post(`${process.env.API_URL}/api/auth/driver/register`, data, {
         headers: { 
           "Content-Type": "multipart/form-data"
         },

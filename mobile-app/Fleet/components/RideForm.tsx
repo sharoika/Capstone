@@ -247,7 +247,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     }
 
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/ride/ride', {
+      const response = await fetch(`${process.env.API_URL}/api/ride/ride`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

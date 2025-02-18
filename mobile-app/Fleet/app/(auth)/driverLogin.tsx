@@ -26,7 +26,7 @@ export default function DriverLoginScreen() {
     }
 
     try {
-      const response = await axios.post(`http://10.0.2.2:5000/api/auth/driver/login`, {
+      const response = await axios.post(`${process.env.API_URL}/api/auth/driver/login`, {
         email,
         password,
       });

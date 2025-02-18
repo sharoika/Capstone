@@ -21,7 +21,7 @@ const ConfirmTripScreen = ({ rideID }) => {
     const fetchDrivers = async () => {
       try {
         const token = await getItemAsync('userToken');
-        const response = await fetch('http://10.0.2.2:5000/api/auth/drivers/list', {
+        const response = await fetch(`${process.env.API_URL}/api/auth/drivers/list`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const ConfirmTripScreen = ({ rideID }) => {
         console.log(selectedDriver);
       const token = await getItemAsync('userToken');
       const response = await fetch(
-        `http://10.0.2.2:5000/api/rides/${rideID}/confirm`,
+        `${process.env.API_URL}/api/rides/${rideID}/confirm`,
         {
           method: 'POST',
           headers: {

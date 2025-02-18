@@ -32,7 +32,7 @@ export default function Settings() {
     const driverId = await getItemAsync('driverID');
     const token = await getItemAsync('driverToken');
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/user/drivers/${driverId}`, {
+      const response = await fetch(`${process.env.API_URL}/api/user/drivers/${driverId}`, {
         headers: {
           Authorization: `Bearer ${token}`, 
         },
