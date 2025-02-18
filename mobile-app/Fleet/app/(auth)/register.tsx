@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
+
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -26,8 +29,8 @@ export default function RegisterScreen() {
     }
 
     try {
-      console.log(process.env.API_URL);
-      const response = await fetch(`${process.env.API_URL}/api/auth/rider/register`, {
+      console.log(apiUrl);
+      const response = await fetch(`${apiUrl}/api/auth/rider/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
