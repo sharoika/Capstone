@@ -1,13 +1,14 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
+
 const driverSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: false },
     password: { type: String, required: true },
-    rate: { type: String, required: false }, // switch to pricingDetails
+    pricingDetails: { type: pricingDetailsSchema, required: true },
     currentLocation: {
         type: { type: String, default: 'Point' },
         coordinates: { type: [Number], default: [0, 0] },
@@ -43,3 +44,10 @@ driverSchema.methods.comparePassword = async function (password) {
 };
 
 module.exports = mongoose.model('Driver', driverSchema);
+
+const mongoose = require('mongoose');
+
+const pricingDetailsSchema = new mongoose.Schema({
+    initialPrice: { type: Number, required: true },
+    perKmPrice: { type: Number, required: true }
+});
