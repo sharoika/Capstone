@@ -37,5 +37,21 @@ const adminAuthenticate = async (req, res, next) => {
         }
     }
 };
+const selfAuthenticate = async (req, res, next) => {
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized: No token provided' });
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.id !== req.params.id) {
+            return res.status(403).json({ message: 'Forbidden: You can only access your own data' });
+        }
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+    }
+};
 
 module.exports = { adminAuthenticate, authenticate };
