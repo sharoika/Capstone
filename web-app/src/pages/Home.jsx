@@ -8,7 +8,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './Home.css';
 
 const Home = () => {
-    console.log(process.env.API_URL);
+    console.log(process.env.REACT_APP_API_URL);
 
     return (
         <>

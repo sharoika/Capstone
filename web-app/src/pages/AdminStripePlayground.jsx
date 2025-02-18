@@ -47,7 +47,7 @@ const AdminStripePlayground = () => {
         // Send payment method and email to backend to create customer
         try {
             console.log(paymentMethod.id);
-            const response = await fetch(`${process.env.API_URL}/api/payment/create-customer`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/payment/create-customer`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ const AdminStripePlayground = () => {
         // Fake amount for testing
         const fakeAmount = 10; // 10 USD for this example
         try {
-            const response = await fetch(`${process.env.API_URL}/api/payment/create-charge`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/payment/create-charge`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
