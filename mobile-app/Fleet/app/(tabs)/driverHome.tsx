@@ -69,6 +69,7 @@ const DriverHome: React.FC = () => {
         <TravelToRideStep
           rideID={rideID}
           driverID={driverID}
+          token={token}
           onRideStarted={() => setCurrentStep(4)} // Move to next step when ride starts
         />
       )}
@@ -76,6 +77,7 @@ const DriverHome: React.FC = () => {
         <DriverInProgressStep
           rideID={rideID}
           driverID={driverID}
+          token={token}
           onRideCompleted={() => setCurrentStep(5)} // Move to Ride Finished Step
           token={token}        />
       )}

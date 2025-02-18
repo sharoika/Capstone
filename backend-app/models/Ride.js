@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
+const RideStates = require('./enums/RideStates');
 
 const RideSchema = new mongoose.Schema({
     riderID: { type: mongoose.Schema.Types.ObjectId, ref: 'Rider', required: true },
+    driverID: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: false },
     start: { type: String, required: true },
     end: { type: String, required: true },
     fare: { type: Number, required: false },
     distance: { type: Number, required: false },
-    rideBooked: { type: Boolean, default: false },
-    driverSelected: { type: Boolean, default: false },
-    rideInProgress: { type: Boolean, default: false },
-    rideFinished: { type: Boolean, default: false },
+    status: { type: String, enum: Object.values(RideStates), default: RideStates.PROPOSED },
     cancellationStatus: { type: String, enum: ['None', 'Rider', 'Driver'], default: 'None' },
     tipAmount: { type: Number, default: 0 },
 });

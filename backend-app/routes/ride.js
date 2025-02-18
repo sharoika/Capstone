@@ -5,6 +5,7 @@ const Admin = require('../models/Admin');
 const Rider = require('../models/Rider');
 const Ride = require('../models/Ride');
 const Driver = require('../models/Driver');
+const RideStates = require('../models/enums/RideStates');
 const router = express.Router();
 const { authenticate } = require("../middlewares/auth");
 
@@ -27,7 +28,7 @@ router.post('/ride', authenticate, async (req, res) => {
             start,
             end,
             distance: numericDistance, 
-            rideBooked: true,
+            status: RideStates.PROPOSED,
         });
 
         await ride.save();
@@ -44,7 +45,7 @@ router.post('/ride', authenticate, async (req, res) => {
     }
 });
 
-// Confirm a trip (Driver accepts a ride)
+// Confirm a trip rider picks a driver
 router.post('/rides/:rideID/confirm', authenticate, async (req, res) => {
     const { rideID } = req.params;
     const { driverID } = req.body;
@@ -60,17 +61,69 @@ console.log(rideID);
         }
 
         const ride = await Ride.findById(rideID);
-        if (!ride || ride.rideFinished || ride.rideInProgress) {
+        if (!ride) {
             return res.status(400).json({ message: 'Invalid ride' });
         }
 
+        if (ride.status !== RideStates.PROPOSED) { 
+            return res.status(400).json({ message: 'Ride cannot be confirmed at this stage' });
+        }
+
         ride.driverID = driverID;
-        ride.driverSelected = true;
+        ride.status = RideStates.SELECTION;
         await ride.save();
 
         res.json({ message: 'Ride confirmed successfully', ride });
     } catch (error) {
         console.error('Error confirming ride:', error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.post('/rides/:rideID/accept', authenticate, async (req, res) => {
+    const { rideID } = req.params;
+    const { driverID } = req.body;
+
+    if (!driverID) {
+        return res.status(400).json({ message: 'Driver ID is required' });
+    }
+
+    try {
+        const ride = await Ride.findById(rideID);
+        if (!ride) {
+            return res.status(404).json({ message: 'Ride not found' });
+        }
+
+        if (ride.status !== RideStates.SELECTION) {
+            return res.status(400).json({ message: 'Ride cannot be accepted at this stage' });
+        }
+
+        if (ride.driverID.toString() !== driverID) {
+            return res.status(403).json({ message: 'Driver not assigned to this ride' });
+        }
+
+        ride.status = RideStates.ACCEPTED; 
+        await ride.save();
+
+        res.json({ message: 'Ride accepted successfully', ride });
+    } catch (error) {
+        console.error('Error accepting ride:', error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.get('/rides/driver/:driverID', authenticate, async (req, res) => {
+    const { driverID } = req.params;
+
+    try {
+        const rides = await Ride.find({
+            driverID: driverID,  
+            status: RideStates.SELECTION,
+        });
+
+        res.json({ message: 'Rides found for driver', rides });
+    } catch (error) {
+        console.error('Error fetching rides for driver:', error.message);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -81,11 +134,15 @@ router.post('/rides/:rideID/start', authenticate, async (req, res) => {
 
     try {
         const ride = await Ride.findById(rideID);
-        if (!ride || !ride.driverSelected || ride.rideInProgress) {
+        if (!ride) {
             return res.status(400).json({ message: 'Ride cannot be started' });
         }
 
-        ride.rideInProgress = true;
+        if (ride.status !== RideStates.ACCEPTED) {
+            return res.status(400).json({ message: 'Ride cannot be started at this stage' });
+        }
+
+        ride.status = RideStates.INPROGRESS;
         await ride.save();
 
         res.json({ message: 'Ride started successfully', ride });
@@ -100,14 +157,16 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
 
     try {
         const ride = await Ride.findById(rideID);
-        if (!ride || !ride.rideInProgress || ride.rideFinished) {
+        if (!ride) {
             return res.status(400).json({ message: 'Ride cannot be finished' });
         }
 
-        ride.rideFinished = true;
-        ride.rideInProgress = false;
+        if (ride.status !== RideStates.INPROGRESS) {
+            return res.status(400).json({ message: 'Ride cannot be finished at this stage' });
+        }
 
-        // Add to completed rides for driver and rider
+        ride.status = RideStates.COMPLETED;
+
         const driver = await Driver.findById(ride.driverID);
         const rider = await Rider.findById(ride.riderID);
         if (driver) driver.completedRides.push(ride._id);
@@ -154,8 +213,9 @@ router.get('/rides/:rideID/status', authenticate, async (req, res) => {
 
         res.json({
             rideID: ride._id,
-            rideInProgress: ride.rideInProgress,
-            rideFinished: ride.rideFinished,
+            status: ride.status, 
+            isCompleted: ride.status === RideStates.COMPLETED, 
+            isInProgress: ride.status === RideStates.INPROGRESS,
         });
     } catch (error) {
         console.error('Error checking ride status:', error.message);
@@ -169,26 +229,23 @@ router.get('/rides/:rideID', authenticate, async (req, res) => {
     const { rideID } = req.params;
 
     try {
-        // Fetch the ride by ID
         const ride = await Ride.findById(rideID)
-            .populate('riderID')   // Populate rider details
+        .populate('riderID') 
+        .populate('driverID');  
 
         if (!ride) {
             return res.status(404).json({ message: 'Ride not found' });
         }
 
-        // Return ride details along with rider and driver information
         res.json({
             rideID: ride._id,
             start: ride.start,
             end: ride.end,
             fare: ride.fare,
             distance: ride.distance,
-            rideBooked: ride.rideBooked,
-            rideInProgress: ride.rideInProgress,
-            rideFinished: ride.rideFinished,
+            status: ride.status, 
             rider: ride.riderID,
-            driverSelected: ride.driverSelected,
+            driver: ride.driverID || null, 
             cancellationStatus: ride.cancellationStatus,
         });
     } catch (error) {
@@ -207,13 +264,12 @@ router.post('/rides/:rideID/cancel', authenticate, async (req, res) => {
 
     try {
         const ride = await Ride.findById(rideID);
-        if (!ride || ride.rideFinished) {
+        if (!ride ) {
             return res.status(400).json({ message: 'Ride cannot be cancelled' });
         }
 
         ride.cancellationStatus = cancelBy;
-        ride.rideBooked = false;
-        ride.rideInProgress = false;
+        ride.status = RideStates.CANCELLED;
 
         await ride.save();
 

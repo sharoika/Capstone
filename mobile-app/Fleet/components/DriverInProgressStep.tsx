@@ -19,7 +19,7 @@ const DriverInProgressStep: React.FC<DriverInProgressStepProps> = ({ rideID, dri
 
   const checkRideStatus = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}/status`, {
+      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${rideID}/status`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -31,10 +31,10 @@ const DriverInProgressStep: React.FC<DriverInProgressStepProps> = ({ rideID, dri
       }
 
       const data = await response.json();
-      if (data.rideFinished) {
-        clearInterval(); // Stop polling
+      if (data.isCompleted) {
+        clearInterval(); 
         Alert.alert('Ride Completed', 'The ride has been successfully completed.');
-        onRideCompleted(); // Move to Ride Finished step
+        onRideCompleted();
       }
     } catch (error) {
       console.error('Error checking ride status:', error);

@@ -4,10 +4,11 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 interface TravelToRideStepProps {
   rideID: string;
   driverID: string;
+  token: string;
   onRideStarted: () => void; // Callback to move to next step
 }
 
-const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, onRideStarted }) => {
+const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, token, onRideStarted }) => {
   const [rideInProgress, setRideInProgress] = useState(false);
 
   useEffect(() => {
@@ -20,11 +21,9 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, o
 
   const checkRideStatus = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/rides/rides/${rideID}/status`, {
+      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${rideID}/status`, {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer YOUR_TOKEN_HERE`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
@@ -32,7 +31,7 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, o
       }
 
       const data = await response.json();
-      if (data.rideInProgress) {
+      if (data.isInProgress) {
         setRideInProgress(true);
         onRideStarted(); // Move to next screen when ride starts
       }

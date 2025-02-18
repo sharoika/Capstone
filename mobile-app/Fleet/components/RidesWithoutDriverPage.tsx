@@ -2,36 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
-interface RidesWithoutDriverStepProps {
+interface RidesForDriverStepProps {
   token: string;
   driverID: string;
-  onRideClaimed: (rideID: string) => void; // Callback to move to next step
+  onRideClaimed: (rideID: string) => void; 
 }
 
-const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, driverID, onRideClaimed }) => {
-  const [ridesWithoutDriver, setRidesWithoutDriver] = useState<any[]>([]);
+const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID, onRideClaimed }) => {
+  const [ridesForDriver, setRidesForDriver] = useState<any[]>([]);
   const [selectedRide, setSelectedRide] = useState<string>('');
 
   useEffect(() => {
-    const interval = setInterval(fetchRidesWithoutDriver, 5000);
+    const interval = setInterval(fetchRidesForDriver, 5000);
     return () => clearInterval(interval);
   }, [token, driverID]);
 
-  const fetchRidesWithoutDriver = async () => {
+  const fetchRidesForDriver = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/ride/rides/without-driver', {
+      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/driver/${driverID}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+        const errorData = await response.json(); 
+        throw new Error(`Error ${response.status}: ${errorData.message || response.statusText}`);
       }
-
+  
       const data = await response.json();
-      setRidesWithoutDriver(data.rides);
+      setRidesForDriver(data.rides);  
     } catch (error) {
-      console.error('Error fetching rides:', error);
+      console.error('Error fetching rides:', error.message);
     }
   };
 
@@ -42,7 +43,7 @@ const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, 
     }
 
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${selectedRide}/confirm`, {
+      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${selectedRide}/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,11 +52,13 @@ const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, 
         body: JSON.stringify({ driverID }),
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (response.ok) {
         Alert.alert('Success', 'Ride claimed successfully');
-        onRideClaimed(selectedRide); // Navigate to TravelToRideStep
+        onRideClaimed(selectedRide); 
       } else {
         Alert.alert('Error', data.message || 'Failed to claim ride');
       }
@@ -67,13 +70,13 @@ const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, 
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Rides Without a Driver</Text>
-      {ridesWithoutDriver.length === 0 ? (
+      <Text style={styles.title}>Rides for Driver</Text>
+      {ridesForDriver.length === 0 ? (
         <Text>No rides available at the moment.</Text>
       ) : (
         <Picker selectedValue={selectedRide} onValueChange={setSelectedRide} style={styles.picker}>
           <Picker.Item label="Select a ride" value="" />
-          {ridesWithoutDriver.map((ride) => (
+          {ridesForDriver.map((ride) => (
             <Picker.Item key={ride._id} label={`Start: ${ride.start}, End: ${ride.end}`} value={ride._id} />
           ))}
         </Picker>
@@ -84,7 +87,6 @@ const RidesWithoutDriverStep: React.FC<RidesWithoutDriverStepProps> = ({ token, 
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -114,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RidesWithoutDriverStep;
+export default RidesForDriverStep;
