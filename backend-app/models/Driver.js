@@ -13,7 +13,6 @@ const driverSchema = new mongoose.Schema({
         coordinates: { type: [Number], default: [0, 0] },
     },
     completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }], // dont need, instead query rides with driverId
-    driverID: { type: String, unique: true, sparse: true }, // prob can remove
     licenseDoc: { type: String },
     abstractDoc: { type: String },
     criminalRecordCheckDoc: { type: String },
