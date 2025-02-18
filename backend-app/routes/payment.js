@@ -5,20 +5,27 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const router = express.Router();
 
+// Fetch the payment method based on customerId
 router.get('/get-payment-method', async (req, res) => {
     try {
-        const { customerId, paymentMethodId } = req.query;
+        const { customerId } = req.query;
 
-        if (!customerId || !paymentMethodId) {
-            return res.status(400).json({ message: 'customerId and paymentMethodId are required' });
+        if (!customerId) {
+            return res.status(400).json({ message: 'customerId is required' });
         }
 
-        const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+        // Retrieve the payment method using Stripe
+        const paymentMethods = await stripe.paymentMethods.list({
+            customer: customerId,
+            type: 'card',
+        });
 
-        if (paymentMethod.customer !== customerId) {
-            return res.status(400).json({ message: 'Payment method does not belong to the customer' });
+        if (paymentMethods.data.length === 0) {
+            return res.status(404).json({ message: 'No payment methods found for this customer' });
         }
-        
+
+        const paymentMethod = paymentMethods.data[0]; // Assuming we are using the first payment method
+
         res.json({ paymentMethod });
     } catch (error) {
         console.error('Error retrieving payment method:', error);
@@ -26,7 +33,7 @@ router.get('/get-payment-method', async (req, res) => {
     }
 });
 
-
+// Create or update the payment method for the user
 router.post('/create-payment-method', async (req, res) => {
     try {
         const { paymentMethodId, id } = req.body;

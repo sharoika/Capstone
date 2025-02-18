@@ -95,10 +95,14 @@ export default function Settings() {
       </View>
 
       <View style={styles.settingsContainer}>
-        <SettingOption icon={<Edit2 color="#39C9C2" size={24} />} title="Edit Profile" onPress={() => {}} />
-        <SettingOption icon={<Banknote color="#39C9C2" size={24} />} title="Payment Settings" onPress={() => {}} />
-        <SettingOption icon={<Bell color="#39C9C2" size={24} />} title="Notifications" onPress={() => {}} />
-        <SettingOption icon={<Lock color="#39C9C2" size={24} />} title="Privacy Settings" onPress={() => {}} />
+        <SettingOption icon={<Edit2 color="#39C9C2" size={24} />} title="Edit Profile" onPress={() => { }} />
+        <SettingOption
+          icon={<Banknote color="#39C9C2" size={24} />}
+          title="Payment Settings"
+          onPress={() => router.push('/(tabs)/paymentSettings')} // Assuming you have a 'payment-settings' route
+        />
+        <SettingOption icon={<Bell color="#39C9C2" size={24} />} title="Notifications" onPress={() => { }} />
+        <SettingOption icon={<Lock color="#39C9C2" size={24} />} title="Privacy Settings" onPress={() => { }} />
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

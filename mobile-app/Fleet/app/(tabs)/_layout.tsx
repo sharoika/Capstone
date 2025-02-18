@@ -4,6 +4,7 @@ import HomeScreen from './home';
 import ProfileScreen from './settings';
 import DriverHomeScreen from './driverHome';
 import DriverProfileScreen from './settingsDriver';
+import PaymentSettingsScreen from './paymentSettings';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { View, Text, ActivityIndicator } from 'react-native';
