@@ -8,7 +8,6 @@ import AdminRiders from './pages/AdminRiders';
 import AdminDrivers from './pages/AdminDrivers';
 import AdminLiveTracker from './pages/AdminLiveTracker';
 import AdminPayments from './pages/AdminPayments';
-import AdminStripePlayground from './pages/AdminStripePlayground';
 import './App.css';
 import Register from './pages/Register';
 import { Navigate } from 'react-router-dom';
@@ -46,10 +45,6 @@ function App() {
         <Route
           path="/admin/payments"
           element={token ? <AdminPayments /> : <Navigate to="/login" replace />}
-        />
-        <Route
-          path="/admin/stripe"
-          element={token ? <AdminStripePlayground /> : <Navigate to="/login" replace />}
         />
       </Routes>
     </BrowserRouter>

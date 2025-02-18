@@ -65,13 +65,7 @@ const AdminDashboard = () => {
                                 Playgrounds
                             </Card.Header>
                             <Card.Body className="d-flex gap-3">
-                                <Button 
-                                    variant="info" 
-                                    onClick={() => navigate('/admin/stripe')}
-                                    style={buttonStyle}
-                                >
-                                    Stripe Playground
-                                </Button>
+
                             </Card.Body>
                         </Card>
                     </Col>
