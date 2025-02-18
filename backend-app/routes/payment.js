@@ -1,73 +1,73 @@
-// backend/stripeRoutes.js
 const express = require('express');
 require('dotenv').config();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { getPaymentMethod, createOrUpdatePaymentMethod } = require('../services/payment');
 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const router = express.Router();
 
-// Fetch the payment method based on customerId
 router.get('/get-payment-method', async (req, res) => {
     try {
-        const { customerId } = req.query;
-
-        if (!customerId) {
-            return res.status(400).json({ message: 'customerId is required' });
-        }
-
-        // Retrieve the payment method using Stripe
-        const paymentMethods = await stripe.paymentMethods.list({
-            customer: customerId,
-            type: 'card',
-        });
-
-        if (paymentMethods.data.length === 0) {
-            return res.status(404).json({ message: 'No payment methods found for this customer' });
-        }
-
-        const paymentMethod = paymentMethods.data[0]; // Assuming we are using the first payment method
-
-        res.json({ paymentMethod });
+        console.log("Hit0");
+        const { riderId } = req.query;
+        res.status(200).json(getPaymentMethod(riderId));
     } catch (error) {
         console.error('Error retrieving payment method:', error);
         res.status(500).json({ error: 'Failed to retrieve payment method' });
     }
 });
 
-// Create or update the payment method for the user
+router.post('/create-setup-intent', async (req, res) => {
+    try {
+        console.log("Hit1");
+      const { riderId } = req.body;
+  
+      console.log(riderId);
+      // Step 1: Create a SetupIntent for saving a payment method
+      const setupIntent = await stripe.setupIntents.create({
+        customer: riderId.stripeCustomerId,  // Attach to the customer
+      });
+
+      console.log(setupIntent);
+  
+      // Step 2: Return the client secret for frontend to use
+      res.status(200).json({
+        clientSecret: setupIntent.client_secret,
+      });
+    } catch (error) {
+    console.log(error);
+      res.status(500).send(error.message);
+    }
+  });
+
+router.post('/attach-payment-method', async (req, res) => {
+    try {
+        console.log("Hit2");
+      const { riderId, paymentMethodId } = req.body;
+  
+      // Step 3: Attach the payment method to the customer
+      const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
+        customer: riderId,
+      });
+  
+      // Step 4: Update the default payment method if desired
+      await stripe.customers.update(riderId, {
+        invoice_settings: {
+          default_payment_method: paymentMethod.id,
+        },
+      });
+  
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  });
+
 router.post('/create-payment-method', async (req, res) => {
     try {
-        const { paymentMethodId, id } = req.body;
-
-        const rider = await Rider.findById(id);
-        if (!rider) {
-            return res.status(404).json({ message: 'Rider not found' });
-        }
-
-        let customerId = rider.stripeCustomerId;
-
-        if (!customerId) {
-            const customer = await stripe.customers.create({
-                email: rider.email,
-                payment_method: paymentMethodId,
-                invoice_settings: {
-                    default_payment_method: paymentMethodId,
-                },
-            });
-            customerId = customer.id;
-        } else {
-            await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
-            await stripe.customers.update(customerId, {
-                invoice_settings: {
-                    default_payment_method: paymentMethodId,
-                },
-            });
-        }
-
-        rider.stripeCustomerId = customerId;
-        rider.stripePaymentMethodId = paymentMethodId;
-        await rider.save();
-
-        res.json({ customerId, paymentMethodId });
+        console.log("Hit3");
+        console.log(req.body);
+        const { riderId, cardNumber, expMonth, expYear, cvc } = req.body;
+        return res.status(200).json(createOrUpdatePaymentMethod(riderId, cardNumber, expMonth, expYear, cvc))
     } catch (error) {
         console.error('Error creating/updating payment method:', error);
         res.status(500).json({ error: 'Failed to create/update payment method' });
