@@ -8,7 +8,13 @@ const RiderSchema = new mongoose.Schema({
   phone: { type: String, required: false},
   password: { type: String, required: true },
   homeLocation: { type: String },
+  currentLocation: {
+    lat: { type: Number, required: true, default: 0 },
+    long: { type: Number, required: true, default: 0 }
+  },
+
   completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],
+
   stripeCustomerId: { type: String, required: false},
   stripePaymentMethodId:{ type: String, required: false}
 });
