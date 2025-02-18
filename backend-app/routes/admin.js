@@ -143,4 +143,34 @@ router.put('/drivers/:id', adminAuthenticate, async (req, res) => {
     }
 });
 
+router.delete('/drivers/:id', adminAuthenticate, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const driver = await Driver.findById(id);
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+    await Driver.findByIdAndDelete(id);
+    res.json({ message: 'Driver deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting driver:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.delete('/riders/:id', adminAuthenticate, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const rider = await Rider.findById(id);
+    if (!rider) {
+      return res.status(404).json({ message: 'Rider not found' });
+    }
+    await Rider.findByIdAndDelete(id);
+    res.json({ message: 'Rider deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting rider:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

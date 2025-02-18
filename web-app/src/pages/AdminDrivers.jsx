@@ -85,6 +85,22 @@ const AdminDrivers = () => {
         }
     };
 
+    const handleDeleteDriver = async (id) => {
+        if (window.confirm('Are you sure you want to delete this driver? This action cannot be undone.')) {
+            try {
+                const token = localStorage.getItem('token');
+                await axios.delete(
+                    `${process.env.REACT_APP_API_URL}/api/admin/drivers/${id}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+                setDrivers(drivers.filter(driver => driver._id !== id));
+            } catch (error) {
+                console.error('Error deleting driver:', error);
+                alert('Error deleting driver');
+            }
+        }
+    };
+
     return (
         <div>
             <AdminHeader title="Admin Panel: Drivers" />
@@ -94,6 +110,7 @@ const AdminDrivers = () => {
                     onApprovalChange={handleApprovalChange}
                     onDriverClick={handleDriverClick}
                     onDocumentDownload={handleDocumentDownload}
+                    onDeleteDriver={handleDeleteDriver}
                 />
                 
                 <DriverEditModal

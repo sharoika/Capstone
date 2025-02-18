@@ -12,6 +12,7 @@ import AdminStripePlayground from './pages/AdminStripePlayground';
 import './App.css';
 import Register from './pages/Register';
 import { Navigate } from 'react-router-dom';
+import './styles/AdminStyles.css';
 
 
 function App() {

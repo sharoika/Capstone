@@ -3,11 +3,13 @@ import { Container, Table, Button } from 'react-bootstrap';
 import axios from 'axios';
 import RiderEditModal from '../components/RiderEditModal';
 import AdminHeader from '../components/AdminHeader';
+import { useNavigate } from 'react-router-dom';
 
 const AdminRiders = () => {
     const [riders, setRiders] = useState([]);
     const [selectedRider, setSelectedRider] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchRiders();
@@ -38,6 +40,22 @@ const AdminRiders = () => {
         ));
     };
 
+    const handleDeleteRider = async (id) => {
+        if (window.confirm('Are you sure you want to delete this rider? This action cannot be undone.')) {
+            try {
+                const token = localStorage.getItem('token');
+                await axios.delete(
+                    `${process.env.REACT_APP_API_URL}/api/admin/riders/${id}`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+                setRiders(riders.filter(rider => rider._id !== id));
+            } catch (error) {
+                console.error('Error deleting rider:', error);
+                alert('Error deleting rider');
+            }
+        }
+    };
+
     return (
         <div>
             <AdminHeader title="Admin Panel: Riders" />
@@ -62,13 +80,22 @@ const AdminRiders = () => {
                                 <td>{rider.homeLocation}</td>
                                 <td>{rider.completedRides?.length || 0}</td>
                                 <td>
-                                    <Button 
-                                        variant="primary" 
-                                        size="sm"
-                                        onClick={() => handleRiderClick(rider)}
-                                    >
-                                        Edit
-                                    </Button>
+                                    <div className="d-flex gap-2">
+                                        <Button 
+                                            variant="primary" 
+                                            className="admin-btn"
+                                            onClick={() => handleRiderClick(rider)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button 
+                                            variant="danger" 
+                                            className="admin-btn"
+                                            onClick={() => handleDeleteRider(rider._id)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

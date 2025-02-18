@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Dropdown, Button } from 'react-bootstrap';
 
-const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverClick }) => {
+const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverClick, onDeleteDriver }) => {
   return (
     <Table responsive hover className="mb-0">
       <thead>
@@ -34,7 +34,7 @@ const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverCl
             </td>
             <td>
               <Dropdown>
-                <Dropdown.Toggle variant="primary" size="sm">
+                <Dropdown.Toggle variant="primary" className="admin-btn" size="sm">
                   Download Documents ▼
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
@@ -47,13 +47,22 @@ const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverCl
               </Dropdown>
             </td>
             <td>
-              <Button 
-                variant="primary" 
-                size="sm"
-                onClick={() => onDriverClick(driver)}
-              >
-                Edit
-              </Button>
+              <div className="d-flex gap-2">
+                <Button 
+                  variant="primary" 
+                  className="admin-btn"
+                  onClick={() => onDriverClick(driver)}
+                >
+                  Edit
+                </Button>
+                <Button 
+                  variant="danger" 
+                  className="admin-btn"
+                  onClick={() => onDeleteDriver(driver._id)}
+                >
+                  Delete
+                </Button>
+              </div>
             </td>
           </tr>
         ))}
