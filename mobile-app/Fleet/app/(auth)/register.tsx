@@ -26,6 +26,7 @@ export default function RegisterScreen() {
     }
 
     try {
+      console.log(process.env.API_URL);
       const response = await fetch(`${process.env.API_URL}/api/auth/rider/register`, {
         method: 'POST',
         headers: {
