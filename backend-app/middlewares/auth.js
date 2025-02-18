@@ -55,4 +55,4 @@ const selfAuthenticate = async (req, res, next) => {
     }
 };
 
-module.exports = { adminAuthenticate, authenticate };
+module.exports = { adminAuthenticate, authenticate, selfAuthenticate };

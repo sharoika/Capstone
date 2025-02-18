@@ -93,7 +93,7 @@ router.get('/drivers/:id', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-/*
+
 router.put('/riders/:id', selfAuthenticate, async (req, res) => {
     const { id } = req.params;
     const { firstName, lastName, email, phone, homeLocation } = req.body;
@@ -104,7 +104,6 @@ router.put('/riders/:id', selfAuthenticate, async (req, res) => {
             return res.status(404).json({ message: 'Rider not found' });
         }
 
-        // Update fields if they exist in request
         if (firstName) rider.firstName = firstName;
         if (lastName) rider.lastName = lastName;
         if (email) rider.email = email;
@@ -154,5 +153,5 @@ router.put('/drivers/:id', selfAuthenticate, async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-*/
+
 module.exports = router;
