@@ -5,22 +5,43 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const router = express.Router();
 
-router.post('/create-customer', async (req, res) => {
+router.post('/create-payment-method', async (req, res) => {
     try {
-        const { paymentMethodId, email } = req.body;
+        const { paymentMethodId, id } = req.body;
 
-        const customer = await stripe.customers.create({
-            email: email,
-            payment_method: paymentMethodId,
-            invoice_settings: {
-                default_payment_method: paymentMethodId,
-            },
-        });
+        const rider = await Rider.findById(id);
+        if (!rider) {
+            return res.status(404).json({ message: 'Rider not found' });
+        }
 
-        res.json({ customerId: customer.id, paymentMethodId });
+        let customerId = rider.stripeCustomerId;
+
+        if (!customerId) {
+            const customer = await stripe.customers.create({
+                email: rider.email,
+                payment_method: paymentMethodId,
+                invoice_settings: {
+                    default_payment_method: paymentMethodId,
+                },
+            });
+            customerId = customer.id;
+        } else {
+            await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+            await stripe.customers.update(customerId, {
+                invoice_settings: {
+                    default_payment_method: paymentMethodId,
+                },
+            });
+        }
+
+        rider.stripeCustomerId = customerId;
+        rider.stripePaymentMethodId = paymentMethodId;
+        await rider.save();
+
+        res.json({ customerId, paymentMethodId });
     } catch (error) {
-        console.error('Error creating customer:', error);
-        res.status(500).json({ error: 'Failed to create customer' });
+        console.error('Error creating/updating payment method:', error);
+        res.status(500).json({ error: 'Failed to create/update payment method' });
     }
 });
 
