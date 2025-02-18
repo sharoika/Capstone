@@ -3,6 +3,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Rider = require("../models/Rider");
 const Driver = require("../models/Driver");
+const multer = require('multer');
+const upload = multer({
+  dest: 'uploads/'
+});
 
 const { authenticate } = require("../middlewares/auth");
 
@@ -120,10 +124,24 @@ router.post('/driver/login', async (req, res) => {
   }
 });
 
-router.post('/driver/register', async (req, res) => {
-  const { firstName, lastName, email, phone, password, vehicleMake, vehicleModel } = req.body;
-
+router.post('/driver/register', upload.fields([
+  { name: 'licenseDoc' },
+  { name: 'abstractDoc' },
+  { name: 'criminalRecordCheckDoc' },
+  { name: 'vehicleRegistrationDoc' },
+  { name: 'safetyInspectionDoc' }
+]), async (req, res) => {
   try {
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
+      password,
+      vehicleMake,
+      vehicleModel
+    } = req.body;
+
     const existingDriver = await Driver.findOne({ email });
 
     if (existingDriver) {
@@ -133,14 +151,19 @@ router.post('/driver/register', async (req, res) => {
     }
 
     const newDriver = new Driver({
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      phone: phone,
-      password: password,
-      vehicleMake: vehicleMake,
-      vehicleModel: vehicleModel,
+      firstName,
+      lastName,
+      email,
+      phone,
+      password,
+      vehicleMake,
+      vehicleModel,
       applicationApproved: false,
+      licenseDoc: req.files?.licenseDoc?.[0]?.path,
+      abstractDoc: req.files?.abstractDoc?.[0]?.path,
+      criminalRecordCheckDoc: req.files?.criminalRecordCheckDoc?.[0]?.path,
+      vehicleRegistrationDoc: req.files?.vehicleRegistrationDoc?.[0]?.path,
+      safetyInspectionDoc: req.files?.safetyInspectionDoc?.[0]?.path
     });
 
     await newDriver.save();
@@ -155,10 +178,9 @@ router.post('/driver/register', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error during driver registration:', error.message);
-
+    console.error('Error during driver registration:', error);
     return res.status(500).json({
-      message: 'Server error. Please try again later.',
+      message: error.message || 'Server error. Please try again later.',
     });
   }
 });
