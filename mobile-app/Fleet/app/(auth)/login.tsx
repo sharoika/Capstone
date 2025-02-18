@@ -26,7 +26,7 @@ export default function LoginScreen() {
     }
     console.log("here");
     try {
-      const response = await axios.post(`http://10.0.2.2:5000/api/auth/rider/login`, {
+      const response = await axios.post(`${process.env.API_URL}/api/auth/rider/login`, {
         email,
         password,
       });

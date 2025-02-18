@@ -12,7 +12,7 @@ const ConfigModal = ({ show, handleClose }) => {
     const fetchConfig = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/config`, {
+            const response = await axios.get(`${process.env.API_URL}/api/config`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setConfig(response.data);
@@ -24,7 +24,7 @@ const ConfigModal = ({ show, handleClose }) => {
     const handleSave = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`${process.env.REACT_APP_API_URL}/api/config`, config, {
+            await axios.post(`${process.env.API_URL}/api/config`, config, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert('Configuration updated successfully');

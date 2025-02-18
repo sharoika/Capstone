@@ -26,7 +26,8 @@ export default function RegisterScreen() {
     }
 
     try {
-      const response = await fetch(`http://localhost:6000/api/auth/rider/register`, {
+      console.log(process.env.API_URL);
+      const response = await fetch(`${process.env.API_URL}/api/auth/rider/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

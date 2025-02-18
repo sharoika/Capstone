@@ -21,7 +21,7 @@ const AdminLiveTracker = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/api/admin/rides/active`,
+                `${process.env.API_URL}/api/admin/rides/active`,
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
             setRides(response.data);

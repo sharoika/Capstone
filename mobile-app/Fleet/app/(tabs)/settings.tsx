@@ -34,7 +34,7 @@ export default function Settings() {
         if (userId && token) {
           setId(userId);
 
-          const response = await fetch(`http://10.0.2.2:5000/api/user/riders/${userId}`, {
+          const response = await fetch(`${process.env.API_URL}/api/user/riders/${userId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',

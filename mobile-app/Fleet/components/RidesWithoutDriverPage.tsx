@@ -19,7 +19,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
 
   const fetchRidesForDriver = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/driver/${driverID}`, {
+      const response = await fetch(`${process.env.API_URL}/api/ride/rides/driver/${driverID}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -43,7 +43,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
     }
 
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${selectedRide}/accept`, {
+      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${selectedRide}/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

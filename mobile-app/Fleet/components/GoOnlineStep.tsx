@@ -12,7 +12,7 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
 
   const toggleOnlineStatus = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/user/driver/${driverID}/online`, {
+      const response = await fetch(`${process.env.API_URL}/api/user/driver/${driverID}/online`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

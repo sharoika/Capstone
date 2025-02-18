@@ -19,7 +19,7 @@ const DriverInProgressStep: React.FC<DriverInProgressStepProps> = ({ rideID, dri
 
   const checkRideStatus = async () => {
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/ride/rides/${rideID}/status`, {
+      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}/status`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
