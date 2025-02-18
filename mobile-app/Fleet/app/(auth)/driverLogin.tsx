@@ -5,6 +5,9 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 const saveToStorage = async (key: string, value: string) => {
   if (Platform.OS === 'web') {
@@ -26,7 +29,7 @@ export default function DriverLoginScreen() {
     }
 
     try {
-      const response = await axios.post(`${process.env.API_URL}/api/auth/driver/login`, {
+      const response = await axios.post(`${apiUrl}/api/auth/driver/login`, {
         email,
         password,
       });

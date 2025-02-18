@@ -10,6 +10,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
+
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 export default function DriverRegisterScreen() {
   const router = useRouter();
@@ -37,7 +40,7 @@ export default function DriverRegisterScreen() {
     }
 
     try {
-      const response = await fetch('http://10.0.2.2:5000/api/auth/driver/register', {
+      const response = await fetch(`${apiUrl}/api/auth/driver/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
