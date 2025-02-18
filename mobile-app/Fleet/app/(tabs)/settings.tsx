@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIndicator, Platform } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { ChevronRight, Edit2, Bell, Lock, LogOut } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
+
 interface Rider {
   firstName: string;
   lastName: string;
@@ -12,12 +13,10 @@ interface Rider {
   riderID?: string;
   completedRides?: string[];
 }
+
+// Function to get stored data based on platform
 const getItemAsync = async (key: string): Promise<string | null> => {
-  if (Platform.OS === 'web') {
-    return localStorage.getItem(key);
-  } else {
-    return await SecureStore.getItemAsync(key);
-  }
+  return Platform.OS === 'web' ? localStorage.getItem(key) : await SecureStore.getItemAsync(key);
 };
 
 export default function Settings() {
@@ -30,9 +29,22 @@ export default function Settings() {
     const fetchUserData = async () => {
       try {
         const userId = await getItemAsync('userObjectId');
-        if (userId) {
+        const token = await getItemAsync('userToken');
+
+        if (userId && token) {
           setId(userId);
-          const response = await fetch(`http://10.0.2.2:5000/api/auth/riders/${userId}`);
+
+          const response = await fetch(`http://10.0.2.2:5000/api/user/riders/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch rider data');
+          }
+
           const data: Rider = await response.json();
           setRider(data);
         }
