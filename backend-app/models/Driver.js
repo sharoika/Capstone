@@ -1,6 +1,10 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
+const pricingDetailsSchema = new mongoose.Schema({
+  initialPrice: { type: Number, required: true },
+  perKmPrice: { type: Number, required: true }
+});
 
 const driverSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
