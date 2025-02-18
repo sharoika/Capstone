@@ -80,7 +80,7 @@ export default function Settings() {
 
   return (
     <ScrollView style={styles.container}>
-      <View >
+      <View style={styles.header}>
         {loading ? (
           <Text style={styles.loadingText}>Loading driver data...</Text>
         ) : (
@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
   settingsContainer: {
     padding: 24,
   },
+  
   settingOption: {
     flexDirection: 'row',
     alignItems: 'center',
