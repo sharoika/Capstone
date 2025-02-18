@@ -1,5 +1,6 @@
 const express = require("express")
 const Driver = require('../models/Driver');
+const Rider = require('../models/Rider');
 const { authenticate } = require("../middlewares/auth");
 const { selfAuthenticate } = require("../middlewares/auth");
 const router = express.Router();
