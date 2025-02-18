@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Edit2, Bell, Lock, LogOut } from 'lucide-react-native';
+import { ChevronRight, Edit2, Banknote, Bell, Lock, LogOut } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
@@ -13,7 +13,6 @@ interface Rider {
   email: string;
   phone?: string;
   homeLocation?: string;
-  riderID?: string;
   completedRides?: string[];
 }
 
@@ -88,20 +87,16 @@ export default function Settings() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Image
-          source={{ uri: 'https://example.com/default-profile.png' }}
-          style={styles.profilePicture}
-        />
         <Text style={styles.userName}>{rider?.firstName} {rider?.lastName}</Text>
         <Text style={styles.userEmail}>{rider?.email}</Text>
         <Text style={styles.userPhone}>Phone: {rider?.phone || 'N/A'}</Text>
         <Text style={styles.userHomeLocation}>Home Location: {rider?.homeLocation || 'N/A'}</Text>
-        <Text style={styles.userRiderID}>Rider ID: {rider?.riderID || 'N/A'}</Text>
         <Text style={styles.userCompletedRides}>Completed Rides: {rider?.completedRides?.length || 0}</Text>
       </View>
 
       <View style={styles.settingsContainer}>
         <SettingOption icon={<Edit2 color="#39C9C2" size={24} />} title="Edit Profile" onPress={() => {}} />
+        <SettingOption icon={<Banknote color="#39C9C2" size={24} />} title="Payment Settings" onPress={() => {}} />
         <SettingOption icon={<Bell color="#39C9C2" size={24} />} title="Notifications" onPress={() => {}} />
         <SettingOption icon={<Lock color="#39C9C2" size={24} />} title="Privacy Settings" onPress={() => {}} />
       </View>
@@ -115,14 +110,12 @@ export default function Settings() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 0.5, backgroundColor: '#FFFFFF' },
   header: { alignItems: 'center', padding: 24, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
-  profilePicture: { width: 100, height: 100, borderRadius: 50, marginBottom: 16 },
   userName: { fontSize: 24, fontWeight: '600', color: '#173252', marginBottom: 4 },
   userEmail: { fontSize: 16, color: '#6D6D6D' },
   userPhone: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },
   userHomeLocation: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },
-  userRiderID: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },
   userCompletedRides: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },
   settingsContainer: { padding: 24 },
   settingOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
