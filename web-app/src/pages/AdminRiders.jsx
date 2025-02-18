@@ -3,13 +3,11 @@ import { Container, Table, Button } from 'react-bootstrap';
 import axios from 'axios';
 import RiderEditModal from '../components/RiderEditModal';
 import AdminHeader from '../components/AdminHeader';
-import { useNavigate } from 'react-router-dom';
 
 const AdminRiders = () => {
     const [riders, setRiders] = useState([]);
     const [selectedRider, setSelectedRider] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchRiders();
