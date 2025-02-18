@@ -37,6 +37,7 @@ const adminAuthenticate = async (req, res, next) => {
         }
     }
 };
+
 const selfAuthenticate = async (req, res, next) => {
     const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
     

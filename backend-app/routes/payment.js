@@ -45,32 +45,32 @@ router.post('/create-payment-method', async (req, res) => {
     }
 });
 
-router.post('/create-charge', async (req, res) => {
-    try {
-        const { customerId, amount } = req.body;
-        console.log("Payment Method")
-        console.log(req.body);
-        console.log(req.body.paymentMethodId);
+// router.post('/create-charge', async (req, res) => {
+//     try {
+//         const { customerId, amount } = req.body;
+//         console.log("Payment Method")
+//         console.log(req.body);
+//         console.log(req.body.paymentMethodId);
 
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount * 100,
-            currency: 'usd',
-            customer: customerId,
-            description: 'Fake charge for test purposes',
-            payment_method: req.body.paymentMethodId,
-            off_session: true,
-            confirm: true,
-        });
+//         const paymentIntent = await stripe.paymentIntents.create({
+//             amount: amount * 100,
+//             currency: 'usd',
+//             customer: customerId,
+//             description: 'Fake charge for test purposes',
+//             payment_method: req.body.paymentMethodId,
+//             off_session: true,
+//             confirm: true,
+//         });
 
-        if (paymentIntent.status === 'succeeded') {
-            res.json({ success: true, message: 'Payment processed successfully!' });
-        } else {
-            res.json({ success: false, message: 'Payment failed' });
-        }
-    } catch (error) {
-        console.error('Error creating charge:', error);
-        res.status(500).json({ error: 'Failed to create charge' });
-    }
-});
+//         if (paymentIntent.status === 'succeeded') {
+//             res.json({ success: true, message: 'Payment processed successfully!' });
+//         } else {
+//             res.json({ success: false, message: 'Payment failed' });
+//         }
+//     } catch (error) {
+//         console.error('Error creating charge:', error);
+//         res.status(500).json({ error: 'Failed to create charge' });
+//     }
+// });
 
 module.exports = router;
