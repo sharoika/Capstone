@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface GoOnlineStepProps {
   token: string;
   driverID: string;
@@ -12,7 +14,7 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
 
   const toggleOnlineStatus = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/user/driver/${driverID}/online`, {
+      const response = await fetch(`${apiUrl}/api/user/driver/${driverID}/online`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIn
 import { useRouter } from 'expo-router';
 import { ChevronRight, Edit2, Bell, Lock, LogOut } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
+
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 interface Rider {
   firstName: string;
@@ -34,7 +37,7 @@ export default function Settings() {
         if (userId && token) {
           setId(userId);
 
-          const response = await fetch(`${process.env.API_URL}/api/user/riders/${userId}`, {
+          const response = await fetch(`${apiUrl}/api/user/riders/${userId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',

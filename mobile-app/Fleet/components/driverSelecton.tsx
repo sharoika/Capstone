@@ -3,7 +3,9 @@ import { View, Text, Picker, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Platform} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 const ConfirmTripScreen = ({ rideID }) => {
   const [drivers, setDrivers] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState('');
@@ -21,7 +23,7 @@ const ConfirmTripScreen = ({ rideID }) => {
     const fetchDrivers = async () => {
       try {
         const token = await getItemAsync('userToken');
-        const response = await fetch(`${process.env.API_URL}/api/auth/drivers/list`, {
+        const response = await fetch(`${apiUrl}/api/auth/drivers/list`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -56,7 +58,7 @@ const ConfirmTripScreen = ({ rideID }) => {
         console.log(selectedDriver);
       const token = await getItemAsync('userToken');
       const response = await fetch(
-        `${process.env.API_URL}/api/rides/${rideID}/confirm`,
+        `${apiUrl}/api/rides/${rideID}/confirm`,
         {
           method: 'POST',
           headers: {

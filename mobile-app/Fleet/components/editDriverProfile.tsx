@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface Driver {
   firstName: string;
   lastName: string;
@@ -33,7 +35,7 @@ export default function editDriverProfile() {
       const driverId = await getItemAsync('driverID');
       const token = await getItemAsync('driverToken');
       try {
-        const response = await fetch(`http://10.0.2.2:5000/api/user/drivers/${driverId}`, {
+        const response = await fetch(`${apiUrl}/api/user/drivers/${driverId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -59,7 +61,7 @@ export default function editDriverProfile() {
     const token = await getItemAsync('driverToken');
 
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/user/drivers/${driverId}`, {
+      const response = await fetch(`${apiUrl}/api/user/drivers/${driverId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

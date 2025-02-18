@@ -4,7 +4,9 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } fr
 import { SafeAreaView } from "react-native-safe-area-context"
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface StartRideProps {
   rideID: string
   token: string
@@ -56,7 +58,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   useEffect(() => {
     const fetchRideDetails = async () => {
       try {
-        const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}`, {
+        const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -122,7 +124,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
 
   const handleStartRide = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}/start`, {
+      const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/start`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

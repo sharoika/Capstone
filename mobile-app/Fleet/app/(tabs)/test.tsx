@@ -4,7 +4,9 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { useRouter } from 'expo-router';
 import { v4 as uuidv4 } from 'uuid';
 import 'react-native-get-random-values';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 const GOOGLE_API_KEY =  'AIzaSyBjVIyhPrpbB4CNHRI6UdGCBzeRyaWEAgM';
 
 export default function AddressAutocomplete() {

@@ -3,7 +3,11 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, Platfo
 import { useRouter } from 'expo-router';
 import { ChevronRight, Edit2, Bell, Lock, LogOut } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
-import Modal from "react-native-modal"; 
+import Modal from "react-native-modal";
+import Constants from 'expo-constants';
+
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
+
 interface Driver {
   firstName: string;
   lastName: string;
@@ -32,7 +36,7 @@ export default function Settings() {
       const token = await getItemAsync('driverToken');
 
       try {
-        const response = await fetch(`${process.env.API_URL}/api/user/drivers/${driverId}`, {
+        const response = await fetch(`${apiUrl}/api/user/drivers/${driverId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -57,7 +61,7 @@ export default function Settings() {
     const token = await getItemAsync('driverToken');
 
     try {
-      const response = await fetch(`http://10.0.2.2:5000/api/user/drivers/${driverId}`, {
+      const response = await fetch(`${apiUrl}/api/user/drivers/${driverId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

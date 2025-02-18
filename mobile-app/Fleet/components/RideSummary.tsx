@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface RideSummaryProps {
   rideID: string;
   token: string;
@@ -16,7 +18,7 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
   useEffect(() => {
     const fetchRideDetails = async () => {
       try {
-        const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}`, {
+        const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface RidesForDriverStepProps {
   token: string;
   driverID: string;
@@ -19,7 +21,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
 
   const fetchRidesForDriver = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/ride/rides/driver/${driverID}`, {
+      const response = await fetch(`${apiUrl}/api/ride/rides/driver/${driverID}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -43,7 +45,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
     }
 
     try {
-      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${selectedRide}/accept`, {
+      const response = await fetch(`${apiUrl}/api/ride/rides/${selectedRide}/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

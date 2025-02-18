@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface DriverInProgressStepProps {
   rideID: string;
   driverID: string;
@@ -19,7 +21,7 @@ const DriverInProgressStep: React.FC<DriverInProgressStepProps> = ({ rideID, dri
 
   const checkRideStatus = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}/status`, {
+      const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/status`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

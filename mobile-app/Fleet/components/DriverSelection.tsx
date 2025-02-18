@@ -9,7 +9,9 @@ import {
   FlatList,
   Image,
 } from 'react-native';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface DriverSelectionProps {
   rideID: string;
   token: string;
@@ -31,7 +33,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
       try {
         console.log('Fetching drivers for ride ID:', rideID);
 
-        const rideResponse = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}`, {
+        const rideResponse = await fetch(`${apiUrl}/api/ride/rides/${rideID}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -45,7 +47,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
         } else {
           Alert.alert('Error', 'Failed to fetch ride details');
         }
-        const driverResponse = await fetch(`${process.env.API_URL}/api/user/drivers`, {
+        const driverResponse = await fetch(`${apiUrl}/api/user/drivers`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

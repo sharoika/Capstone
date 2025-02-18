@@ -3,7 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } fro
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface RideFormProps {
   token: string;
   riderID: string;
@@ -247,7 +249,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     }
 
     try {
-      const response = await fetch(`${process.env.API_URL}/api/ride/ride`, {
+      const response = await fetch(`${apiUrl}/api/ride/ride`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

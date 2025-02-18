@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import Constants from 'expo-constants';
 
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface TravelToRideStepProps {
   rideID: string;
   driverID: string;
@@ -21,7 +23,7 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
 
   const checkRideStatus = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}/status`, {
+      const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/status`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
