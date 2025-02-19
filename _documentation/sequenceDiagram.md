@@ -1,3 +1,4 @@
+```mermaid
 sequenceDiagram
     participant R as Rider
     participant RA as Rider App

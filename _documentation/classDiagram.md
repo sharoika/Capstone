@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
     class User {
         +string id
@@ -22,7 +23,7 @@ classDiagram
         +string vehicleMake
         +string vehicleModel
         +boolean isOnline
-        +toggleOnlineStatus()
+        +toggleOnlineStatus()D
         +acceptRide()
         +startRide()
         +completeRide()
