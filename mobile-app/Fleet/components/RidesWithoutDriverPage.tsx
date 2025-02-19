@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import Constants from 'expo-constants';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
+
 interface RidesForDriverStepProps {
   token: string;
   driverID: string;
@@ -38,14 +38,14 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
     }
   };
 
-  const handleClaimRide = async () => {
-    if (!selectedRide) {
+  const handleClaimRide = async (rideID: string) => {
+    if (!rideID) {
       Alert.alert('Error', 'Please select a ride');
       return;
     }
 
     try {
-      const response = await fetch(`${apiUrl}/api/ride/rides/${selectedRide}/accept`, {
+      const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,13 +54,11 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
         body: JSON.stringify({ driverID }),
       });
 
-      console.log('Response status:', response.status);
       const data = await response.json();
-      console.log('Response data:', data);
 
       if (response.ok) {
         Alert.alert('Success', 'Ride claimed successfully');
-        onRideClaimed(selectedRide); 
+        onRideClaimed(rideID); 
       } else {
         Alert.alert('Error', data.message || 'Failed to claim ride');
       }
@@ -70,22 +68,29 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
     }
   };
 
+  const renderItem = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => handleClaimRide(item._id)}
+    >
+      <Text style={styles.cardTitle}>Start: {item.start}</Text>
+      <Text style={styles.cardSubtitle}>End: {item.end}</Text>
+      <Text style={styles.cardDetails}>Date: {item.date}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Rides for Driver</Text>
       {ridesForDriver.length === 0 ? (
         <Text>No rides available at the moment.</Text>
       ) : (
-        <Picker selectedValue={selectedRide} onValueChange={setSelectedRide} style={styles.picker}>
-          <Picker.Item label="Select a ride" value="" />
-          {ridesForDriver.map((ride) => (
-            <Picker.Item key={ride._id} label={`Start: ${ride.start}, End: ${ride.end}`} value={ride._id} />
-          ))}
-        </Picker>
+        <FlatList
+          data={ridesForDriver}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+        />
       )}
-      <TouchableOpacity style={styles.claimButton} onPress={handleClaimRide}>
-        <Text style={styles.claimButtonText}>Claim Ride</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -101,20 +106,29 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  picker: {
-    width: '100%',
-    height: 50,
-    marginBottom: 20,
+  card: {
+    backgroundColor: '#f9f9f9',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  claimButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
   },
-  claimButtonText: {
-    color: '#fff',
+  cardSubtitle: {
     fontSize: 16,
+    color: '#666',
+  },
+  cardDetails: {
+    fontSize: 14,
+    color: '#888',
   },
 });
 

@@ -82,7 +82,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
       console.log(`Confirming ride with ID: ${rideID} and Driver ID: ${selectedDriver}`);
 
       const response = await fetch(
-        `${process.env.API_URL}/api/ride/rides/${rideID}/confirm`,
+        `${apiUrl}/api/ride/rides/${rideID}/confirm`,
         {
           method: 'POST',
           headers: {
@@ -92,7 +92,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
           body: JSON.stringify({ driverID: selectedDriver }),
         }
       );
-
+      
       if (response.ok) {
         Alert.alert('Success', 'Ride confirmed successfully');
         onDriverConfirmed();
@@ -102,7 +102,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
         Alert.alert('Error', 'Failed to confirm ride');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.log('Error:', error);
       Alert.alert('Error', 'An error occurred while confirming the ride');
     }
   };

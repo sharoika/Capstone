@@ -18,7 +18,7 @@ const driverSchema = new mongoose.Schema({
         long: { type: Number, required: true, default: 0 }
     },
     
-    pricingDetails: { type: pricingDetailsSchema, required: true },
+    pricingDetails: { type: pricingDetailsSchema, required: false },
 
     completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],
 

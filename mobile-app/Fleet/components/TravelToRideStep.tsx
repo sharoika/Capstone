@@ -1,22 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import Constants from 'expo-constants';
+import MapView, { Marker, Region } from 'react-native-maps';
+import * as Location from 'expo-location';
+import Constants from 'expo-constants'
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface TravelToRideStepProps {
   rideID: string;
   driverID: string;
   token: string;
-  onRideStarted: () => void; // Callback to move to next step
+  onRideStarted: () => void; 
 }
 
 const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, token, onRideStarted }) => {
   const [rideInProgress, setRideInProgress] = useState(false);
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [region, setRegion] = useState<Region | null>(null);
 
   useEffect(() => {
+    const fetchLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Required',
+          'Location access is needed to show your position on the map.',
+        );
+        return;
+      }
+
+      const userLocation = await Location.getCurrentPositionAsync({});
+      setLocation(userLocation);
+      setRegion({
+        latitude: userLocation.coords.latitude,
+        longitude: userLocation.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    };
+
+    fetchLocation();
+
     const interval = setInterval(() => {
       checkRideStatus();
-    }, 5000); // Poll every 5 seconds
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -35,7 +61,7 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
       const data = await response.json();
       if (data.isInProgress) {
         setRideInProgress(true);
-        onRideStarted(); // Move to next screen when ride starts
+        onRideStarted(); 
       }
     } catch (error) {
       console.error('Error checking ride status:', error);
@@ -52,6 +78,23 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
       <TouchableOpacity style={styles.button} onPress={checkRideStatus}>
         <Text style={styles.buttonText}>Refresh Status</Text>
       </TouchableOpacity>
+
+      {region ? (
+        <MapView style={styles.map} region={region} showsUserLocation>
+          {location && (
+            <Marker
+              coordinate={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }}
+              title="You are here"
+            />
+          )}
+        </MapView>
+      ) : (
+        <Text>Loading map...</Text>
+      )}
+
     </View>
   );
 };
@@ -87,6 +130,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
+  },
+  map: {
+    width: '100%',
+    height: 300,
+    marginTop: 20,
   },
 });
 

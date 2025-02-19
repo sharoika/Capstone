@@ -68,9 +68,9 @@ console.log(rideID);
         if (ride.status !== RideStates.PROPOSED) { 
             return res.status(400).json({ message: 'Ride cannot be confirmed at this stage' });
         }
-
+        console.log("here");
         ride.driverID = driverID;
-        ride.status = RideStates.SELECTION;
+        ride.status = RideStates.SELECTED;
         await ride.save();
 
         res.json({ message: 'Ride confirmed successfully', ride });
@@ -94,7 +94,7 @@ router.post('/rides/:rideID/accept', authenticate, async (req, res) => {
             return res.status(404).json({ message: 'Ride not found' });
         }
 
-        if (ride.status !== RideStates.SELECTION) {
+        if (ride.status !== RideStates.SELECTED) {
             return res.status(400).json({ message: 'Ride cannot be accepted at this stage' });
         }
 
@@ -118,7 +118,7 @@ router.get('/rides/driver/:driverID', authenticate, async (req, res) => {
     try {
         const rides = await Ride.find({
             driverID: driverID,  
-            status: RideStates.SELECTION,
+            status: RideStates.SELECTED,
         });
 
         res.json({ message: 'Rides found for driver', rides });
