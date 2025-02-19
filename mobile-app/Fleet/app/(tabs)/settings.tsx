@@ -99,9 +99,13 @@ export default function Settings() {
         <SettingOption
           icon={<Banknote color="#39C9C2" size={24} />}
           title="Payment Settings"
-          onPress={() => router.push('/paymentSettings')} // Assuming you have a 'payment-settings' route
+          onPress={() => router.push('/paymentSettings')}
         />
-        <SettingOption icon={<Bell color="#39C9C2" size={24} />} title="Notifications" onPress={() => { }} />
+        <SettingOption 
+          icon={<Bell color="#39C9C2" size={24} />} 
+          title="Notifications" 
+          onPress={() => alert('Notifications Management Coming Soon')} 
+        />
         <SettingOption icon={<Lock color="#39C9C2" size={24} />} title="Privacy Settings" onPress={() => { }} />
       </View>
 
