@@ -156,151 +156,205 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Current Ride</Text>
-        </View>
-
-        <View style={styles.mapContainer}>
-          <MapView
-            ref={mapRef}
-            style={styles.map}
-            showsUserLocation={true}
-            followsUserLocation={true}
-          >
-            {routeCoordinates.length > 0 && (
-              <Polyline
-                coordinates={routeCoordinates}
-                strokeWidth={4}
-                strokeColor="#39c9c2"
+    <View style={styles.container}>
+      <View style={styles.mapContainer}>
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          showsUserLocation={true}
+        >
+          {routeCoordinates.length > 0 && (
+            <Polyline
+              coordinates={routeCoordinates}
+              strokeColor="#39C9C2"
+              strokeWidth={3}
+            />
+          )}
+          {rideDetails && (
+            <>
+              <Marker
+                coordinate={{
+                  latitude: routeCoordinates[0]?.latitude || 0,
+                  longitude: routeCoordinates[0]?.longitude || 0,
+                }}
+                title="Pickup"
+                description={rideDetails.start}
               />
-            )}
-            {rideDetails && (
-              <>
-                <Marker
-                  coordinate={{
-                    latitude: routeCoordinates[0]?.latitude || 0,
-                    longitude: routeCoordinates[0]?.longitude || 0,
-                  }}
-                  title="Pickup"
-                  description={rideDetails.start}
-                />
-                <Marker
-                  coordinate={{
-                    latitude: routeCoordinates[routeCoordinates.length - 1]?.latitude || 0,
-                    longitude: routeCoordinates[routeCoordinates.length - 1]?.longitude || 0,
-                  }}
-                  title="Destination"
-                  description={rideDetails.end}
-                />
-              </>
-            )}
-          </MapView>
+              <Marker
+                coordinate={{
+                  latitude: routeCoordinates[routeCoordinates.length - 1]?.latitude || 0,
+                  longitude: routeCoordinates[routeCoordinates.length - 1]?.longitude || 0,
+                }}
+                title="Destination"
+                description={rideDetails.end}
+              />
+            </>
+          )}
+        </MapView>
+      </View>
+
+      <View style={styles.detailsContainer}>
+        <View style={styles.driverInfo}>
+          <View style={styles.driverAvatar}>
+            <Text style={styles.driverInitial}>
+              {rideDetails?.driver?.firstName?.[0] || 'D'}
+            </Text>
+          </View>
+          <View style={styles.driverDetails}>
+            <Text style={styles.driverName}>
+              {rideDetails?.driver?.firstName} {rideDetails?.driver?.lastName}
+            </Text>
+            <Text style={styles.vehicleInfo}>
+              {rideDetails?.driver?.vehicleMake} {rideDetails?.driver?.vehicleModel}
+            </Text>
+          </View>
         </View>
 
-        {rideDetails && (
-          <>
-            <View style={styles.rideInfo}>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Start Location</Text>
-                <Text style={styles.infoText}>{rideDetails.start}</Text>
-              </View>
-              <View style={styles.separator} />
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>End Location</Text>
-                <Text style={styles.infoText}>{rideDetails.end}</Text>
-              </View>
-              <View style={styles.separator} />
-              <View style={styles.fareContainer}>
-                <Text style={styles.fareLabel}>Current Fare</Text>
-                <Text style={styles.fareText}>${rideDetails.fare}</Text>
-              </View>
-            </View>
-            <TouchableOpacity style={styles.finishButton} onPress={handleFinishRide} activeOpacity={0.8}>
-              <Text style={styles.finishButtonText}>End Ride</Text>
-            </TouchableOpacity>
-          </>
-        )}
+        <View style={styles.locationContainer}>
+          <View style={styles.locationItem}>
+            <View style={[styles.dot, { backgroundColor: '#39C9C2' }]} />
+            <Text style={styles.locationText} numberOfLines={1}>{rideDetails.start}</Text>
+          </View>
+          <View style={styles.locationItem}>
+            <View style={[styles.dot, { backgroundColor: '#39C9C2' }]} />
+            <Text style={styles.locationText} numberOfLines={1}>{rideDetails.end}</Text>
+          </View>
+        </View>
+
+        <View style={styles.fareContainer}>
+          <View style={styles.fareItem}>
+            <Text style={styles.fareLabel}>Distance</Text>
+            <Text style={styles.fareValue}>{rideDetails.distance?.toFixed(2)} km</Text>
+          </View>
+          <View style={styles.fareDivider} />
+          <View style={styles.fareItem}>
+            <Text style={styles.fareLabel}>Total Fare</Text>
+            <Text style={styles.fareValue}>${rideDetails.fare?.toFixed(2)}</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={styles.endRideButton}
+          onPress={handleFinishRide}
+        >
+          <Text style={styles.endRideButtonText}>End Ride</Text>
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#f6f7f9",
-  },
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  mapContainer: {
+    flex: 1,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+  detailsContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     padding: 20,
-  },
-  header: {
-    marginBottom: 24,
-  },
-  headerText: {
-    fontSize: 28,
-    fontWeight: "600",
-    color: "#173252",
-  },
-  rideInfo: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  infoRow: {
-    marginVertical: 8,
-  },
-  infoLabel: {
-    fontSize: 14,
-    color: "#6d6d6d",
-    marginBottom: 4,
-  },
-  infoText: {
-    fontSize: 16,
-    color: "#173252",
-    fontWeight: "500",
-  },
-  separator: {
-    height: 1,
-    backgroundColor: "#f6f7f9",
-    marginVertical: 8,
-  },
-  fareContainer: {
-    marginTop: 8,
-  },
-  fareLabel: {
-    fontSize: 14,
-    color: "#6d6d6d",
-    marginBottom: 4,
-  },
-  fareText: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: "#39c9c2",
-  },
-  finishButton: {
-    backgroundColor: "#39c9c2",
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 5,
   },
-  finishButtonText: {
-    color: "#ffffff",
+  driverInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  driverAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#E8F7F7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  driverInitial: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#39C9C2',
+  },
+  driverName: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: '600',
+    color: '#173252',
+    marginBottom: 4,
+  },
+  vehicleInfo: {
+    fontSize: 14,
+    color: '#666',
+  },
+  locationContainer: {
+    marginBottom: 16,
+  },
+  locationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
+  },
+  locationText: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+  },
+  fareContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  fareItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  fareDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: '#E8F7F7',
+    marginHorizontal: 10,
+  },
+  fareLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+  fareValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#39C9C2',
+  },
+  endRideButton: {
+    backgroundColor: '#39C9C2',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  endRideButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
@@ -320,16 +374,6 @@ const styles = StyleSheet.create({
     color: "#ff4444",
     textAlign: "center",
   },
-  mapContainer: {
-    height: 300,
-    marginBottom: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  map: {
-    flex: 1,
-  },
 })
 
 export default RideInProgress
-

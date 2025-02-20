@@ -21,6 +21,8 @@ interface Driver {
   vehicleModel: string;
   vehicleYear?: string;
   vehiclePlate: string;
+  farePrice?: number;
+  initialPrice?: number;
   ledger?: {
     totalEarnings: number;
     availableBalance: number;
@@ -46,6 +48,9 @@ export default function Settings() {
   const [updating, setUpdating] = useState<boolean>(false);
   const [payoutAmount, setPayoutAmount] = useState('');
   const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [showPriceModal, setShowPriceModal] = useState(false);
+  const [farePrice, setFarePrice] = useState('');
+  const [initialPrice, setInitialPrice] = useState('');
 
   useEffect(() => {
     const fetchDriverData = async () => {
@@ -226,6 +231,36 @@ export default function Settings() {
     }
   };
 
+  const handleUpdatePrice = async () => {
+    try {
+      const token = await getItemAsync('driverToken');
+      const response = await fetch(`${getApiUrl()}/api/driver/fare`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          farePrice: parseFloat(farePrice),
+          initialPrice: parseFloat(initialPrice)
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update price');
+      }
+
+      const data = await response.json();
+      setFarePrice(data.farePrice.toString());
+      setInitialPrice(data.initialPrice.toString());
+      setShowPriceModal(false);
+      Alert.alert('Success', 'Price updated successfully');
+    } catch (error) {
+      console.error('Error updating price:', error);
+      Alert.alert('Error', 'Failed to update price');
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -286,6 +321,22 @@ export default function Settings() {
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.settingOption}
+          onPress={() => setShowPriceModal(true)}
+        >
+          <View style={styles.settingOptionContent}>
+            <Banknote color="#39C9C2" size={24} />
+            <Text style={styles.settingOptionText}>Set Prices</Text>
+          </View>
+          <View style={styles.rowRight}>
+            <Text style={styles.valueText}>
+              ${driver?.farePrice?.toFixed(2) || '0.00'} / ${driver?.initialPrice?.toFixed(2) || '0.00'}
+            </Text>
+            <ChevronRight color="#666" size={24} />
+          </View>
+        </TouchableOpacity>
+
         {__DEV__ && (
           <TouchableOpacity 
             style={styles.settingOption} 
@@ -339,6 +390,52 @@ export default function Settings() {
           >
             <Text style={styles.buttonText}>Submit Request</Text>
           </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showPriceModal}
+        onRequestClose={() => setShowPriceModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Set Your Prices</Text>
+            
+            <Text style={styles.label}>Base Fee ($)</Text>
+            <TextInput
+              style={styles.input}
+              value={initialPrice}
+              onChangeText={setInitialPrice}
+              placeholder="Enter base fee"
+              keyboardType="decimal-pad"
+            />
+
+            <Text style={styles.label}>Rate per Kilometer ($)</Text>
+            <TextInput
+              style={styles.input}
+              value={farePrice}
+              onChangeText={setFarePrice}
+              placeholder="Enter rate per kilometer"
+              keyboardType="decimal-pad"
+            />
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowPriceModal(false)}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleUpdatePrice}
+              >
+                <Text style={styles.buttonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </Modal>
     </ScrollView>
@@ -463,5 +560,112 @@ const styles = StyleSheet.create({
     color: '#39C9C2',
     marginTop: 4,
   },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5',
+  },
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rowText: {
+    fontSize: 16,
+    marginLeft: 12,
+    color: '#333333',
+  },
+  rowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  valueText: {
+    fontSize: 16,
+    color: '#666',
+    marginRight: 8,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 16,
+    fontSize: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    padding: 15,
+    borderRadius: 8,
+    width: '45%',
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+  },
+  saveButton: {
+    backgroundColor: '#39C9C2',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 20,
+    color: '#173252',
+  },
+  label: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    width: '100%',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    width: '100%',
+    maxWidth: 400,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    gap: 10,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+  },
+  saveButton: {
+    backgroundColor: '#39C9C2',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
-

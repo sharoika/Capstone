@@ -18,6 +18,8 @@ const driverSchema = new mongoose.Schema({
         long: { type: Number, required: true, default: 0 }
     },
     
+    farePrice: { type: Number, default: 0 },
+    initialPrice: { type: Number, default: 2 },
     pricingDetails: { type: pricingDetailsSchema, required: false },
 
     completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],

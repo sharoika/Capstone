@@ -54,7 +54,8 @@ router.put('/driver/:id/online', authenticate, async (req, res) => {
 
 router.get('/drivers', async (req, res) => {
     try {
-        const drivers = await Driver.find();
+        const drivers = await Driver.find()
+            .select('firstName lastName profilePicture farePrice isOnline');
         res.json(drivers);
     } catch (error) {
         console.error('Error fetching drivers:', error.message);

@@ -178,6 +178,9 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          fare: fare
+        })
       })
 
       if (!response.ok) {
@@ -213,9 +216,47 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.headerText}>Driver is Enroute</Text>
-        <Text style={styles.infoText}>When driver arrives press start ride</Text>
-        {rideDetails && (
+        <View style={styles.mapContainer}>
+          {location ? (
+            <MapView
+              ref={mapRef}
+              style={styles.map}
+              region={region}
+              onRegionChangeComplete={setRegion}
+            >
+              {routeCoordinates.length > 0 && (
+                <Polyline
+                  coordinates={routeCoordinates}
+                  strokeWidth={4}
+                  strokeColor="#00f"
+                />
+              )}
+              <Marker
+                coordinate={{
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                }}
+                title="Your Location"
+                description="This is your current location"
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    backgroundColor: 'blue',
+                    borderRadius: 20,
+                    borderWidth: 2,
+                    borderColor: 'white',
+                  }}
+                />
+              </Marker>
+            </MapView>
+          ) : (
+            <Text>Loading map...</Text>
+          )}
+        </View>
+
+        <View style={styles.detailsContainer}>
           <View style={styles.rideInfoCard}>
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Ride ID</Text>
@@ -234,7 +275,12 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
 
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Fare</Text>
-              <Text style={styles.fareText}>${rideDetails.fare}</Text>
+              <Text style={styles.fareText}>${fare.toFixed(2)}</Text>
+            </View>
+
+            <View style={styles.infoSection}>
+              <Text style={styles.infoLabel}>Distance</Text>
+              <Text style={styles.infoText}>{distance}</Text>
             </View>
 
             <View style={styles.statusSection}>
@@ -253,43 +299,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
               </View>
             </View>
 
-            {location ? (
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          region={region}
-          onRegionChangeComplete={setRegion}
-        >
-          {routeCoordinates.length > 0 && (
-            <Polyline
-              coordinates={routeCoordinates}
-              strokeWidth={4}
-              strokeColor="#00f"
-            />
-          )}
-<Marker
-  coordinate={{
-    latitude: location.latitude,
-    longitude: location.longitude,
-  }}
-  title="Your Location"
-  description="This is your current location"
->
-  <View
-    style={{
-      width: 40,
-      height: 40,
-      backgroundColor: 'blue',
-      borderRadius: 20,
-      borderWidth: 2,
-      borderColor: 'white',
-    }}
-  />
-</Marker>
-        </MapView>
-      ) : (
-        <Text>Loading map...</Text>
-      )}
             {rideDetails.rider && (
               <View style={styles.infoSection}>
                 <Text style={styles.infoLabel}>Rider</Text>
@@ -297,10 +306,11 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
               </View>
             )}
           </View>
-        )}
-        <TouchableOpacity style={styles.startButton} onPress={handleStartRide} activeOpacity={0.8}>
-          <Text style={styles.startButtonText}>Start Ride</Text>
-        </TouchableOpacity>
+
+          <TouchableOpacity style={styles.startButton} onPress={handleStartRide} activeOpacity={0.8}>
+            <Text style={styles.startButtonText}>Start Ride</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   )
@@ -315,16 +325,27 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
   },
-  headerText: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: "#173252",
-    marginBottom: 12,
+  mapContainer: {
+    flex: 1,
   },
   map: {
-    width: "100%",
-    height: 200,
+    width: '100%',
+    height: '100%',
     borderRadius: 10
+  },
+  detailsContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
   },
   rideInfoCard: {
     backgroundColor: "#ffffff",
@@ -414,4 +435,3 @@ const styles = StyleSheet.create({
 })
 
 export default StartRide
-

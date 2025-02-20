@@ -131,6 +131,7 @@ router.get('/rides/driver/:driverID', authenticate, async (req, res) => {
 // Start a trip
 router.post('/rides/:rideID/start', authenticate, async (req, res) => {
     const { rideID } = req.params;
+    const { fare } = req.body;
 
     try {
         const ride = await Ride.findById(rideID);
@@ -143,9 +144,14 @@ router.post('/rides/:rideID/start', authenticate, async (req, res) => {
         }
 
         ride.status = RideStates.INPROGRESS;
+        ride.fare = fare;
         await ride.save();
 
-        res.json({ message: 'Ride started successfully', ride });
+        res.json({ 
+            message: 'Ride started successfully', 
+            ride,
+            fare: ride.fare
+        });
     } catch (error) {
         console.error('Error starting ride:', error.message);
         res.status(500).json({ message: 'Server error' });
@@ -158,37 +164,44 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
     try {
         const ride = await Ride.findById(rideID);
         if (!ride) {
-            return res.status(400).json({ message: 'Ride cannot be finished' });
+            return res.status(404).json({ message: 'Ride not found' });
         }
 
         if (ride.status !== RideStates.INPROGRESS) {
             return res.status(400).json({ message: 'Ride cannot be finished at this stage' });
         }
 
+        // Update ride status
         ride.status = RideStates.COMPLETED;
+        ride.completedAt = new Date();
+        await ride.save();
 
+        // Update driver's balance and add transaction
         const driver = await Driver.findById(ride.driverID);
-        const rider = await Rider.findById(ride.riderID);
-
-        // Update driver's ledger
         if (driver) {
-            driver.completedRides.push(ride._id);
-            driver.ledger.totalEarnings += ride.fare;
+            // Add fare to available balance
             driver.ledger.availableBalance += ride.fare;
+            driver.ledger.totalEarnings += ride.fare;
+            
+            // Add transaction record
             driver.ledger.transactions.push({
                 rideID: ride._id,
                 amount: ride.fare,
-                type: 'EARNING'
+                type: 'EARNING',
+                status: 'COMPLETED',
+                timestamp: new Date()
             });
+
+            await driver.save();
         }
 
-        if (rider) rider.completedRides.push(ride._id);
-
-        await Promise.all([ride.save(), driver?.save(), rider?.save()]);
-
-        res.json({ message: 'Ride finished successfully', ride });
+        res.json({ 
+            message: 'Ride completed successfully', 
+            ride,
+            driverBalance: driver ? driver.ledger.availableBalance : null
+        });
     } catch (error) {
-        console.error('Error finishing ride:', error.message);
+        console.error('Error finishing ride:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
