@@ -33,6 +33,18 @@ const driverSchema = new mongoose.Schema({
     applicationApproved: { type: Boolean, default: false },
     
     isOnline: { type: Boolean, default: false },
+
+    ledger: {
+      totalEarnings: { type: Number, default: 0 },
+      availableBalance: { type: Number, default: 0 },
+      transactions: [{
+        rideID: { type: mongoose.Schema.Types.ObjectId, ref: 'Ride' },
+        amount: Number,
+        type: { type: String, enum: ['EARNING', 'PAYOUT'], required: true },
+        status: { type: String, enum: ['PENDING', 'COMPLETED', 'FAILED'], default: 'COMPLETED' },
+        timestamp: { type: Date, default: Date.now }
+      }]
+    }
 }, { collection: 'Drivers' });
 
 mongoose.connection.once('open', async () => {

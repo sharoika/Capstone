@@ -21,6 +21,8 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   const [region, setRegion] = useState<any>(null);
   const mapRef = useRef<MapView | null>(null);
   const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [distance, setDistance] = useState<string>('');
+  const [fare, setFare] = useState<number>(0);
 
   const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
 
@@ -35,7 +37,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         const startLocation = startResponse.results[0].geometry.location;
         const endLocation = endResponse.results[0].geometry.location;
   
-        // Fetch route from Google Directions API
         const directionsResponse = await fetch(
           `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation.lat},${startLocation.lng}&destination=${endLocation.lat},${endLocation.lng}&key=${GOOGLE_API_KEY}`
         );
@@ -44,6 +45,14 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   
         if (directionsData.routes.length > 0) {
           const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
+          const distance = directionsData.routes[0].legs[0].distance.text;
+          const distanceValue = directionsData.routes[0].legs[0].distance.value; // in meters
+          
+          // Calculate fare based on distance (example: $2 base + $1.5 per km)
+          const fareAmount = 2 + ((distanceValue / 1000) * 1.5);
+          
+          setDistance(distance);
+          setFare(parseFloat(fareAmount.toFixed(2)));
           setRouteCoordinates(points);
           setRegion({
             latitude: startLocation.lat,

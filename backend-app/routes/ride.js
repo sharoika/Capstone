@@ -169,7 +169,19 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
 
         const driver = await Driver.findById(ride.driverID);
         const rider = await Rider.findById(ride.riderID);
-        if (driver) driver.completedRides.push(ride._id);
+
+        // Update driver's ledger
+        if (driver) {
+            driver.completedRides.push(ride._id);
+            driver.ledger.totalEarnings += ride.fare;
+            driver.ledger.availableBalance += ride.fare;
+            driver.ledger.transactions.push({
+                rideID: ride._id,
+                amount: ride.fare,
+                type: 'EARNING'
+            });
+        }
+
         if (rider) rider.completedRides.push(ride._id);
 
         await Promise.all([ride.save(), driver?.save(), rider?.save()]);

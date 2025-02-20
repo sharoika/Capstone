@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Edit2, Bell, Lock, LogOut } from 'lucide-react-native';
+import { ChevronRight, Edit2, Bell, Lock, LogOut, Banknote } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import Modal from "react-native-modal";
 import Constants from 'expo-constants';
 
-const apiUrl = Constants.expoConfig?.extra?.API_URL;
+const getApiUrl = () => {
+  const url = Constants.expoConfig?.extra?.API_URL;
+  console.log('API URL:', url);
+  return url;
+};
 
 interface Driver {
   firstName: string;
@@ -17,6 +21,17 @@ interface Driver {
   vehicleModel: string;
   vehicleYear?: string;
   vehiclePlate: string;
+  ledger?: {
+    totalEarnings: number;
+    availableBalance: number;
+    transactions: Array<{
+      rideID: string;
+      amount: number;
+      type: 'EARNING' | 'PAYOUT';
+      status: string;
+      timestamp: string;
+    }>;
+  };
 }
 
 const getItemAsync = async (key: string): Promise<string | null> => {
@@ -29,29 +44,77 @@ export default function Settings() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [updating, setUpdating] = useState<boolean>(false);
+  const [payoutAmount, setPayoutAmount] = useState('');
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
 
   useEffect(() => {
     const fetchDriverData = async () => {
-      const driverId = await getItemAsync('driverID');
-      const token = await getItemAsync('driverToken');
-
       try {
-        const response = await fetch(`${apiUrl}/api/user/drivers/${driverId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const driverId = await getItemAsync('driverID');
+        const token = await getItemAsync('driverToken');
+        
+        console.log('Fetching driver data:', {
+          driverId,
+          hasToken: !!token,
+          apiUrl: getApiUrl()
         });
 
-        if (!response.ok) throw new Error('Failed to fetch driver details');
+        if (!driverId || !token) {
+          throw new Error('Missing authentication credentials');
+        }
+
+        const response = await fetch(`${getApiUrl()}/api/user/drivers/${driverId}`, {
+          method: 'GET',
+          headers: { 
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          },
+        });
+
+        console.log('Driver data response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
+          throw new Error(`Failed to fetch driver details: ${response.status}`);
+        }
 
         const data: Driver = await response.json();
+        console.log('Driver data received:', data);
         setDriver(data);
       } catch (error) {
         console.error('Error fetching driver data:', error);
+        Alert.alert('Error', 'Failed to load driver profile. Please try logging in again.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchDriverData();
+  }, []);
+
+  useEffect(() => {
+    const fetchLedger = async () => {
+      try {
+        const token = await getItemAsync('driverToken');
+        const response = await fetch(`${getApiUrl()}/api/driver/earnings`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch earnings');
+        }
+
+        const ledgerData = await response.json();
+        setDriver(prev => prev ? { ...prev, ledger: ledgerData } : prev);
+      } catch (error) {
+        console.error('Error fetching ledger:', error);
+      }
+    };
+
+    fetchLedger();
   }, []);
 
   const handleUpdateProfile = async () => {
@@ -61,7 +124,7 @@ export default function Settings() {
     const token = await getItemAsync('driverToken');
 
     try {
-      const response = await fetch(`${apiUrl}/api/user/drivers/${driverId}`, {
+      const response = await fetch(`${getApiUrl()}/api/user/drivers/${driverId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -79,6 +142,87 @@ export default function Settings() {
       console.error('Error updating profile:', error);
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handlePayoutRequest = async () => {
+    if (!payoutAmount || parseFloat(payoutAmount) <= 0) {
+      Alert.alert('Error', 'Please enter a valid amount');
+      return;
+    }
+
+    const token = await getItemAsync('driverToken');
+    
+    try {
+      const response = await fetch(`${getApiUrl()}/api/driver/payout-request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ amount: parseFloat(payoutAmount) }),
+      });
+
+      if (!response.ok) throw new Error('Payout request failed');
+
+      const data = await response.json();
+      Alert.alert('Success', 'Payout request submitted successfully');
+      setShowPayoutModal(false);
+      setPayoutAmount('');
+      
+      setDriver(prev => prev ? { ...prev, ledger: data.ledger } : prev);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to submit payout request');
+    }
+  };
+
+  const addTestEarnings = async () => {
+    try {
+      const token = await getItemAsync('driverToken');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const url = `${getApiUrl()}/api/driver/test/add-earnings`;
+      console.log('Making test earnings request to:', url);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      console.log('Test earnings response status:', response.status);
+      
+      const responseText = await response.text();
+      console.log('Test earnings response:', responseText);
+
+      try {
+        const data = JSON.parse(responseText);
+        
+        if (!response.ok) {
+          throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        }
+
+        setDriver(prev => prev ? {
+          ...prev,
+          ledger: data.ledger
+        } : prev);
+
+        Alert.alert('Success', 'Test earnings added successfully');
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError);
+        throw new Error('Invalid server response');
+      }
+    } catch (error) {
+      console.error('Error adding test earnings:', error);
+      Alert.alert(
+        'Error', 
+        `Failed to add test earnings: ${error.message}`
+      );
     }
   };
 
@@ -123,6 +267,37 @@ export default function Settings() {
           </View>
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.settingOption} 
+          onPress={() => setShowPayoutModal(true)}
+        >
+          <View style={styles.settingOptionContent}>
+            <Banknote color="#39C9C2" size={24} />
+            <View style={styles.earningsContainer}>
+              <Text style={styles.settingOptionText}>Earnings & Payouts</Text>
+              {driver?.ledger && (
+                <Text style={styles.balanceText}>
+                  Balance: ${driver.ledger.availableBalance.toFixed(2)}
+                </Text>
+              )}
+            </View>
+          </View>
+          <ChevronRight color="#6D6D6D" size={24} />
+        </TouchableOpacity>
+
+        {__DEV__ && (
+          <TouchableOpacity 
+            style={styles.settingOption} 
+            onPress={addTestEarnings}
+          >
+            <View style={styles.settingOptionContent}>
+              <Banknote color="#39C9C2" size={24} />
+              <Text style={styles.settingOptionText}>Add Test $10</Text>
+            </View>
+            <ChevronRight color="#6D6D6D" size={24} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={() => router.push('/(auth)/login')}>
@@ -141,6 +316,28 @@ export default function Settings() {
 
           <TouchableOpacity style={styles.button} onPress={handleUpdateProfile} disabled={updating}>
             <Text style={styles.buttonText}>{updating ? 'Updating...' : 'Update Profile'}</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal isVisible={showPayoutModal} onBackdropPress={() => setShowPayoutModal(false)}>
+        <View style={styles.modalContent}>
+          <Text style={styles.title}>Request Payout</Text>
+          <Text style={styles.balanceInfo}>
+            Available Balance: ${driver?.ledger?.availableBalance.toFixed(2) || '0.00'}
+          </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter amount"
+            keyboardType="decimal-pad"
+            value={payoutAmount}
+            onChangeText={setPayoutAmount}
+          />
+          <TouchableOpacity 
+            style={styles.button}
+            onPress={handlePayoutRequest}
+          >
+            <Text style={styles.buttonText}>Submit Request</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -210,19 +407,20 @@ const styles = StyleSheet.create({
   settingOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
+    padding: 16,
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
+    borderBottomColor: '#E5E5E5',
   },
   settingOptionContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   settingOptionText: {
     fontSize: 16,
-    color: '#173252',
-    marginLeft: 16,
+    marginLeft: 12,
+    color: '#333333',
   },
   logoutButton: {
     flexDirection: 'row',
@@ -251,5 +449,19 @@ const styles = StyleSheet.create({
   input: { width: '100%', borderBottomWidth: 1, padding: 10, marginBottom: 10 },
   button: { backgroundColor: '#39C9C2', padding: 15, borderRadius: 8, width: '100%', alignItems: 'center' },
   buttonText: { color: 'white', fontSize: 16 },
+  balanceInfo: {
+    fontSize: 14,
+    color: '#39C9C2',
+    marginLeft: 8,
+  },
+  earningsContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  balanceText: {
+    fontSize: 14,
+    color: '#39C9C2',
+    marginTop: 4,
+  },
 });
 

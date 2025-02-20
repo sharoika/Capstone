@@ -11,6 +11,8 @@ const userRoutes = require('./routes/user')
 const paymentRoutes = require('./routes/payment')
 const configRoutes = require('./routes/config');
 const rideRoutes = require('./routes/ride');
+const driverRoutes = require('./routes/driver');
+
 
 dotenv.config();
 
@@ -30,7 +32,7 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 app.use(express.json());
-
+app.use('/api/driver', driverRoutes);
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,

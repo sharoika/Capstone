@@ -100,6 +100,13 @@ const AdminDashboard = () => {
                                 >
                                     Payments
                                 </Button>
+                                <Button 
+                                    variant="info" 
+                                    onClick={() => navigate('/admin/payouts')}
+                                    style={buttonStyle}
+                                >
+                                    Payouts
+                                </Button>
                             </Card.Body>
                         </Card>
                     </Col>

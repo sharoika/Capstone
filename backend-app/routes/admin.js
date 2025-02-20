@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 const Rider= require("../models/Rider");
 const Driver = require("../models/Driver");
+const Payout = require("../models/Payout");
 
 const { adminAuthenticate } = require("../middlewares/auth");
 
@@ -171,6 +172,41 @@ router.delete('/riders/:id', adminAuthenticate, async (req, res) => {
     console.error('Error deleting rider:', error);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+router.get('/payout-requests', adminAuthenticate, async (req, res) => {
+    try {
+        const payouts = await Payout
+            .find()
+            .populate('driverID', 'firstName lastName email')
+            .sort('-requestedAt');
+
+        res.json(payouts);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.post('/payout-requests/:id/status', adminAuthenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const payout = await Payout.findById(id);
+        if (!payout) {
+            return res.status(404).json({ message: 'Payout request not found' });
+        }
+
+        payout.status = status;
+        if (status === 'PAID') {
+            payout.paidAt = new Date();
+        }
+
+        await payout.save();
+        res.json({ message: 'Payout status updated', payout });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 module.exports = router;

@@ -7,6 +7,7 @@ import AdminRiders from './pages/AdminRiders';
 import AdminDrivers from './pages/AdminDrivers';
 import AdminLiveTracker from './pages/AdminLiveTracker';
 import AdminPayments from './pages/AdminPayments';
+import AdminPayouts from './pages/AdminPayouts';
 import './App.css';
 import { Navigate } from 'react-router-dom';
 import './styles/AdminStyles.css';
@@ -41,6 +42,10 @@ function App() {
         <Route
           path="/admin/payments"
           element={token ? <AdminPayments /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/admin/payouts"
+          element={token ? <AdminPayouts /> : <Navigate to="/login" replace />}
         />
       </Routes>
     </BrowserRouter>
