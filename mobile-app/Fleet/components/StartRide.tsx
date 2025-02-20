@@ -22,6 +22,8 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   const mapRef = useRef<MapView | null>(null);
   const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
 
+  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+
   useEffect(() => {
     const fetchCoordinates = async () => {
       if (!rideDetails?.start || !rideDetails?.end) return;
@@ -33,27 +35,65 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         const startLocation = startResponse.results[0].geometry.location;
         const endLocation = endResponse.results[0].geometry.location;
   
-        const newCoordinates = [
-          { latitude: startLocation.lat, longitude: startLocation.lng },
-          { latitude: endLocation.lat, longitude: endLocation.lng },
-        ];
+        // Fetch route from Google Directions API
+        const directionsResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation.lat},${startLocation.lng}&destination=${endLocation.lat},${endLocation.lng}&key=${GOOGLE_API_KEY}`
+        );
   
-        setRouteCoordinates(newCoordinates);
-        setRegion({
-          latitude: startLocation.lat,
-          longitude: startLocation.lng,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        });
+        const directionsData = await directionsResponse.json();
   
+        if (directionsData.routes.length > 0) {
+          const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
+          setRouteCoordinates(points);
+          setRegion({
+            latitude: startLocation.lat,
+            longitude: startLocation.lng,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          });
+        }
       } catch (error) {
-        console.error("Error geocoding addresses:", error);
+        console.error("Error getting route:", error);
         Alert.alert("Error", "Failed to retrieve route coordinates.");
       }
     };
   
     fetchCoordinates();
   }, [rideDetails]);
+
+  // Add this helper function to decode the polyline
+  const decodePolyline = (encoded: string) => {
+    let points = [];
+    let index = 0, len = encoded.length;
+    let lat = 0, lng = 0;
+  
+    while (index < len) {
+      let b, shift = 0, result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      let dlat = result & 1 ? ~(result >> 1) : result >> 1;
+      lat += dlat;
+  
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      let dlng = result & 1 ? ~(result >> 1) : result >> 1;
+      lng += dlng;
+  
+      points.push({
+        latitude: lat * 1e-5,
+        longitude: lng * 1e-5
+      });
+    }
+    return points;
+  };
 
   useEffect(() => {
     const fetchRideDetails = async () => {
@@ -83,7 +123,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     fetchRideDetails()
   }, [rideID, token])
 
-  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
   useEffect(() => {
     (async () => {
       try {
