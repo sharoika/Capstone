@@ -29,43 +29,82 @@ const createSetupIntent = async (riderId) => {
       const customer = await stripe.customers.create({
         email: rider.email,
       });
+      console.log("CUSTOMER:::");      
+      console.log(customer);
       const stripeCustomerId = customer.id;
       await updateRiderById(riderId, { stripeCustomerId });
+      return;
     }
 
     const setupIntent = await stripe.setupIntents.create({
       customer: rider.stripeCustomerId,
     });
 
+    console.log("SETUP INTENT");
     console.log(setupIntent);
 
-    return setupIntent.client_secret;
+    console.log(setupIntent.id);
+
+    const stripeSetupIntentId = setupIntent.id
+
+    await updateRiderById(riderId, { stripeSetupIntentId });
+    // console.log(setupIntent);
+    // console.log(setupIntent.customer);
+
+    // console.log("Client Secret: ");
+    // console.log(setupIntent.client_secret);
+
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+      { customer: setupIntent.customer },
+      { apiVersion: '2020-08-27' } // Ensure you specify the API version
+    );
+
+    // console.log(ephemeralKey);
+    
+
+    return {
+      setupIntentClientSecret: setupIntent.client_secret,
+      customerId: setupIntent.customer,
+      ephemeralKeySecret: ephemeralKey.secret,
+    };
   } catch (error) {
     console.error('Error in createSetupIntent:', error);
     throw new Error('Failed to create SetupIntent');
   }
 };
 
-const attachPaymentMethod = async (riderId, paymentMethodId) => {
+const attachPaymentMethodFromSetupIntent = async (riderId) => {
   try {
     const rider = await getRiderById(riderId);
     if (!rider) throw new Error('Rider not found');
 
     if (!rider.stripeCustomerId) throw new Error('Rider does not have a Stripe customer ID');
+    if (!rider.stripeSetupIntentId) throw new Error('Rider does not have a Stripe SetupIntent ID');
 
-    const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
+    // Retrieve SetupIntent from Stripe
+    const setupIntent = await stripe.setupIntents.retrieve(rider.stripeSetupIntentId);
+    if (!setupIntent.payment_method) throw new Error('No payment method found in SetupIntent');
+
+    const paymentMethodId = setupIntent.payment_method;
+
+    // Attach payment method to customer
+    await stripe.paymentMethods.attach(paymentMethodId, {
       customer: rider.stripeCustomerId,
     });
 
+    // Set as default payment method
     await stripe.customers.update(rider.stripeCustomerId, {
-      invoice_settings: { default_payment_method: paymentMethod.id },
+      invoice_settings: { default_payment_method: paymentMethodId },
     });
 
-    await updateRiderById(riderId, { stripePaymentMethodId: paymentMethod.id });
+    // Update rider with new payment method ID
+    await updateRiderById(riderId, { stripePaymentMethodId: paymentMethodId });
+
+    console.log(`Payment method ${paymentMethodId} attached and set as default for rider ${riderId}`);
   } catch (error) {
-    console.error('Error in attachPaymentMethod:', error);
+    console.error('Error in attachPaymentMethodFromSetupIntent:', error);
     throw new Error('Failed to attach payment method');
   }
 };
 
-module.exports = { retrievePaymentMethod, createSetupIntent, attachPaymentMethod };
+module.exports = { retrievePaymentMethod, createSetupIntent, attachPaymentMethodFromSetupIntent };

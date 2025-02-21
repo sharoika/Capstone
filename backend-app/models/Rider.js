@@ -16,6 +16,7 @@ const RiderSchema = new mongoose.Schema({
   completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],
 
   stripeCustomerId: { type: String, required: false},
+  stripeSetupIntentId:{ type: String, required: false},
   stripePaymentMethodId:{ type: String, required: false}
 });
 

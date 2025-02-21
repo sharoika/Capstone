@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Text } from 'react-native';
-import { CardField, useStripe } from '@stripe/stripe-react-native';
+import { View, Button, Text, ActivityIndicator } from 'react-native';
+import { useStripe } from '@stripe/stripe-react-native';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 
@@ -8,16 +8,14 @@ const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 function PaymentScreen() {
   const [loading, setLoading] = useState(true);
-  const { confirmSetupIntent } = useStripe();
   const [paymentMethod, setPaymentMethod] = useState(null);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
-  const riderId = SecureStore.getItem('userObjectId');
-
-  // Fetch Payment Method on initial render
   useEffect(() => {
     const fetchPaymentMethod = async () => {
-      setLoading(true); 
       try {
+        setLoading(true);
+        const riderId = await SecureStore.getItemAsync('userObjectId');
         const response = await fetch(`${apiUrl}/api/payment/payment-method`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -38,51 +36,89 @@ function PaymentScreen() {
     };
 
     fetchPaymentMethod();
-  }, []); 
+  }, []);
 
-  const handlePayPress = async () => {
+  const initializePaymentSheet = async () => {
     try {
-      console.log("1");
       setLoading(true);
-      console.log("2");
-      console.log("3");
-      const billingDetails = {email: 'jenny.rosen@example.com'};
-      console.log("4");
-
+      const riderId = await SecureStore.getItemAsync('userObjectId');
       const response = await fetch(`${apiUrl}/api/payment/create-setup-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ riderId }),
       });
-      console.log("5");
 
       if (!response.ok) {
         throw new Error('Failed to create SetupIntent');
       }
 
-      const { clientSecret } = await response.json();
-      const { setupIntent, error } = await confirmSetupIntent(clientSecret, {
-        paymentMethodType: 'Card',
-        paymentMethodData: { billingDetails },
+      const { paymentIntent, customer, ephemeralKey } = await response.json();
+
+      console.log(response);
+      console.log(response.json);
+
+      console.log(ephemeralKey)
+
+      console.log(customer);
+
+      console.log(paymentIntent);
+
+      const { error } = await initPaymentSheet({
+        merchantDisplayName: "Example, Inc.",
+        customerId: customer,
+        customerEphemeralKeySecret: ephemeralKey,
+        setupIntentClientSecret: paymentIntent,
+        // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
+        //methods that complete payment after a delay, like SEPA Debit and Sofort.
+        allowsDelayedPaymentMethods: true,
+        defaultBillingDetails: {
+          name: 'Jane Doe',
+        }
       });
 
+
+      // const { error } = await initPaymentSheet({
+      //   setupIntentClientSecret: setupIntentClientSecret,
+      //   // customerEphemeralKeySecret: ephemeralKeySecret,
+      //   merchantDisplayName: 'Your Merchant Name',
+      // });
+
       if (error) {
-        console.error('Error:', error);
+        console.error('Error initializing PaymentSheet:', error);
+        setLoading(false);
         return;
       }
 
-      if (setupIntent?.paymentMethodId) {
-        await fetch(`${apiUrl}/api/payment/attach-payment-method`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ riderId, paymentMethodId: setupIntent.paymentMethodId }),
-        });
+      const { error: presentError } = await presentPaymentSheet();
+
+      if (presentError) {
+        console.error('Error presenting PaymentSheet:', presentError);
+      } else {
+        console.log('PaymentSheet presented successfully');
       }
 
-      setLoading(false);
-      console.log('SetupIntent confirmed:', setupIntent);
+
+      try {
+        const response =  await fetch(`${apiUrl}/api/payment/attach-payment-method`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ riderId }), // Send the riderId
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to attach payment method');
+        }
+
+        console.log('Payment method attached successfully');
+      } catch (apiError) {
+        console.error('Error calling /attach-payment-method:', apiError);
+      }
+
     } catch (error) {
-      console.error('Error in handlePayPress:', error);
+      console.error('Error in initializePaymentSheet:', error);
+    } finally {
       setLoading(false);
     }
   };
@@ -90,33 +126,22 @@ function PaymentScreen() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <>
-          <View style={styles.paymentInfo}>
-            <Text style={styles.cardText}>
-              Card ending in {paymentMethod?.card?.last4}
-            </Text>
+          {paymentMethod ? (
+            <View style={styles.paymentInfo}>
               <Text style={styles.cardText}>
-                Expires {paymentMethod?.card?.exp_month}/{paymentMethod?.card?.exp_year}
+                Card ending in {paymentMethod.card.last4}
+              </Text>
+              <Text style={styles.cardText}>
+                Expires {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
               </Text>
             </View>
-            <CardField
-              postalCodeEnabled={true}
-              placeholders={{
-                number: '4242 4242 4242 4242',
-              }}
-              cardStyle={styles.cardField}
-              style={styles.cardFieldContainer}
-              countryCode="CA" // Set country code to 'CA' for Canada
-              onCardChange={(cardDetails) => {
-                console.log('Card details:', cardDetails);
-              }}
-              onFocus={(focusedField) => {
-                console.log('Focused field:', focusedField);
-              }}
-            />
-            <Button onPress={handlePayPress} title="Save Card" />
+          ) : (
+            <Text>No saved payment method</Text>
+          )}
+          <Button onPress={initializePaymentSheet} title="Add/Update Payment Method" />
         </>
       )}
     </View>
@@ -132,21 +157,13 @@ const styles = {
   },
   paymentInfo: {
     alignItems: 'center',
+    marginBottom: 20,
   },
   cardText: {
     fontSize: 16,
     color: '#000',
     marginBottom: 5,
   },
-  cardField: {
-    backgroundColor: '#FFFFFF',
-    textColor: '#000000',
-  },
-  cardFieldContainer: {
-    width: '100%',
-    height: 50,
-    marginVertical: 30,
-  }
 };
 
 export default PaymentScreen;
