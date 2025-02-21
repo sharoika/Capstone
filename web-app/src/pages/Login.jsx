@@ -26,6 +26,7 @@ const Login = () => {
 
             if (response.status === 200) {
                 localStorage.setItem('token', data.token);
+                console.log("Here");
                 navigate('/admin');
             } else {
                 setError(data.message);

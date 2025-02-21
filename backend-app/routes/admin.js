@@ -11,6 +11,28 @@ const { adminAuthenticate } = require("../middlewares/auth");
 
 const router = express.Router();
 
+
+router.get("/check-admin", async (req, res) => {
+  const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+  
+  if (!token) {
+      return res.status(401).json({ isAdmin: false, message: "Unauthorized: No token provided" });
+  }
+  
+  try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const isAdmin = await Admin.exists({ _id: decoded.id });
+      
+      if (!isAdmin) {
+          return res.status(403).json({ isAdmin: false, message: "Forbidden: Admin access required" });
+      }
+      
+      res.json({ isAdmin: true, message: "Token belongs to an admin" });
+  } catch (error) {
+      return res.status(401).json({ isAdmin: false, message: "Unauthorized: Invalid token" });
+  }
+});
+
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
