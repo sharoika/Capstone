@@ -1,117 +1,151 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { useStripe } from '@stripe/stripe-react-native';
-import * as SecureStore from 'expo-secure-store';
-
+import React, { useState, useEffect } from 'react';
+import { View, Button, Text } from 'react-native';
+import { CardField, useStripe } from '@stripe/stripe-react-native';
 import Constants from 'expo-constants';
+import * as SecureStore from 'expo-secure-store';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
-export default function PaymentSettings() {
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [processing, setProcessing] = useState(false);
+function PaymentScreen() {
+  const [loading, setLoading] = useState(true);
+  const { confirmSetupIntent } = useStripe();
+  const [paymentMethod, setPaymentMethod] = useState(null);
 
-  const handleAddPaymentMethod = async () => {
-    setProcessing(true);
-    try {
-      const riderId = await SecureStore.getItemAsync('userObjectId');
-      if (!riderId) {
-        throw new Error('User ID not found');
+  const riderId = SecureStore.getItem('userObjectId');
+
+  // Fetch Payment Method on initial render
+  useEffect(() => {
+    const fetchPaymentMethod = async () => {
+      setLoading(true); 
+      try {
+        const response = await fetch(`${apiUrl}/api/payment/payment-method`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ riderId }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to retrieve payment method');
+        }
+
+        const { paymentMethod } = await response.json();
+        setPaymentMethod(paymentMethod);
+      } catch (error) {
+        console.error('Error fetching payment method:', error);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      console.log(riderId);
+    fetchPaymentMethod();
+  }, []); 
 
-      console.log("here69");
-      // Step 1: Create a SetupIntent on your backend
-      console.log(`${apiUrl}/api/payment/create-setup-intent`);
+  const handlePayPress = async () => {
+    try {
+      console.log("1");
+      setLoading(true);
+      console.log("2");
+      console.log("3");
+      const billingDetails = { email: 'jenny.rosen@example.com' };
+      console.log("4");
+
       const response = await fetch(`${apiUrl}/api/payment/create-setup-intent`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ riderId }),
       });
+      console.log("5");
+
       if (!response.ok) {
         throw new Error('Failed to create SetupIntent');
       }
 
-      console.log("here6969");
-      console.log(clientSecret);
-      console.log(response);
       const { clientSecret } = await response.json();
-      console.log(clientSecret);
-
-      // Step 2: Initialize the Payment Sheet with the SetupIntent client secret
-      const { error } = await initPaymentSheet({
-        setupIntentClientSecret: clientSecret
+      const { setupIntent, error } = await confirmSetupIntent(clientSecret, {
+        paymentMethodType: 'Card',
+        paymentMethodData: { billingDetails },
       });
 
       if (error) {
-        throw new Error(error.message);
+        console.error('Error:', error);
+        return;
       }
 
-      // Step 3: Present the Payment Sheet
-      const { error: sheetError, paymentMethod } = await presentPaymentSheet();
-      if (sheetError) {
-        throw new Error(sheetError.message);
+      if (setupIntent?.paymentMethodId) {
+        await fetch(`${apiUrl}/api/payment/attach-payment-method`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ riderId, paymentMethodId: setupIntent.paymentMethodId }),
+        });
       }
 
-      // Step 4: Get the paymentMethodId from the Payment Sheet
-      const paymentMethodId = paymentMethod.id;
-
-      // Step 5: Send the paymentMethodId to your backend to attach it to the customer
-      const backendResponse = await fetch(`${apiUrl}/api/payment/attach-payment-method`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          riderId,
-          paymentMethodId: paymentMethodId,
-        }),
-      });
-
-      if (!backendResponse.ok) {
-        throw new Error('Failed to attach payment method');
-      }
-
-      Alert.alert('Success', 'Payment method added successfully!');
+      setLoading(false);
+      console.log('SetupIntent confirmed:', setupIntent);
     } catch (error) {
-      console.error('Error processing payment:', error);
-      Alert.alert('Error', error.message);
-    } finally {
-      setProcessing(false);
+      console.error('Error in handlePayPress:', error);
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add Payment Method</Text>
-      <TouchableOpacity
-        style={[styles.submitButton, processing && styles.disabledButton]}
-        onPress={handleAddPaymentMethod}
-        disabled={processing}
-      >
-        {processing ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text style={styles.submitButtonText}>Add Payment Method</Text>
-        )}
-      </TouchableOpacity>
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : (
+        <>
+          <View style={styles.paymentInfo}>
+            <Text style={styles.cardText}>
+              Card ending in {paymentMethod?.card?.last4}
+            </Text>
+            <Text style={styles.cardText}>
+              Expires {paymentMethod?.card?.exp_month}/{paymentMethod?.card?.exp_year}
+            </Text>
+          </View>
+          <CardField
+            postalCodeEnabled={true}
+            placeholders={{
+              number: '4242 4242 4242 4242',
+            }}
+            cardStyle={styles.cardField}
+            style={styles.cardFieldContainer}
+            onCardChange={(cardDetails) => {
+              console.log('Card details:', cardDetails);
+            }}
+            onFocus={(focusedField) => {
+              console.log('Focused field:', focusedField);
+            }}
+          />
+          <Button onPress={handlePayPress} title="Save Card" />
+        </>
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, backgroundColor: '#fff', justifyContent: 'center' },
-  title: { fontSize: 24, fontWeight: '600', color: '#173252', marginBottom: 20 },
-  submitButton: {
-    backgroundColor: '#39C9C2',
-    padding: 12,
-    borderRadius: 8,
+const styles = {
+  container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
-  submitButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  disabledButton: { backgroundColor: '#6D6D6D' },
-});
+  paymentInfo: {
+    alignItems: 'center',
+  },
+  cardText: {
+    fontSize: 16,
+    color: '#000',
+    marginBottom: 5,
+  },
+  cardField: {
+    backgroundColor: '#FFFFFF',
+    textColor: '#000000',
+  },
+  cardFieldContainer: {
+    width: '100%',
+    height: 50,
+    marginVertical: 30,
+  }
+};
+
+export default PaymentScreen;

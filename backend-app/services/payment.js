@@ -1,67 +1,71 @@
+require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const Rider = require('../models/Rider');
 const { getRiderById, updateRiderById } = require('../services/user');
+const Rider = require('../models/Rider');
 
-const getPaymentMethod = async (riderId) => {
-    try {
-        console.log("here1")
-        var rider = await getRiderById(riderId);
-        console.log("here2")
-        if (!rider.stripeCustomerId) {
-            const customer = await stripe.customers.create({
-                email: rider.email,
-              });
-            const stripeCustomerId = customer.id;
-            console.log(stripeCustomerId);
-            await updateRiderById(riderId, { stripeCustomerId })
-        }
-        console.log("here3");
-        return
-    } catch (error) {
-        console.error('Error in getPaymentMethod:', error);
-        return;
+const retrievePaymentMethod = async (riderId) => {
+  try {
+    const rider = await getRiderById(riderId);
+    if (!rider) throw new Error('Rider not found');
+
+    if (rider.stripePaymentMethodId) {
+      const paymentMethod = await stripe.paymentMethods.retrieve(rider.stripePaymentMethodId);
+      return paymentMethod;
+    } else {
+      return null;
     }
-};
-
-async function createOrUpdatePaymentMethod(riderId, cardNumber, expMonth, expYear, cvc) {
-    try {
-      const rider = await Rider.findById(riderId);
-      if (!rider) throw new Error('Rider not found');
-  
-      console
-      if (!rider.stripeCustomerId) throw new Error('Rider does not have a Stripe customer ID');
-
-      const paymentMethod = await stripe.paymentMethods.create({
-        type: 'card',
-        card: {
-          number: cardNumber,
-          exp_month: expMonth,
-          exp_year: expYear,
-          cvc: cvc,
-        },
-        billing_details: {
-          email: rider.email,
-        },
-      });
-
-      await stripe.paymentMethods.attach(paymentMethod.id, {
-        customer: rider.stripeCustomerId,
-      });
-  
-      await stripe.customers.update(rider.stripeCustomerId, {
-        invoice_settings: { default_payment_method: paymentMethod.id },
-      });
-  
-      const updatedRider = await updateRiderById(riderId, { paymentMethodId: paymentMethod.id });
-  
-      return { success: true, paymentMethodId: paymentMethod.id, rider: updatedRider };
-    } catch (error) {
-      console.error('Error in createOrUpdatePaymentMethod:', error);
-      return { success: false, error: error.message };
-    }
+  } catch (error) {
+    console.error('Error retrieving PaymentMethod:', error);
+    throw new Error('Failed to retrieve PaymentMethod');
   }
-
-module.exports = {
-    getPaymentMethod,
-    createOrUpdatePaymentMethod
 };
+
+const createSetupIntent = async (riderId) => {
+  try {
+    const rider = await getRiderById(riderId);
+    if (!rider) throw new Error('Rider not found');
+
+    if (!rider.stripeCustomerId) {
+      const customer = await stripe.customers.create({
+        email: rider.email,
+      });
+      const stripeCustomerId = customer.id;
+      await updateRiderById(riderId, { stripeCustomerId });
+    }
+
+    const setupIntent = await stripe.setupIntents.create({
+      customer: rider.stripeCustomerId,
+    });
+
+    console.log(setupIntent);
+
+    return setupIntent.client_secret;
+  } catch (error) {
+    console.error('Error in createSetupIntent:', error);
+    throw new Error('Failed to create SetupIntent');
+  }
+};
+
+const attachPaymentMethod = async (riderId, paymentMethodId) => {
+  try {
+    const rider = await getRiderById(riderId);
+    if (!rider) throw new Error('Rider not found');
+
+    if (!rider.stripeCustomerId) throw new Error('Rider does not have a Stripe customer ID');
+
+    const paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
+      customer: rider.stripeCustomerId,
+    });
+
+    await stripe.customers.update(rider.stripeCustomerId, {
+      invoice_settings: { default_payment_method: paymentMethod.id },
+    });
+
+    await updateRiderById(riderId, { stripePaymentMethodId: paymentMethod.id });
+  } catch (error) {
+    console.error('Error in attachPaymentMethod:', error);
+    throw new Error('Failed to attach payment method');
+  }
+};
+
+module.exports = { retrievePaymentMethod, createSetupIntent, attachPaymentMethod };
