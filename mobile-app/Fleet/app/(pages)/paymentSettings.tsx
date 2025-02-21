@@ -46,7 +46,7 @@ function PaymentScreen() {
       setLoading(true);
       console.log("2");
       console.log("3");
-      const billingDetails = { email: 'jenny.rosen@example.com' };
+      const billingDetails = {email: 'jenny.rosen@example.com'};
       console.log("4");
 
       const response = await fetch(`${apiUrl}/api/payment/create-setup-intent`, {
@@ -97,25 +97,26 @@ function PaymentScreen() {
             <Text style={styles.cardText}>
               Card ending in {paymentMethod?.card?.last4}
             </Text>
-            <Text style={styles.cardText}>
-              Expires {paymentMethod?.card?.exp_month}/{paymentMethod?.card?.exp_year}
-            </Text>
-          </View>
-          <CardField
-            postalCodeEnabled={true}
-            placeholders={{
-              number: '4242 4242 4242 4242',
-            }}
-            cardStyle={styles.cardField}
-            style={styles.cardFieldContainer}
-            onCardChange={(cardDetails) => {
-              console.log('Card details:', cardDetails);
-            }}
-            onFocus={(focusedField) => {
-              console.log('Focused field:', focusedField);
-            }}
-          />
-          <Button onPress={handlePayPress} title="Save Card" />
+              <Text style={styles.cardText}>
+                Expires {paymentMethod?.card?.exp_month}/{paymentMethod?.card?.exp_year}
+              </Text>
+            </View>
+            <CardField
+              postalCodeEnabled={true}
+              placeholders={{
+                number: '4242 4242 4242 4242',
+              }}
+              cardStyle={styles.cardField}
+              style={styles.cardFieldContainer}
+              countryCode="CA" // Set country code to 'CA' for Canada
+              onCardChange={(cardDetails) => {
+                console.log('Card details:', cardDetails);
+              }}
+              onFocus={(focusedField) => {
+                console.log('Focused field:', focusedField);
+              }}
+            />
+            <Button onPress={handlePayPress} title="Save Card" />
         </>
       )}
     </View>
