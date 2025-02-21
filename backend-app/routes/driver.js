@@ -57,9 +57,9 @@ router.post('/payout-request', authenticate, async (req, res) => {
 // Update driver's fare price
 router.put('/fare', authenticate, async (req, res) => {
     try {
-        const { farePrice, initialPrice } = req.body;
+        const { farePrice, baseFee } = req.body;
         
-        if (typeof farePrice !== 'number' || farePrice < 0 || typeof initialPrice !== 'number' || initialPrice < 0) {
+        if (typeof farePrice !== 'number' || farePrice < 0 || typeof baseFee !== 'number' || baseFee < 0) {
             return res.status(400).json({ message: 'Invalid price values' });
         }
 
@@ -69,14 +69,15 @@ router.put('/fare', authenticate, async (req, res) => {
         }
 
         driver.farePrice = farePrice;
-        driver.initialPrice = initialPrice;
+        driver.baseFee = baseFee;
         await driver.save();
 
         res.json({ 
-            success: true,
             message: 'Prices updated successfully',
-            farePrice: driver.farePrice,
-            initialPrice: driver.initialPrice
+            driver: {
+                farePrice: driver.farePrice,
+                baseFee: driver.baseFee
+            }
         });
     } catch (error) {
         console.error('Error updating prices:', error);

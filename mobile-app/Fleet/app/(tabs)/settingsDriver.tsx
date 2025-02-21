@@ -22,7 +22,7 @@ interface Driver {
   vehicleYear?: string;
   vehiclePlate: string;
   farePrice?: number;
-  initialPrice?: number;
+  baseFee?: number;
   ledger?: {
     totalEarnings: number;
     availableBalance: number;
@@ -50,7 +50,7 @@ export default function Settings() {
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [showPriceModal, setShowPriceModal] = useState(false);
   const [farePrice, setFarePrice] = useState('');
-  const [initialPrice, setInitialPrice] = useState('');
+  const [baseFee, setBaseFee] = useState('');
 
   useEffect(() => {
     const fetchDriverData = async () => {
@@ -121,6 +121,13 @@ export default function Settings() {
 
     fetchLedger();
   }, []);
+
+  useEffect(() => {
+    if (driver) {
+      setFarePrice(driver.farePrice?.toString() || '0');
+      setBaseFee(driver.baseFee?.toString() || '2');
+    }
+  }, [driver]);
 
   const handleUpdateProfile = async () => {
     if (!driver) return;
@@ -242,7 +249,7 @@ export default function Settings() {
         },
         body: JSON.stringify({
           farePrice: parseFloat(farePrice),
-          initialPrice: parseFloat(initialPrice)
+          baseFee: parseFloat(baseFee)
         }),
       });
 
@@ -251,8 +258,15 @@ export default function Settings() {
       }
 
       const data = await response.json();
-      setFarePrice(data.farePrice.toString());
-      setInitialPrice(data.initialPrice.toString());
+      console.log('Price update response:', data);
+      
+      // Update the driver state with new prices
+      setDriver(prev => prev ? {
+        ...prev,
+        farePrice: data.driver.farePrice,
+        baseFee: data.driver.baseFee
+      } : prev);
+      
       setShowPriceModal(false);
       Alert.alert('Success', 'Price updated successfully');
     } catch (error) {
@@ -331,7 +345,7 @@ export default function Settings() {
           </View>
           <View style={styles.rowRight}>
             <Text style={styles.valueText}>
-              ${driver?.farePrice?.toFixed(2) || '0.00'} / ${driver?.initialPrice?.toFixed(2) || '0.00'}
+              ${driver?.farePrice?.toFixed(2) || '0.00'} / ${driver?.baseFee?.toFixed(2) || '0.00'}
             </Text>
             <ChevronRight color="#666" size={24} />
           </View>
@@ -406,8 +420,8 @@ export default function Settings() {
             <Text style={styles.label}>Base Fee ($)</Text>
             <TextInput
               style={styles.input}
-              value={initialPrice}
-              onChangeText={setInitialPrice}
+              value={baseFee}
+              onChangeText={setBaseFee}
               placeholder="Enter base fee"
               keyboardType="decimal-pad"
             />

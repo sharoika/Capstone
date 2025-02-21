@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
 const pricingDetailsSchema = new mongoose.Schema({
-  initialPrice: { type: Number, required: true },
+  baseFee: { type: Number, required: true },
   perKmPrice: { type: Number, required: true }
 });
 
@@ -19,7 +19,7 @@ const driverSchema = new mongoose.Schema({
     },
     
     farePrice: { type: Number, default: 0 },
-    initialPrice: { type: Number, default: 2 },
+    baseFee: { type: Number, default: 2 },
     pricingDetails: { type: pricingDetailsSchema, required: false },
 
     completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],

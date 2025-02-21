@@ -24,7 +24,7 @@ interface Driver {
   lastName: string;
   profilePicture: string;
   farePrice: number;
-  initialPrice: number;
+  baseFee: number;
 }
 
 const DriverSelection: React.FC<DriverSelectionProps> = ({
@@ -67,7 +67,12 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
 
         if (driverResponse.ok) {
           const driverList = await driverResponse.json();
-          setDrivers(driverList);
+          console.log('Fetched drivers:', driverList);
+          setDrivers(driverList.map(driver => ({
+            ...driver,
+            baseFee: typeof driver.baseFee === 'number' ? driver.baseFee : 2,
+            farePrice: typeof driver.farePrice === 'number' ? driver.farePrice : 0
+          })));
         } else {
           Alert.alert('Error', 'Failed to fetch drivers');
         }
@@ -82,17 +87,29 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
     fetchData();
   }, [token, rideID]);
 
-  const calculateTotalFare = (farePrice: number, initialPrice: number) => {
-    const distanceInKm = rideDetails.distance;
-    const totalFare = initialPrice + (farePrice * distanceInKm);
-    return totalFare.toFixed(2);
+  const calculateTotalFare = (farePrice: number, baseFee: number) => {
+    // Ensure we have valid numbers
+    const validBaseFee = typeof baseFee === 'number' && !isNaN(baseFee) ? baseFee : 2;
+    const validFarePrice = typeof farePrice === 'number' && !isNaN(farePrice) ? farePrice : 0;
+    const validDistance = typeof rideDetails.distance === 'number' && !isNaN(rideDetails.distance) ? rideDetails.distance : 0;
+
+    const distanceFare = validDistance * validFarePrice;
+    return (validBaseFee + distanceFare).toFixed(2);
   };
 
   const renderDriver = ({ item }: { item: Driver }) => {
-    const totalFare = calculateTotalFare(item.farePrice, item.initialPrice || 2);
+    // Ensure we have valid numbers for display
+    const validBaseFee = typeof item.baseFee === 'number' && !isNaN(item.baseFee) ? item.baseFee : 2;
+    const validFarePrice = typeof item.farePrice === 'number' && !isNaN(item.farePrice) ? item.farePrice : 0;
+    
+    const totalFare = calculateTotalFare(validFarePrice, validBaseFee);
+    
     return (
       <TouchableOpacity
-        style={[styles.card, selectedDriver === item._id && styles.selectedCard]}
+        style={[
+          styles.card,
+          selectedDriver === item._id && styles.selectedCard
+        ]}
         onPress={() => setSelectedDriver(item._id)}
       >
         <View style={[styles.profileImage, { backgroundColor: '#E1E1E1', justifyContent: 'center', alignItems: 'center' }]}>
@@ -105,12 +122,12 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
         <View style={styles.priceContainer}>
           <View style={styles.priceItem}>
             <Text style={styles.priceLabel}>Base Fee</Text>
-            <Text style={styles.priceValue}>${(item.initialPrice || 2).toFixed(2)}</Text>
+            <Text style={styles.priceValue}>${validBaseFee.toFixed(2)}</Text>
           </View>
           <View style={styles.priceDivider} />
           <View style={styles.priceItem}>
             <Text style={styles.priceLabel}>Rate per km</Text>
-            <Text style={styles.priceValue}>${item.farePrice.toFixed(2)}</Text>
+            <Text style={styles.priceValue}>${validFarePrice.toFixed(2)}</Text>
           </View>
         </View>
 
@@ -128,7 +145,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
 
     try {
       const selectedDriverData = drivers.find(d => d._id === selectedDriver);
-      const totalFare = selectedDriverData ? calculateTotalFare(selectedDriverData.farePrice, selectedDriverData.initialPrice || 2) : '0';
+      const totalFare = selectedDriverData ? calculateTotalFare(selectedDriverData.farePrice, selectedDriverData.baseFee) : '0';
 
       const response = await fetch(
         `${apiUrl}/api/ride/rides/${rideID}/confirm`,

@@ -46,13 +46,22 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         if (directionsData.routes.length > 0) {
           const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
           const distance = directionsData.routes[0].legs[0].distance.text;
-          const distanceValue = directionsData.routes[0].legs[0].distance.value; // in meters
-          
-          // Calculate fare based on distance (example: $2 base + $1.5 per km)
-          const fareAmount = 2 + ((distanceValue / 1000) * 1.5);
+          const distanceValue = directionsData.routes[0].legs[0].distance.value / 1000; // Convert to km
           
           setDistance(distance);
-          setFare(parseFloat(fareAmount.toFixed(2)));
+          
+          // Update ride details with new distance and recalculate fare
+          if (rideDetails.driver && typeof rideDetails.driver.farePrice === 'number' && typeof rideDetails.driver.baseFee === 'number') {
+            const validBaseFee = !isNaN(rideDetails.driver.baseFee) ? rideDetails.driver.baseFee : 2;
+            const validFarePrice = !isNaN(rideDetails.driver.farePrice) ? rideDetails.driver.farePrice : 0;
+            
+            const distanceFare = distanceValue * validFarePrice;
+            const totalFare = parseFloat((validBaseFee + distanceFare).toFixed(2));
+            
+            console.log('Recalculated fare:', totalFare, 'using baseFee:', validBaseFee, 'farePrice:', validFarePrice, 'distance:', distanceValue);
+            setFare(totalFare);
+          }
+          
           setRouteCoordinates(points);
           setRegion({
             latitude: startLocation.lat,
@@ -120,6 +129,21 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         }
 
         const data = await response.json()
+        console.log('Raw ride details:', data);
+        
+        // Calculate fare using driver pricing
+        if (data.driver && typeof data.driver.farePrice === 'number' && typeof data.driver.baseFee === 'number' && typeof data.distance === 'number') {
+          const validBaseFee = !isNaN(data.driver.baseFee) ? data.driver.baseFee : 2;
+          const validFarePrice = !isNaN(data.driver.farePrice) ? data.driver.farePrice : 0;
+          const validDistance = !isNaN(data.distance) ? data.distance : 0;
+          
+          const distanceFare = validDistance * validFarePrice;
+          const totalFare = parseFloat((validBaseFee + distanceFare).toFixed(2));
+          
+          console.log('Calculated fare:', totalFare, 'using baseFee:', validBaseFee, 'farePrice:', validFarePrice, 'distance:', validDistance);
+          setFare(totalFare);
+        }
+        
         setRideDetails(data)
       } catch (err) {
         setError("Error fetching ride details")

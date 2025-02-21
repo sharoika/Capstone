@@ -255,8 +255,8 @@ router.get('/rides/:rideID', authenticate, async (req, res) => {
 
     try {
         const ride = await Ride.findById(rideID)
-        .populate('riderID') 
-        .populate('driverID');  
+            .populate('riderID')
+            .populate('driverID', 'firstName lastName profilePicture farePrice baseFee');
 
         if (!ride) {
             return res.status(404).json({ message: 'Ride not found' });
@@ -268,9 +268,16 @@ router.get('/rides/:rideID', authenticate, async (req, res) => {
             end: ride.end,
             fare: ride.fare,
             distance: ride.distance,
-            status: ride.status, 
+            status: ride.status,
             rider: ride.riderID,
-            driver: ride.driverID || null, 
+            driver: ride.driverID ? {
+                _id: ride.driverID._id,
+                firstName: ride.driverID.firstName,
+                lastName: ride.driverID.lastName,
+                profilePicture: ride.driverID.profilePicture,
+                farePrice: ride.driverID.farePrice || 0,
+                baseFee: ride.driverID.baseFee || 2
+            } : null,
             cancellationStatus: ride.cancellationStatus,
         });
     } catch (error) {
