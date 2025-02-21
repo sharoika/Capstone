@@ -107,4 +107,25 @@ const attachPaymentMethodFromSetupIntent = async (riderId) => {
   }
 };
 
-module.exports = { retrievePaymentMethod, createSetupIntent, attachPaymentMethodFromSetupIntent };
+const chargePaymentMethod = async (riderId, amount, currency = 'usd') => {
+  const rider = await getRiderById(riderId);
+  if (!rider) throw new Error('Rider not found');
+
+  if (!rider.stripeCustomerId || !rider.stripePaymentMethodId) {
+    throw new Error('Rider is missing Stripe payment details');
+  }
+
+  // Create a PaymentIntent using the rider's saved payment method
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount, // Amount in the smallest currency unit (e.g., cents)
+    currency,
+    customer: rider.stripeCustomerId,
+    payment_method: rider.stripePaymentMethodId,
+    confirm: true, // Automatically confirm the payment
+    off_session: true, // Allows processing without user interaction
+  });
+
+  return paymentIntent;
+};
+
+module.exports = { retrievePaymentMethod, chargePaymentMethod, createSetupIntent, attachPaymentMethodFromSetupIntent };

@@ -123,6 +123,30 @@ function PaymentScreen() {
     }
   };
 
+  const chargePayment = async () => {
+    try {
+      setLoading(true);
+      const riderId = await SecureStore.getItemAsync('userObjectId');
+      const response = await fetch(`${apiUrl}/api/payment/charge-payment-method`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          riderId: String(riderId), // Convert to string if necessary
+          amount: 6969,
+          currency: "usd"
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Payment failed');
+
+    } catch (error) {
+      console.error('Payment failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -142,6 +166,7 @@ function PaymentScreen() {
             <Text>No saved payment method</Text>
           )}
           <Button onPress={initializePaymentSheet} title="Add/Update Payment Method" />
+          <Button onPress={chargePayment} title="Charge Payment Method" color="green" />
         </>
       )}
     </View>
