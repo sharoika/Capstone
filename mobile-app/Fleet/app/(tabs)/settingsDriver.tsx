@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Edit2, Bell, Lock, LogOut, Banknote } from 'lucide-react-native';
+import { ChevronRight, Edit2, Bell, Lock, LogOut, Banknote, Receipt } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import Modal from "react-native-modal";
 import Constants from 'expo-constants';
+import axios from 'axios';
 
 const getApiUrl = () => {
   const url = Constants.expoConfig?.extra?.API_URL;
@@ -238,6 +239,64 @@ export default function Settings() {
     }
   };
 
+  const createTestReceipt = async () => {
+    try {
+      const token = await getItemAsync('driverToken');
+      const driverId = await getItemAsync('driverID');
+      
+      if (!token || !driverId) {
+        Alert.alert('Error', 'You must be logged in to create a test receipt');
+        return;
+      }
+
+      // Generate a valid MongoDB ObjectId-like string
+      const generateObjectId = () => {
+        const timestamp = Math.floor(new Date().getTime() / 1000).toString(16).padStart(8, '0');
+        const machineId = Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
+        const processId = Math.floor(Math.random() * 65536).toString(16).padStart(4, '0');
+        const counter = Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
+        return timestamp + machineId + processId + counter;
+      };
+
+      const testReceiptData = {
+        rideID: generateObjectId(),
+        riderID: generateObjectId(),
+        driverID: driverId,
+        timestamp: new Date().toISOString(),
+        baseFare: 2.50,
+        distanceFare: 12.75,
+        tipAmount: 3.00,
+        totalAmount: 18.25,
+        paymentMethod: "Credit Card",
+        distance: 8.5,
+        duration: 25,
+        pickupLocation: "123 Main St, City",
+        dropoffLocation: "456 Oak Ave, City"
+      };
+
+      console.log('Sending test receipt data (driver):', testReceiptData);
+      console.log('API URL:', `${getApiUrl()}/api/receipt/receipts/generate`);
+
+      const response = await axios.post(`${getApiUrl()}/api/receipt/receipts/generate`, testReceiptData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Receipt creation response (driver):', response.data);
+
+      if (response.status === 201 || response.status === 200) {
+        Alert.alert('Success', 'Test receipt created successfully!');
+      } else {
+        Alert.alert('Error', 'Failed to create test receipt');
+      }
+    } catch (error) {
+      console.error('Error creating test receipt:', error);
+      Alert.alert('Error', `Failed to create test receipt: ${error}`);
+    }
+  };
+
   const handleUpdatePrice = async () => {
     try {
       const token = await getItemAsync('driverToken');
@@ -349,6 +408,17 @@ export default function Settings() {
             </Text>
             <ChevronRight color="#666" size={24} />
           </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.settingOption} 
+          onPress={createTestReceipt}
+        >
+          <View style={styles.settingOptionContent}>
+            <Receipt color="#39C9C2" size={24} />
+            <Text style={styles.settingOptionText}>Create Test Receipt</Text>
+          </View>
+          <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
         {__DEV__ && (

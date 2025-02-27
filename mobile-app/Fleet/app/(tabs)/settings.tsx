@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIndicator, Platform, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Edit2, Banknote, Bell, Lock, LogOut } from 'lucide-react-native';
+import { ChevronRight, Edit2, Banknote, Bell, Lock, LogOut, Receipt } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
+import axios from 'axios';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -68,6 +69,64 @@ export default function Settings() {
     router.push('/(auth)/login');
   };
 
+  const createTestReceipt = async () => {
+    try {
+      const token = await getItemAsync('userToken');
+      const userId = await getItemAsync('userObjectId');
+      
+      if (!token || !userId) {
+        Alert.alert('Error', 'You must be logged in to create a test receipt');
+        return;
+      }
+
+      // Generate a valid MongoDB ObjectId-like string
+      const generateObjectId = () => {
+        const timestamp = Math.floor(new Date().getTime() / 1000).toString(16).padStart(8, '0');
+        const machineId = Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
+        const processId = Math.floor(Math.random() * 65536).toString(16).padStart(4, '0');
+        const counter = Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
+        return timestamp + machineId + processId + counter;
+      };
+
+      const testReceiptData = {
+        rideID: generateObjectId(),
+        riderID: userId,
+        driverID: generateObjectId(),
+        timestamp: new Date().toISOString(),
+        baseFare: 2.50,
+        distanceFare: 12.75,
+        tipAmount: 3.00,
+        totalAmount: 18.25,
+        paymentMethod: "Credit Card",
+        distance: 8.5,
+        duration: 25,
+        pickupLocation: "123 Main St, City",
+        dropoffLocation: "456 Oak Ave, City"
+      };
+
+      console.log('Sending test receipt data:', testReceiptData);
+      console.log('API URL:', `${apiUrl}/api/receipt/receipts/generate`);
+
+      const response = await axios.post(`${apiUrl}/api/receipt/receipts/generate`, testReceiptData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Receipt creation response:', response.data);
+
+      if (response.status === 201 || response.status === 200) {
+        Alert.alert('Success', 'Test receipt created successfully!');
+      } else {
+        Alert.alert('Error', 'Failed to create test receipt');
+      }
+    } catch (error) {
+      console.error('Error creating test receipt:', error);
+      Alert.alert('Error', `Failed to create test receipt: ${error}`);
+    }
+  };
+
   interface SettingOptionProps {
     icon: JSX.Element;
     title: string;
@@ -107,6 +166,11 @@ export default function Settings() {
           onPress={() => alert('Notifications Management Coming Soon')} 
         />
         <SettingOption icon={<Lock color="#39C9C2" size={24} />} title="Privacy Settings" onPress={() => { }} />
+        <SettingOption 
+          icon={<Receipt color="#39C9C2" size={24} />} 
+          title="Create Test Receipt" 
+          onPress={createTestReceipt} 
+        />
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

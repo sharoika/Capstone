@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from 'expo-constants';
+import { Ionicons } from '@expo/vector-icons';
+import Receipt from './Receipt';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface RideSummaryProps {
@@ -14,6 +16,9 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
   const [rideDetails, setRideDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<any>(null);
+  const [receiptModalVisible, setReceiptModalVisible] = useState(false);
+  const [loadingReceipt, setLoadingReceipt] = useState(false);
 
   useEffect(() => {
     const fetchRideDetails = async () => {
@@ -32,6 +37,11 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
 
         const data = await response.json();
         setRideDetails(data);
+        
+        // Check if the ride is completed, then try to fetch receipt
+        if (data.status === 'COMPLETED') {
+          fetchReceipt();
+        }
       } catch (err) {
         setError("Error fetching ride details");
         console.error("Error:", err);
@@ -42,6 +52,38 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
 
     fetchRideDetails();
   }, [rideID, token]);
+
+  const fetchReceipt = async () => {
+    setLoadingReceipt(true);
+    try {
+      const response = await fetch(`${apiUrl}/api/receipt/receipts/ride/${rideID}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setReceipt(data);
+      } else {
+        console.log("No receipt found for this ride");
+      }
+    } catch (err) {
+      console.error("Error fetching receipt:", err);
+    } finally {
+      setLoadingReceipt(false);
+    }
+  };
+
+  const viewReceipt = () => {
+    setReceiptModalVisible(true);
+  };
+
+  const closeReceiptModal = () => {
+    setReceiptModalVisible(false);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -73,6 +115,19 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
               <Text style={styles.infoLabel}>Total Fare</Text>
               <Text style={styles.fareText}>${rideDetails.fare}</Text>
             </View>
+            
+            {receipt && (
+              <TouchableOpacity 
+                style={styles.receiptButton} 
+                onPress={viewReceipt}
+                disabled={loadingReceipt}
+              >
+                <Ionicons name="receipt-outline" size={20} color="#ffffff" />
+                <Text style={styles.receiptButtonText}>
+                  {loadingReceipt ? "Loading Receipt..." : "View Receipt"}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
           <Text style={styles.noDataText}>No ride details available</Text>
@@ -82,6 +137,17 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
           <Text style={styles.returnButtonText}>Return to Home</Text>
         </TouchableOpacity>
       </View>
+      
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={receiptModalVisible}
+        onRequestClose={closeReceiptModal}
+      >
+        {receipt && (
+          <Receipt receipt={receipt} onClose={closeReceiptModal} />
+        )}
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -155,6 +221,21 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  receiptButton: {
+    backgroundColor: "#173252",
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  receiptButtonText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "600",
+    marginLeft: 8,
   },
 });
 

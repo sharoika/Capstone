@@ -8,6 +8,7 @@ const Driver = require('../models/Driver');
 const RideStates = require('../models/enums/RideStates');
 const router = express.Router();
 const { authenticate } = require("../middlewares/auth");
+const axios = require('axios');
 
 router.post('/ride', authenticate, async (req, res) => {
     const { riderID, start, end, distance } = req.body;
@@ -160,6 +161,7 @@ router.post('/rides/:rideID/start', authenticate, async (req, res) => {
 
 router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
     const { rideID } = req.params;
+    const { driverID, tipAmount = 0 } = req.body;
 
     try {
         const ride = await Ride.findById(rideID);
@@ -171,32 +173,53 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
             return res.status(400).json({ message: 'Ride cannot be finished at this stage' });
         }
 
-        // Update ride status
         ride.status = RideStates.COMPLETED;
-        ride.completedAt = new Date();
+        ride.tipAmount = tipAmount;
         await ride.save();
 
-        // Update driver's balance and add transaction
-        const driver = await Driver.findById(ride.driverID);
-        if (driver) {
-            // Add fare to available balance
-            driver.ledger.availableBalance += ride.fare;
-            driver.ledger.totalEarnings += ride.fare;
-            
-            // Add transaction record
-            driver.ledger.transactions.push({
-                rideID: ride._id,
-                amount: ride.fare,
-                type: 'EARNING',
-                status: 'COMPLETED',
-                timestamp: new Date()
-            });
-
-            await driver.save();
+        // Update rider's completed rides
+        const rider = await Rider.findById(ride.riderID);
+        if (rider) {
+            rider.completedRides.push(ride._id);
+            await rider.save();
         }
 
-        res.json({ 
-            message: 'Ride completed successfully', 
+        // Update driver's completed rides and ledger
+        const driver = await Driver.findById(driverID);
+        if (driver) {
+            driver.completedRides.push(ride._id);
+            
+            // Calculate fare components
+            const baseFare = driver.baseFee || 2;
+            const distanceFare = ride.distance * (driver.farePrice || 1.5);
+            const totalFare = baseFare + distanceFare + parseFloat(tipAmount);
+            
+            // Update ride fare
+            ride.fare = totalFare;
+            await ride.save();
+            
+            // Update driver ledger
+            driver.ledger.availableBalance += totalFare;
+            await driver.save();
+            
+            // Generate receipt
+            try {
+                // Call the receipt generation endpoint
+                await axios.post(`${process.env.API_URL || 'http://localhost:5000'}/api/receipt/receipts/generate`, {
+                    rideID: ride._id
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${req.headers.authorization.split(' ')[1]}`
+                    }
+                });
+            } catch (receiptError) {
+                console.error('Error generating receipt:', receiptError);
+                // Continue even if receipt generation fails
+            }
+        }
+
+        res.json({
+            message: 'Ride finished successfully',
             ride,
             driverBalance: driver ? driver.ledger.availableBalance : null
         });
