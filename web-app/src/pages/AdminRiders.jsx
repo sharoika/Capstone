@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button } from 'react-bootstrap';
+import { Container, Button } from 'react-bootstrap';
 import axios from 'axios';
 import RiderEditModal from '../components/RiderEditModal';
 import AdminHeader from '../components/AdminHeader';
+import SortableTable from '../components/SortableTable';
 
 const AdminRiders = () => {
     const [riders, setRiders] = useState([]);
@@ -54,23 +55,22 @@ const AdminRiders = () => {
         }
     };
 
+    const columns = [
+        { key: 'name', label: 'Name', sortable: true, accessor: (rider) => `${rider.firstName} ${rider.lastName}` },
+        { key: 'email', label: 'Email', sortable: true },
+        { key: 'phone', label: 'Phone', sortable: true },
+        { key: 'homeLocation', label: 'Home Location', sortable: true },
+        { key: 'completedRides', label: 'Completed Rides', sortable: true, accessor: (rider) => rider.completedRides?.length || 0 },
+        { key: 'actions', label: 'Actions', sortable: false },
+    ];
+
     return (
         <div>
             <AdminHeader title="Admin Panel: Riders" />
             <Container className="py-4">
-                <Table striped bordered hover responsive>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Home Location</th>
-                            <th>Completed Rides</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {riders.map((rider) => (
+                <SortableTable columns={columns} data={riders}>
+                    {(sortedRiders) => 
+                        sortedRiders.map((rider) => (
                             <tr key={rider._id}>
                                 <td>{rider.firstName} {rider.lastName}</td>
                                 <td>{rider.email}</td>
@@ -96,9 +96,9 @@ const AdminRiders = () => {
                                     </div>
                                 </td>
                             </tr>
-                        ))}
-                    </tbody>
-                </Table>
+                        ))
+                    }
+                </SortableTable>
 
                 <RiderEditModal
                     show={showEditModal}

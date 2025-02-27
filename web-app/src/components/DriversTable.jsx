@@ -1,22 +1,22 @@
 import React from 'react';
-import { Table, Dropdown, Button } from 'react-bootstrap';
+import { Dropdown, Button } from 'react-bootstrap';
+import SortableTable from './SortableTable';
 
 const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverClick, onDeleteDriver }) => {
+  const columns = [
+    { key: 'name', label: 'Name', sortable: true, accessor: (driver) => `${driver.firstName} ${driver.lastName}` },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'phone', label: 'Phone', sortable: true },
+    { key: 'vehicle', label: 'Vehicle', sortable: true, accessor: (driver) => `${driver.vehicleMake} ${driver.vehicleModel}` },
+    { key: 'applicationApproved', label: 'Status', sortable: true },
+    { key: 'documents', label: 'Documents', sortable: false },
+    { key: 'actions', label: 'Actions', sortable: false },
+  ];
+
   return (
-    <Table responsive hover className="mb-0">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Vehicle</th>
-          <th>Status</th>
-          <th>Documents</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {drivers.map((driver) => (
+    <SortableTable columns={columns} data={drivers}>
+      {(sortedDrivers) => 
+        sortedDrivers.map((driver) => (
           <tr key={driver._id}>
             <td>{driver.firstName} {driver.lastName}</td>
             <td className="text-break">{driver.email}</td>
@@ -65,11 +65,10 @@ const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverCl
               </div>
             </td>
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        ))
+      }
+    </SortableTable>
   );
 };
 
 export default DriverTable;
-

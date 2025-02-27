@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import axios from 'axios';
 import AdminHeader from '../components/AdminHeader';
+import SortableTable from '../components/SortableTable';
 
 const AdminPayments = () => {
     const [rides, setRides] = useState([]);
@@ -24,26 +25,25 @@ const AdminPayments = () => {
         }
     };
 
+    const columns = [
+        { key: '_id', label: 'Ride ID', sortable: true },
+        { key: 'rider', label: 'Rider', sortable: true, accessor: (ride) => `${ride.riderID?.firstName || ''} ${ride.riderID?.lastName || ''}` },
+        { key: 'driver', label: 'Driver', sortable: true, accessor: (ride) => `${ride.driverID?.firstName || ''} ${ride.driverID?.lastName || ''}` },
+        { key: 'distance', label: 'Distance', sortable: true, accessor: (ride) => ride.distance || 0 },
+        { key: 'fare', label: 'Fare', sortable: true, accessor: (ride) => ride.fare || 0 },
+        { key: 'tipAmount', label: 'Tip', sortable: true, accessor: (ride) => ride.tipAmount || 0 },
+        { key: 'total', label: 'Total', sortable: true, accessor: (ride) => (parseFloat(ride.fare) || 0) + (parseFloat(ride.tipAmount) || 0) },
+        { key: 'rideFinished', label: 'Status', sortable: true },
+        { key: 'createdAt', label: 'Date', sortable: true, accessor: (ride) => new Date(ride.createdAt).getTime() },
+    ];
+
     return (
         <div>
             <AdminHeader title="Admin Panel: Payments" />
             <Container className="py-4">
-                <Table striped bordered hover responsive>
-                    <thead>
-                        <tr>
-                            <th>Ride ID</th>
-                            <th>Rider</th>
-                            <th>Driver</th>
-                            <th>Distance</th>
-                            <th>Fare</th>
-                            <th>Tip</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rides.map((ride) => (
+                <SortableTable columns={columns} data={rides}>
+                    {(sortedRides) => 
+                        sortedRides.map((ride) => (
                             <tr key={ride._id}>
                                 <td>{ride._id}</td>
                                 <td>{ride.riderID?.firstName} {ride.riderID?.lastName}</td>
@@ -55,9 +55,9 @@ const AdminPayments = () => {
                                 <td>{ride.rideFinished ? 'Completed' : 'In Progress'}</td>
                                 <td>{new Date(ride.createdAt).toLocaleDateString()}</td>
                             </tr>
-                        ))}
-                    </tbody>
-                </Table>
+                        ))
+                    }
+                </SortableTable>
             </Container>
         </div>
     );

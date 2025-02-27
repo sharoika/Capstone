@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import axios from 'axios';
 import AdminHeader from '../components/AdminHeader';
+import SortableTable from '../components/SortableTable';
 
 const AdminPayouts = () => {
     const [payouts, setPayouts] = useState([]);
@@ -46,6 +47,15 @@ const AdminPayouts = () => {
         return () => clearInterval(interval);
     }, []);
 
+    const columns = [
+        { key: 'driver', label: 'Driver', sortable: true, accessor: (payout) => `${payout.driverID.firstName} ${payout.driverID.lastName}` },
+        { key: 'email', label: 'Email', sortable: true, accessor: (payout) => payout.driverID.email },
+        { key: 'amount', label: 'Amount', sortable: true, accessor: (payout) => payout.amount },
+        { key: 'requestedAt', label: 'Requested Date', sortable: true, accessor: (payout) => new Date(payout.requestedAt).getTime() },
+        { key: 'status', label: 'Status', sortable: true },
+        { key: 'paidAt', label: 'Actions', sortable: true, accessor: (payout) => payout.paidAt ? new Date(payout.paidAt).getTime() : 0 },
+    ];
+
     if (loading) {
         return (
             <>
@@ -62,19 +72,9 @@ const AdminPayouts = () => {
             <AdminHeader />
             <Container>
                 <h2 className="my-4">Payout Requests</h2>
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th>Driver</th>
-                            <th>Email</th>
-                            <th>Amount</th>
-                            <th>Requested Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {payouts.map((payout) => (
+                <SortableTable columns={columns} data={payouts}>
+                    {(sortedPayouts) => 
+                        sortedPayouts.map((payout) => (
                             <tr key={payout._id}>
                                 <td>{payout.driverID.firstName} {payout.driverID.lastName}</td>
                                 <td>{payout.driverID.email}</td>
@@ -92,12 +92,12 @@ const AdminPayouts = () => {
                                 </td>
                                 <td>{payout.paidAt && new Date(payout.paidAt).toLocaleString()}</td>
                             </tr>
-                        ))}
-                    </tbody>
-                </Table>
+                        ))
+                    }
+                </SortableTable>
             </Container>
         </>
     );
 };
 
-export default AdminPayouts; 
+export default AdminPayouts;
