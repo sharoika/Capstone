@@ -6,6 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
+import { Ionicons } from '@expo/vector-icons';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -55,6 +56,10 @@ export default function DriverLoginScreen() {
     router.push('/(auth)/driverRegister');
   };
 
+  const handleRiderLogin = () => {
+    router.push('/(auth)/login');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -93,6 +98,10 @@ export default function DriverLoginScreen() {
         <Text style={styles.registerText}>Don't have an account?</Text>
         <TouchableOpacity onPress={handleRegister}>
           <Text style={styles.registerLink}>Register</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.riderButton} onPress={handleRiderLogin}>
+          <Text style={styles.riderButtonText}>Rider Login</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -161,6 +170,20 @@ const styles = StyleSheet.create({
   registerLink: {
     fontSize: 16,
     color: '#39C9C2',
+    fontWeight: '600',
+  },
+  riderButton: {
+    marginTop: 16,
+    backgroundColor: '#173252',
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  riderButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '600',
   },
 });

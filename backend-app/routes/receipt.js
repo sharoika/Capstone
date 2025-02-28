@@ -28,7 +28,7 @@ router.post('/receipts/generate', authenticate, async (req, res) => {
         try {
             existingReceipt = await Receipt.findOne({ rideID: ensureValidObjectId(rideID) });
         } catch (error) {
-            console.log('Error checking for existing receipt:', error);
+            // Error checking for existing receipt
         }
         
         if (existingReceipt) {
@@ -46,7 +46,7 @@ router.post('/receipts/generate', authenticate, async (req, res) => {
                 .populate('riderID')
                 .populate('driverID');
         } catch (error) {
-            console.log('Ride not found, but continuing for test receipt');
+            // Ride not found, but continuing for test receipt
         }
 
         // Create a new receipt with provided data or data from ride
@@ -91,22 +91,12 @@ router.get('/receipts/rider/:riderId', authenticate, async (req, res) => {
     const { riderId } = req.params;
 
     try {
-        console.log(`Fetching receipts for rider: ${riderId}`);
-        
         // Ensure valid ObjectId
         const validRiderId = ensureValidObjectId(riderId);
-        console.log(`Valid rider ID: ${validRiderId}`);
         
         const receipts = await Receipt.find({ riderID: validRiderId })
             .populate('driverID', 'firstName lastName vehicleMake vehicleModel')
             .sort({ timestamp: -1 });
-            
-        console.log(`Found ${receipts.length} receipts for rider ${riderId}`);
-        
-        // Log the first receipt to check population
-        if (receipts.length > 0) {
-            console.log('First receipt driverID:', receipts[0].driverID);
-        }
 
         res.json(receipts);
     } catch (error) {
@@ -156,20 +146,12 @@ router.get('/receipts/:receiptId', authenticate, async (req, res) => {
     const { receiptId } = req.params;
 
     try {
-        console.log(`Fetching receipt by ID: ${receiptId}`);
-        
         let receipt;
         try {
             receipt = await Receipt.findById(receiptId)
                 .populate('rideID')
                 .populate('riderID', 'firstName lastName email')
                 .populate('driverID', 'firstName lastName email vehicleMake vehicleModel');
-                
-            console.log('Receipt found:', !!receipt);
-            if (receipt) {
-                console.log('Driver populated:', !!receipt.driverID);
-                console.log('Rider populated:', !!receipt.riderID);
-            }
         } catch (findError) {
             console.error('Error finding receipt by ID:', findError);
             return res.status(500).json({ message: 'Error finding receipt', error: findError.message });
@@ -181,7 +163,6 @@ router.get('/receipts/:receiptId', authenticate, async (req, res) => {
 
         // If driverID or riderID is not populated correctly, try to populate them manually
         if (!receipt.driverID || !receipt.riderID) {
-            console.log('Attempting to manually populate missing fields');
             try {
                 if (!receipt.driverID) {
                     const Driver = require('../models/Driver');
