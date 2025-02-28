@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIndicator, Platform, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Edit2, Banknote, Bell, Lock, LogOut, Receipt } from 'lucide-react-native';
+import { ChevronRight, Edit2, Banknote, Bell, Lock, LogOut, Receipt, User } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import axios from 'axios';
@@ -15,6 +15,7 @@ interface Rider {
   phone?: string;
   homeLocation?: string;
   completedRides?: string[];
+  profilePicture?: string;
 }
 
 // Function to get stored data based on platform
@@ -146,6 +147,15 @@ export default function Settings() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
+        <View style={styles.profileImageContainer}>
+          {rider?.profilePicture ? (
+            <Image source={{ uri: rider.profilePicture }} style={styles.profileImage} />
+          ) : (
+            <View style={styles.profileImagePlaceholder}>
+              <User color="#39C9C2" size={40} />
+            </View>
+          )}
+        </View>
         <Text style={styles.userName}>{rider?.firstName} {rider?.lastName}</Text>
         <Text style={styles.userEmail}>{rider?.email}</Text>
         <Text style={styles.userPhone}>Phone: {rider?.phone || 'N/A'}</Text>
@@ -154,7 +164,7 @@ export default function Settings() {
       </View>
 
       <View style={styles.settingsContainer}>
-        <SettingOption icon={<Edit2 color="#39C9C2" size={24} />} title="Edit Profile" onPress={() => { }} />
+        <SettingOption icon={<Edit2 color="#39C9C2" size={24} />} title="Edit Profile" onPress={() => router.push('/(pages)/editProfile')} />
         <SettingOption
           icon={<Banknote color="#39C9C2" size={24} />}
           title="Payment Settings"
@@ -184,6 +194,27 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: { flex: 0.5, backgroundColor: '#FFFFFF' },
   header: { alignItems: 'center', padding: 24, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
+  profileImageContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+  },
+  profileImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
   userName: { fontSize: 24, fontWeight: '600', color: '#173252', marginBottom: 4 },
   userEmail: { fontSize: 16, color: '#6D6D6D' },
   userPhone: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },

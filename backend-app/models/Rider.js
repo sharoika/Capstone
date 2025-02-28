@@ -8,6 +8,7 @@ const RiderSchema = new mongoose.Schema({
   phone: { type: String, required: false},
   password: { type: String, required: true },
   homeLocation: { type: String },
+  profilePicture: { type: String },
   currentLocation: {
     lat: { type: Number, required: true, default: 0 },
     long: { type: Number, required: true, default: 0 }
