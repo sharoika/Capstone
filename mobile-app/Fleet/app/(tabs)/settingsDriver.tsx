@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, Platform, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, Platform, ActivityIndicator, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Edit2, Bell, Lock, LogOut, Banknote, Receipt } from 'lucide-react-native';
+import { ChevronRight, Edit2, Bell, Lock, LogOut, Banknote, Receipt, User } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import Modal from "react-native-modal";
 import Constants from 'expo-constants';
@@ -22,6 +22,7 @@ interface Driver {
   vehicleModel: string;
   vehicleYear?: string;
   vehiclePlate: string;
+  profilePicture?: string;
   farePrice?: number;
   baseFee?: number;
   ledger?: {
@@ -342,6 +343,15 @@ export default function Settings() {
         ) : (
           driver && (
             <View style={styles.driverInfo}>
+              <View style={styles.profileImageContainer}>
+                {driver.profilePicture ? (
+                  <Image source={{ uri: driver.profilePicture }} style={styles.profileImage} />
+                ) : (
+                  <View style={styles.profileImagePlaceholder}>
+                    <User color="#39C9C2" size={40} />
+                  </View>
+                )}
+              </View>
               <Text style={styles.driverName}>{driver.firstName} {driver.lastName}</Text>
               <Text style={styles.driverEmail}>{driver.email}</Text>
               <Text style={styles.driverVehicle}>{driver.vehicleMake} {driver.vehicleModel}</Text>
@@ -352,7 +362,7 @@ export default function Settings() {
       </View>
 
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingOption} onPress={() => setIsEditing(true)}>
+        <TouchableOpacity style={styles.settingOption} onPress={() => router.push('/(pages)/editDriverProfile')}>
           <View style={styles.settingOptionContent}>
             <Edit2 color="#39C9C2" size={24} />
             <Text style={styles.settingOptionText}>Edit Profile</Text>
@@ -537,11 +547,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F5F5F5',
   },
-  profilePicture: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+  profileImageContainer: {
+    alignItems: 'center',
     marginBottom: 16,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
+  profileImagePlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   userName: {
     fontSize: 24,

@@ -18,6 +18,8 @@ const driverSchema = new mongoose.Schema({
         long: { type: Number, required: true, default: 0 }
     },
     
+    profilePicture: { type: String },
+    
     farePrice: { type: Number, default: 0 },
     baseFee: { type: Number, default: 2 },
     pricingDetails: { type: pricingDetailsSchema, required: false },

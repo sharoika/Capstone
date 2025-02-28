@@ -227,4 +227,40 @@ router.post('/riders/:id/profile-picture', selfAuthenticate, upload.single('prof
     }
 });
 
+// Upload driver profile picture
+router.post('/drivers/:id/profile-picture', selfAuthenticate, upload.single('profilePicture'), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const driver = await Driver.findById(id);
+        if (!driver) {
+            return res.status(404).json({ message: 'Driver not found' });
+        }
+
+        // Delete old profile picture if it exists
+        if (driver.profilePicture && fs.existsSync(driver.profilePicture)) {
+            fs.unlinkSync(driver.profilePicture);
+        }
+
+        // Update driver with new profile picture path
+        driver.profilePicture = req.file.path;
+        await driver.save();
+
+        res.status(200).json({ 
+            message: 'Profile picture uploaded successfully',
+            profilePicture: `${req.protocol}://${req.get('host')}/${req.file.path}`
+        });
+    } catch (error) {
+        console.error('Error uploading profile picture:', error);
+        res.status(500).json({ 
+            message: 'Error uploading profile picture',
+            error: error.message 
+        });
+    }
+});
+
 module.exports = router;
