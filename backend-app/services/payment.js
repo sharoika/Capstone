@@ -6,6 +6,7 @@ const Rider = require('../models/Rider');
 const retrievePaymentMethod = async (riderId) => {
   try {
     const rider = await getRiderById(riderId);
+
     if (!rider) throw new Error('Rider not found');
 
     if (rider.stripePaymentMethodId) {
@@ -14,6 +15,7 @@ const retrievePaymentMethod = async (riderId) => {
     } else {
       return null;
     }
+
   } catch (error) {
     console.error('Error retrieving PaymentMethod:', error);
     throw new Error('Failed to retrieve PaymentMethod');
@@ -23,45 +25,34 @@ const retrievePaymentMethod = async (riderId) => {
 const createSetupIntent = async (riderId) => {
   try {
     const rider = await getRiderById(riderId);
+
     if (!rider) throw new Error('Rider not found');
 
     if (!rider.stripeCustomerId) {
       const customer = await stripe.customers.create({
         email: rider.email,
       });
-      console.log("CUSTOMER:::");      
-      console.log(customer);
       const stripeCustomerId = customer.id;
       await updateRiderById(riderId, { stripeCustomerId });
       return;
     }
 
+    // TODO: we don't need to create a new intent each time
+    // but instead we can just attach a new payment to the 
+    // present one 
     const setupIntent = await stripe.setupIntents.create({
       customer: rider.stripeCustomerId,
     });
 
-    console.log("SETUP INTENT");
-    console.log(setupIntent);
-
-    console.log(setupIntent.id);
-
     const stripeSetupIntentId = setupIntent.id
 
     await updateRiderById(riderId, { stripeSetupIntentId });
-    // console.log(setupIntent);
-    // console.log(setupIntent.customer);
-
-    // console.log("Client Secret: ");
-    // console.log(setupIntent.client_secret);
 
     const ephemeralKey = await stripe.ephemeralKeys.create(
       { customer: setupIntent.customer },
-      { apiVersion: '2020-08-27' } // Ensure you specify the API version
+      { apiVersion: '2020-08-27' }
     );
-
-    // console.log(ephemeralKey);
     
-
     return {
       setupIntentClientSecret: setupIntent.client_secret,
       customerId: setupIntent.customer,
@@ -81,23 +72,19 @@ const attachPaymentMethodFromSetupIntent = async (riderId) => {
     if (!rider.stripeCustomerId) throw new Error('Rider does not have a Stripe customer ID');
     if (!rider.stripeSetupIntentId) throw new Error('Rider does not have a Stripe SetupIntent ID');
 
-    // Retrieve SetupIntent from Stripe
     const setupIntent = await stripe.setupIntents.retrieve(rider.stripeSetupIntentId);
     if (!setupIntent.payment_method) throw new Error('No payment method found in SetupIntent');
 
     const paymentMethodId = setupIntent.payment_method;
 
-    // Attach payment method to customer
     await stripe.paymentMethods.attach(paymentMethodId, {
       customer: rider.stripeCustomerId,
     });
 
-    // Set as default payment method
     await stripe.customers.update(rider.stripeCustomerId, {
       invoice_settings: { default_payment_method: paymentMethodId },
     });
 
-    // Update rider with new payment method ID
     await updateRiderById(riderId, { stripePaymentMethodId: paymentMethodId });
 
     console.log(`Payment method ${paymentMethodId} attached and set as default for rider ${riderId}`);
@@ -115,14 +102,13 @@ const chargePaymentMethod = async (riderId, amount, currency = 'usd') => {
     throw new Error('Rider is missing Stripe payment details');
   }
 
-  // Create a PaymentIntent using the rider's saved payment method
   const paymentIntent = await stripe.paymentIntents.create({
-    amount, // Amount in the smallest currency unit (e.g., cents)
+    amount,
     currency,
     customer: rider.stripeCustomerId,
     payment_method: rider.stripePaymentMethodId,
-    confirm: true, // Automatically confirm the payment
-    off_session: true, // Allows processing without user interaction
+    confirm: true,
+    off_session: true,
   });
 
   return paymentIntent;

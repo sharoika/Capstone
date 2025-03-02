@@ -2,6 +2,7 @@ const express = require('express');
 const { createSetupIntent, attachPaymentMethodFromSetupIntent, chargePaymentMethod, retrievePaymentMethod } = require('../services/payment');
 const router = express.Router();
 
+// TODO: this should be a get
 router.post('/payment-method', async (req, res) => {
   try {
     const { riderId } = req.body;
@@ -13,12 +14,10 @@ router.post('/payment-method', async (req, res) => {
   }
 });
 
-
 router.post('/create-setup-intent', async (req, res) => {
   try {
     const { riderId } = req.body;
     const clientSecret = await createSetupIntent(riderId);
-    console.log(clientSecret);
     res.status(200).send({
       paymentIntent: clientSecret.setupIntentClientSecret,
       customer: clientSecret.customerId,
@@ -41,22 +40,24 @@ router.post('/attach-payment-method', async (req, res) => {
   }
 });
 
-router.post('/charge-payment-method', async (req, res) => {
-  try {
-    console.log("hit");
-    const { riderId, amount, currency } = req.body;
-    const paymentIntent = await chargePaymentMethod(riderId, amount, currency);
+// TODO: This shouldnt exist, maybe only an admin route for re-billing if a
+// payment fails - otherwise should occur on conclusion of a ride.
 
-    res.status(200).json({
-      success: true,
-      message: 'Payment processed successfully',
-      paymentIntentId: paymentIntent.id,
-    });
-  } catch (error) {
-    console.error('Error in /charge-payment-method:', error);
-    res.status(500).send('Failed to process payment');
-  }
-});
+// router.post('/charge-payment-method', async (req, res) => {
+//   try {
+//     const { riderId, amount, currency } = req.body;
+//     const paymentIntent = await chargePaymentMethod(riderId, amount, currency);
+
+//     res.status(200).json({
+//       success: true,
+//       message: 'Payment processed successfully',
+//       paymentIntentId: paymentIntent.id,
+//     });
+//   } catch (error) {
+//     console.error('Error in /charge-payment-method:', error);
+//     res.status(500).send('Failed to process payment');
+//   }
+// });
 
 
 module.exports = router;
