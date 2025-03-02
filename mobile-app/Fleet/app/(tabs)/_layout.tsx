@@ -4,6 +4,7 @@ import HomeScreen from './home';
 import ProfileScreen from './settings';
 import DriverHomeScreen from './driverHome';
 import DriverProfileScreen from './settingsDriver';
+import ReceiptsScreen from './receipts';
 import PaymentSettingsScreen from '../(pages)/paymentSettings';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
@@ -37,8 +38,9 @@ const TabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ color, size }) => {
-          let iconName = '';
+          let iconName: keyof typeof Ionicons.glyphMap = 'home-outline';
 
           if (route.name === 'Home') {
             iconName = 'home-outline'; 
@@ -48,6 +50,8 @@ const TabNavigator = () => {
             iconName = 'car-outline';
           } else if (route.name === 'Driver Profile') {
             iconName = 'person-circle-outline';
+          } else if (route.name === 'Receipts') {
+            iconName = 'receipt-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -57,12 +61,14 @@ const TabNavigator = () => {
       {userType === "driver" && (
         <>
           <Tab.Screen name="Driver Home" component={DriverHomeScreen} />
+          <Tab.Screen name="Receipts" component={ReceiptsScreen} />
           <Tab.Screen name="Driver Profile" component={DriverProfileScreen} />
         </>
       )}
       {userType === "rider" && (
         <>
           <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Receipts" component={ReceiptsScreen} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
         </>
       )}

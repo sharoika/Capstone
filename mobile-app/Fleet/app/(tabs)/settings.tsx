@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, ActivityIndicator, Platform, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ChevronRight, Edit2, Banknote, Bell, Lock, LogOut } from 'lucide-react-native';
+import { ChevronRight, Edit2, Banknote, Bell, Lock, LogOut, Receipt, User } from 'lucide-react-native';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
+import axios from 'axios';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -14,6 +15,7 @@ interface Rider {
   phone?: string;
   homeLocation?: string;
   completedRides?: string[];
+  profilePicture?: string;
 }
 
 // Function to get stored data based on platform
@@ -68,6 +70,64 @@ export default function Settings() {
     router.push('/(auth)/login');
   };
 
+  const createTestReceipt = async () => {
+    try {
+      const token = await getItemAsync('userToken');
+      const userId = await getItemAsync('userObjectId');
+      
+      if (!token || !userId) {
+        Alert.alert('Error', 'You must be logged in to create a test receipt');
+        return;
+      }
+
+      // Generate a valid MongoDB ObjectId-like string
+      const generateObjectId = () => {
+        const timestamp = Math.floor(new Date().getTime() / 1000).toString(16).padStart(8, '0');
+        const machineId = Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
+        const processId = Math.floor(Math.random() * 65536).toString(16).padStart(4, '0');
+        const counter = Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0');
+        return timestamp + machineId + processId + counter;
+      };
+
+      const testReceiptData = {
+        rideID: generateObjectId(),
+        riderID: userId,
+        driverID: generateObjectId(),
+        timestamp: new Date().toISOString(),
+        baseFare: 2.50,
+        distanceFare: 12.75,
+        tipAmount: 3.00,
+        totalAmount: 18.25,
+        paymentMethod: "Credit Card",
+        distance: 8.5,
+        duration: 25,
+        pickupLocation: "123 Main St, City",
+        dropoffLocation: "456 Oak Ave, City"
+      };
+
+      console.log('Sending test receipt data:', testReceiptData);
+      console.log('API URL:', `${apiUrl}/api/receipt/receipts/generate`);
+
+      const response = await axios.post(`${apiUrl}/api/receipt/receipts/generate`, testReceiptData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Receipt creation response:', response.data);
+
+      if (response.status === 201 || response.status === 200) {
+        Alert.alert('Success', 'Test receipt created successfully!');
+      } else {
+        Alert.alert('Error', 'Failed to create test receipt');
+      }
+    } catch (error) {
+      console.error('Error creating test receipt:', error);
+      Alert.alert('Error', `Failed to create test receipt: ${error}`);
+    }
+  };
+
   interface SettingOptionProps {
     icon: JSX.Element;
     title: string;
@@ -87,6 +147,15 @@ export default function Settings() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
+        <View style={styles.profileImageContainer}>
+          {rider?.profilePicture ? (
+            <Image source={{ uri: rider.profilePicture }} style={styles.profileImage} />
+          ) : (
+            <View style={styles.profileImagePlaceholder}>
+              <User color="#39C9C2" size={40} />
+            </View>
+          )}
+        </View>
         <Text style={styles.userName}>{rider?.firstName} {rider?.lastName}</Text>
         <Text style={styles.userEmail}>{rider?.email}</Text>
         <Text style={styles.userPhone}>Phone: {rider?.phone || 'N/A'}</Text>
@@ -95,7 +164,7 @@ export default function Settings() {
       </View>
 
       <View style={styles.settingsContainer}>
-        <SettingOption icon={<Edit2 color="#39C9C2" size={24} />} title="Edit Profile" onPress={() => { }} />
+        <SettingOption icon={<Edit2 color="#39C9C2" size={24} />} title="Edit Profile" onPress={() => router.push('/(pages)/editProfile')} />
         <SettingOption
           icon={<Banknote color="#39C9C2" size={24} />}
           title="Payment Settings"
@@ -107,6 +176,11 @@ export default function Settings() {
           onPress={() => alert('Notifications Management Coming Soon')} 
         />
         <SettingOption icon={<Lock color="#39C9C2" size={24} />} title="Privacy Settings" onPress={() => { }} />
+        <SettingOption 
+          icon={<Receipt color="#39C9C2" size={24} />} 
+          title="Create Test Receipt" 
+          onPress={createTestReceipt} 
+        />
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -120,6 +194,27 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: { flex: 0.5, backgroundColor: '#FFFFFF' },
   header: { alignItems: 'center', padding: 24, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
+  profileImageContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+  },
+  profileImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
   userName: { fontSize: 24, fontWeight: '600', color: '#173252', marginBottom: 4 },
   userEmail: { fontSize: 16, color: '#6D6D6D' },
   userPhone: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },

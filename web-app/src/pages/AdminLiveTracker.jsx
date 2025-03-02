@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Badge } from 'react-bootstrap';
+import { Container, Badge } from 'react-bootstrap';
 import axios from 'axios';
 import AdminHeader from '../components/AdminHeader';
+import SortableTable from '../components/SortableTable';
 
 const AdminLiveTracker = () => {
     const [rides, setRides] = useState([]);
@@ -43,25 +44,29 @@ const AdminLiveTracker = () => {
         return <Badge bg="success">Completed</Badge>;
     };
 
+    const columns = [
+        { key: '_id', label: 'Ride ID', sortable: true },
+        { key: 'rider', label: 'Rider', sortable: true, accessor: (ride) => `${ride.riderID?.firstName || ''} ${ride.riderID?.lastName || ''}` },
+        { key: 'driver', label: 'Driver', sortable: true, accessor: (ride) => ride.driverID ? `${ride.driverID.firstName} ${ride.driverID.lastName}` : 'Not Assigned' },
+        { key: 'pickupLocation', label: 'Pickup Location', sortable: true },
+        { key: 'dropoffLocation', label: 'Dropoff Location', sortable: true },
+        { key: 'status', label: 'Status', sortable: true, accessor: (ride) => {
+            if (!ride.driverID) return 0;
+            if (!ride.rideStarted) return 1;
+            if (!ride.rideFinished) return 2;
+            return 3;
+        }},
+        { key: 'currentLocation', label: 'Current Location', sortable: false },
+        { key: 'rideStartTime', label: 'Time Started', sortable: true, accessor: (ride) => ride.rideStarted ? new Date(ride.rideStartTime).getTime() : 0 },
+    ];
+
     return (
         <div>
             <AdminHeader title="Admin Panel: Live Tracker" />
             <Container className="py-4">
-                <Table striped bordered hover responsive>
-                    <thead>
-                        <tr>
-                            <th>Ride ID</th>
-                            <th>Rider</th>
-                            <th>Driver</th>
-                            <th>Pickup Location</th>
-                            <th>Dropoff Location</th>
-                            <th>Status</th>
-                            <th>Current Location</th>
-                            <th>Time Started</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rides.map((ride) => (
+                <SortableTable columns={columns} data={rides}>
+                    {(sortedRides) => 
+                        sortedRides.map((ride) => (
                             <tr key={ride._id}>
                                 <td>{ride._id}</td>
                                 <td>
@@ -89,9 +94,9 @@ const AdminLiveTracker = () => {
                                     }
                                 </td>
                             </tr>
-                        ))}
-                    </tbody>
-                </Table>
+                        ))
+                    }
+                </SortableTable>
             </Container>
         </div>
     );

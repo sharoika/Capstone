@@ -4,6 +4,42 @@ const Rider = require('../models/Rider');
 const { authenticate } = require("../middlewares/auth");
 const { selfAuthenticate } = require("../middlewares/auth");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+// Configure multer storage for profile pictures
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = "uploads/profile-pictures";
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
+    },
+});
+
+// File filter for images
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type. Only images are allowed.'), false);
+    }
+};
+
+// Create multer upload instance
+const upload = multer({ 
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+});
 
 router.get('/rider/:id', authenticate, async (req, res) => {
     const { id } = req.params;
@@ -152,6 +188,78 @@ router.put('/drivers/:id', selfAuthenticate, async (req, res) => {
     } catch (error) {
         console.error('Error updating driver:', error);
         res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Upload rider profile picture
+router.post('/riders/:id/profile-picture', selfAuthenticate, upload.single('profilePicture'), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const rider = await Rider.findById(id);
+        if (!rider) {
+            return res.status(404).json({ message: 'Rider not found' });
+        }
+
+        // Delete old profile picture if it exists
+        if (rider.profilePicture && fs.existsSync(rider.profilePicture)) {
+            fs.unlinkSync(rider.profilePicture);
+        }
+
+        // Update rider with new profile picture path
+        rider.profilePicture = req.file.path;
+        await rider.save();
+
+        res.status(200).json({ 
+            message: 'Profile picture uploaded successfully',
+            profilePicture: `${req.protocol}://${req.get('host')}/${req.file.path}`
+        });
+    } catch (error) {
+        console.error('Error uploading profile picture:', error);
+        res.status(500).json({ 
+            message: 'Error uploading profile picture',
+            error: error.message 
+        });
+    }
+});
+
+// Upload driver profile picture
+router.post('/drivers/:id/profile-picture', selfAuthenticate, upload.single('profilePicture'), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const driver = await Driver.findById(id);
+        if (!driver) {
+            return res.status(404).json({ message: 'Driver not found' });
+        }
+
+        // Delete old profile picture if it exists
+        if (driver.profilePicture && fs.existsSync(driver.profilePicture)) {
+            fs.unlinkSync(driver.profilePicture);
+        }
+
+        // Update driver with new profile picture path
+        driver.profilePicture = req.file.path;
+        await driver.save();
+
+        res.status(200).json({ 
+            message: 'Profile picture uploaded successfully',
+            profilePicture: `${req.protocol}://${req.get('host')}/${req.file.path}`
+        });
+    } catch (error) {
+        console.error('Error uploading profile picture:', error);
+        res.status(500).json({ 
+            message: 'Error uploading profile picture',
+            error: error.message 
+        });
     }
 });
 

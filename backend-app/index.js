@@ -12,7 +12,7 @@ const paymentRoutes = require('./routes/payment')
 const configRoutes = require('./routes/config');
 const rideRoutes = require('./routes/ride');
 const driverRoutes = require('./routes/driver');
-
+const receiptRoutes = require('./routes/receipt');
 
 dotenv.config();
 
@@ -53,6 +53,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/config', configRoutes)
 app.use('/api/ride', rideRoutes);
+app.use('/api/receipt', receiptRoutes);
 
 if (!fs.existsSync('uploads')) {
     fs.mkdirSync('uploads');
