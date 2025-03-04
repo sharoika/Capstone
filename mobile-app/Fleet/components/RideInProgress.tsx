@@ -55,16 +55,15 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
     }
   }
 
-  const updateMapRoute = async (start: string, end: string) => {
+  const updateMapRoute = async (start: { coordinates: [number, number] }, end: { coordinates: [number, number] }) => {
     try {
       // Convert addresses to coordinates
-      const startCoords = (await Geocoder.from(start)).results[0].geometry.location
-      const endCoords = (await Geocoder.from(end)).results[0].geometry.location
-
+      const startCoords = start.coordinates; 
+      const endCoords = end.coordinates;  
       // Fetch route from Google Directions API
       const directionsResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${startCoords.lat},${startCoords.lng}&destination=${endCoords.lat},${endCoords.lng}&key=${GOOGLE_API_KEY}`
-      )
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${startCoords[1]},${startCoords[0]}&destination=${endCoords[1]},${endCoords[0]}&key=${GOOGLE_API_KEY}`
+    );
 
       const directionsData = await directionsResponse.json()
 
@@ -74,11 +73,11 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
 
         // Set initial map region to show the entire route
         const region = {
-          latitude: (startCoords.lat + endCoords.lat) / 2,
-          longitude: (startCoords.lng + endCoords.lng) / 2,
-          latitudeDelta: Math.abs(startCoords.lat - endCoords.lat) * 1.5,
-          longitudeDelta: Math.abs(startCoords.lng - endCoords.lng) * 1.5,
-        }
+          latitude: (startCoords[1] + endCoords[1]) / 2,
+          longitude: (startCoords[0] + endCoords[0]) / 2,
+          latitudeDelta: Math.abs(startCoords[1] - endCoords[1]) * 1.5,
+          longitudeDelta: Math.abs(startCoords[0] - endCoords[0]) * 1.5,
+      };
         mapRef.current?.animateToRegion(region)
       }
     } catch (error) {
@@ -118,7 +117,7 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
 
   const handleFinishRide = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/api/ride/rides/${rideID}/finish`, {
+      const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/finish`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -178,7 +177,7 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
                   longitude: routeCoordinates[0]?.longitude || 0,
                 }}
                 title="Pickup"
-                description={rideDetails.start}
+               
               />
               <Marker
                 coordinate={{
@@ -186,7 +185,7 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
                   longitude: routeCoordinates[routeCoordinates.length - 1]?.longitude || 0,
                 }}
                 title="Destination"
-                description={rideDetails.end}
+               
               />
             </>
           )}
@@ -213,11 +212,11 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
         <View style={styles.locationContainer}>
           <View style={styles.locationItem}>
             <View style={[styles.dot, { backgroundColor: '#39C9C2' }]} />
-            <Text style={styles.locationText} numberOfLines={1}>{rideDetails.start}</Text>
+            <Text style={styles.locationText} numberOfLines={1}></Text>
           </View>
           <View style={styles.locationItem}>
             <View style={[styles.dot, { backgroundColor: '#39C9C2' }]} />
-            <Text style={styles.locationText} numberOfLines={1}>{rideDetails.end}</Text>
+            <Text style={styles.locationText} numberOfLines={1}></Text>
           </View>
         </View>
 

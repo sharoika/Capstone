@@ -13,11 +13,11 @@ interface RideFormProps {
 }
 
 const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) => {
-  const [start, setStart] = useState('');
-  const [end, setEnd] = useState('');
+  const [start, setStart] = useState<{ type: string; coordinates: [number, number] } | null>(null);
+  const [end, setEnd] = useState<{ type: string; coordinates: [number, number] } | null>(null);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [region, setRegion] = useState({
-    latitude: 37.7749, // Default coordinates
+    latitude: 37.7749, 
     longitude: -122.4194,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
@@ -30,71 +30,86 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
 
   const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
 
-  useEffect(() => {
-    Geocoder.init(GOOGLE_API_KEY); 
-    console.log('Geolocation API');
-    (async () => {
-      try {
-        const response = await fetch(
-          `https://www.googleapis.com/geolocation/v1/geolocate?key=${GOOGLE_API_KEY}`,
-          { method: 'POST' }
-        );
-        console.log('Geolocation API Response:', response);
-        if (response.ok) {
-          const data = await response.json();
-          const { location } = data;
-          if (location && location.lat != null && location.lng != null) {
-            setLocation({ latitude: location.lat, longitude: location.lng });
-            setRegion({
-              latitude: location.lat,
-              longitude: location.lng,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
-          } else {
-            Alert.alert('Error', 'Location data is invalid or missing.');
-          }
+  const fetchLocation = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/location/getOne?userId=${riderID}&userType=rider`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        
+        if (data.location && data.location.lat && data.location.long) {
+          const mappedLocation = {
+            latitude: data.location.lat, 
+            longitude: data.location.long, 
+          };
+          console.log("mapped: ", mappedLocation);
+          setLocation(mappedLocation); 
+          console.log("Location: ", location);
+          setRegion({
+            latitude: mappedLocation.latitude,
+            longitude: mappedLocation.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
         } else {
-          Alert.alert('Error', 'Failed to fetch location.');
+          Alert.alert('Error', 'Location not found.');
         }
-      } catch (error) {
-        console.error('Error fetching location:', error);
-        Alert.alert('Error', 'An error occurred while fetching location.');
+      } else {
+        const errorData = await response.json();
+        console.error('Error fetching location:', errorData);
+        Alert.alert('Error', errorData.message || 'Failed to fetch location.');
       }
-    })();
+    } catch (error) {
+      console.error('Error fetching location:', error);
+      Alert.alert('Error', 'An error occurred while fetching location.');
+    }
+  };
+
+  useEffect(() => {
+    fetchLocation();
   }, []);
 
-  const fetchCoordinatesAndRoute = async () => {
+   const fetchCoordinatesAndRoute = async () => {
     if (!start || !end) {
       Alert.alert('Error', 'Please provide both start and end locations.');
       return;
     }
 
     try {
-      // Convert start and end addresses to coordinates
-      const startCoords = (await Geocoder.from(start)).results[0].geometry.location;
-      const endCoords = (await Geocoder.from(end)).results[0].geometry.location;
-
-      // Fetch route from Google Directions API
-      const directionsResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${startCoords.lat},${startCoords.lng}&destination=${endCoords.lat},${endCoords.lng}&key=${GOOGLE_API_KEY}`
-      );
-
+      const [startLng, startLat] = start.coordinates; 
+      const [endLng, endLat] = end.coordinates;
+  
+      console.log("Start Coordinates:", startLat, startLng);  
+      console.log("End Coordinates:", endLat, endLng);  
+  
+      if (!startLat || !startLng || !endLat || !endLng) {
+        throw new Error("Invalid coordinates extracted.");
+      }
+  
+      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLat},${startLng}&destination=${endLat},${endLng}&key=${GOOGLE_API_KEY}`;
+      console.log("Fetching URL:", url); 
+      const directionsResponse = await fetch(url);
       const directionsData = await directionsResponse.json();
 
       if (directionsData.routes.length) {
         const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
         setRouteCoordinates(points);
 
-        // Get and format the estimated time
         const durationInSeconds = directionsData.routes[0].legs[0].duration.value;
         const durationText = directionsData.routes[0].legs[0].duration.text;
         setEstimatedTime(durationText);
         const distance = directionsData.routes[0].legs[0].distance.text; 
         setDistance(distance);
         mapRef.current?.animateToRegion({
-          latitude: startCoords.lat,
-          longitude: startCoords.lng,
+          latitude: startLat,
+          longitude: startLng,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         });
@@ -242,6 +257,16 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
         ]
     }
 ];
+const handleLocationSelect = (data: any, details: any | null, type: 'start' | 'end') => {
+  if (details && details.geometry && details.geometry.location) {
+    const coordinates: [number, number] = [details.geometry.location.lng, details.geometry.location.lat];
+    if (type === 'start') {
+      setStart({ type: 'Point', coordinates });
+    } else {
+      setEnd({ type: 'Point', coordinates });
+    }
+  }
+};
   const handleConfirmRide = async () => {
     if (!start || !end ) {
       Alert.alert('Error', 'Please fill in all the fields.');
@@ -253,7 +278,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // Pass the token for authentication
+          Authorization: `Bearer ${token}`, 
         },
         body: JSON.stringify({
           riderID,
@@ -266,7 +291,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
       if (response.ok) {
         const data = await response.json();
         Alert.alert('Success', 'Ride created successfully!');
-        onRideCreated(data.rideID); // Move to the next step using the rideID
+        onRideCreated(data.rideID); 
       } else {
         const errorData = await response.json();
         console.error('Error response:', errorData);
@@ -282,10 +307,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
       <Text>Start Location:</Text>
       <GooglePlacesAutocomplete
         placeholder="Enter start location"
-        onPress={(data, details = null) => {
-          setStart(data.description);
-          console.log('Selected Start Location:', data.description);
-        }}
+        onPress={(data, details) => handleLocationSelect(data, details, 'start')}
         query={{
           key: GOOGLE_API_KEY,
           language: 'en',
@@ -301,10 +323,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
       <Text>End Location:</Text>
       <GooglePlacesAutocomplete
         placeholder="Enter end location"
-        onPress={(data, details = null) => {
-          setEnd(data.description);
-          console.log('Selected End Location:', data.description);
-        }}
+        onPress={(data, details) => handleLocationSelect(data, details, 'end')}
         query={{
           key: GOOGLE_API_KEY,
           language: 'en',

@@ -45,7 +45,7 @@ const HomeScreen: React.FC = () => {
   }, []);
 
   if (!token || !riderID) {
-    return null; // or show a loading spinner
+    return null; 
   }
 
   return (

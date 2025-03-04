@@ -14,31 +14,30 @@ interface StartRideProps {
 }
 
 const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) => {
-  const [rideDetails, setRideDetails] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [rideDetails, setRideDetails] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [region, setRegion] = useState<any>(null);
   const mapRef = useRef<MapView | null>(null);
   const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
-  const [distance, setDistance] = useState<string>('');
+  const [distance, setDistance] = useState<string>("");
   const [fare, setFare] = useState<number>(0);
 
   const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
 
   useEffect(() => {
     const fetchCoordinates = async () => {
-      if (!rideDetails?.start || !rideDetails?.end) return;
-  
       try {
-        const startResponse = await Geocoder.from(rideDetails.start);
-        const endResponse = await Geocoder.from(rideDetails.end);
+        if (!rideDetails?.start?.coordinates || !rideDetails?.end?.coordinates) {
+          console.error("Missing start or end coordinates:", rideDetails);
+          return;
+        }
   
-        const startLocation = startResponse.results[0].geometry.location;
-        const endLocation = endResponse.results[0].geometry.location;
+        const startLocation = `${rideDetails.start.coordinates[1]},${rideDetails.start.coordinates[0]}`;
+        const endLocation = `${rideDetails.end.coordinates[1]},${rideDetails.end.coordinates[0]}`;
   
         const directionsResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation.lat},${startLocation.lng}&destination=${endLocation.lat},${endLocation.lng}&key=${GOOGLE_API_KEY}`
+          `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation}&destination=${endLocation}&key=${GOOGLE_API_KEY}`
         );
   
         const directionsData = await directionsResponse.json();
@@ -47,25 +46,27 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
           const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
           const distance = directionsData.routes[0].legs[0].distance.text;
           const distanceValue = directionsData.routes[0].legs[0].distance.value / 1000; // Convert to km
-          
+  
           setDistance(distance);
-          
-          // Update ride details with new distance and recalculate fare
+  
           if (rideDetails.driver && typeof rideDetails.driver.farePrice === 'number' && typeof rideDetails.driver.baseFee === 'number') {
             const validBaseFee = !isNaN(rideDetails.driver.baseFee) ? rideDetails.driver.baseFee : 2;
             const validFarePrice = !isNaN(rideDetails.driver.farePrice) ? rideDetails.driver.farePrice : 0;
-            
+  
             const distanceFare = distanceValue * validFarePrice;
             const totalFare = parseFloat((validBaseFee + distanceFare).toFixed(2));
-            
+  
             console.log('Recalculated fare:', totalFare, 'using baseFee:', validBaseFee, 'farePrice:', validFarePrice, 'distance:', distanceValue);
             setFare(totalFare);
           }
-          
+  
+          const [startLat, startLng] = startLocation.split(',').map(Number);
+          const [endLat, endLng] = endLocation.split(',').map(Number);
+  
           setRouteCoordinates(points);
           setRegion({
-            latitude: startLocation.lat,
-            longitude: startLocation.lng,
+            latitude: startLat, 
+            longitude: startLng, 
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           });
@@ -77,9 +78,8 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     };
   
     fetchCoordinates();
-  }, [rideDetails]);
+  }, [rideDetails]); 
 
-  // Add this helper function to decode the polyline
   const decodePolyline = (encoded: string) => {
     let points = [];
     let index = 0, len = encoded.length;
@@ -122,66 +122,59 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        })
+        });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch ride details")
+          throw new Error("Failed to fetch ride details");
         }
 
-        const data = await response.json()
-        console.log('Raw ride details:', data);
-        
-        // Calculate fare using driver pricing
-        if (data.driver && typeof data.driver.farePrice === 'number' && typeof data.driver.baseFee === 'number' && typeof data.distance === 'number') {
-          const validBaseFee = !isNaN(data.driver.baseFee) ? data.driver.baseFee : 2;
-          const validFarePrice = !isNaN(data.driver.farePrice) ? data.driver.farePrice : 0;
-          const validDistance = !isNaN(data.distance) ? data.distance : 0;
-          
-          const distanceFare = validDistance * validFarePrice;
-          const totalFare = parseFloat((validBaseFee + distanceFare).toFixed(2));
-          
-          console.log('Calculated fare:', totalFare, 'using baseFee:', validBaseFee, 'farePrice:', validFarePrice, 'distance:', validDistance);
+        const data = await response.json();
+        console.log("Ride details:", data);
+
+        if (data.start?.coordinates && data.end?.coordinates) {
+          const startLocation = {
+            latitude: data.start.coordinates[1],
+            longitude: data.start.coordinates[0],
+          };
+          const endLocation = {
+            latitude: data.end.coordinates[1],
+            longitude: data.end.coordinates[0],
+          };
+
+          setRouteCoordinates([startLocation, endLocation]); 
+          setRegion({
+            latitude: startLocation.latitude,
+            longitude: startLocation.longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          });
+
+          setDistance(`${data.distance} km`);
+        }
+
+        // Calculate fare
+        if (data.driver?.farePrice && data.driver?.baseFee && typeof data.distance === "number") {
+          const baseFee = !isNaN(data.driver.baseFee) ? data.driver.baseFee : 2;
+          const farePrice = !isNaN(data.driver.farePrice) ? data.driver.farePrice : 0;
+          const distanceFare = data.distance * farePrice;
+          const totalFare = parseFloat((baseFee + distanceFare).toFixed(2));
+          console.log("Calculated fare:", totalFare);
           setFare(totalFare);
         }
-        
-        setRideDetails(data)
+
+        setRideDetails(data);
       } catch (err) {
-        setError("Error fetching ride details")
-        console.error("Error:", err)
+        setError("Error fetching ride details");
+        console.error("Error:", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchRideDetails()
-  }, [rideID, token])
+    fetchRideDetails();
+  }, [rideID, token]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch(
-          `https://www.googleapis.com/geolocation/v1/geolocate?key=${GOOGLE_API_KEY}`,
-          { method: 'POST' }
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          const { location } = data;
-          
-          if (location && location.lat != null && location.lng != null) {
-            setLocation({ latitude: location.lat, longitude: location.lng });
-          } else {
-            Alert.alert('Error', 'Location data is invalid or missing.');
-          }
-        } else {
-          Alert.alert('Error', 'Failed to fetch location.');
-        }
-      } catch (error) {
-        console.error('Error fetching location:', error);
-        Alert.alert('Error', 'An error occurred while fetching location.');
-      }
-    })();
-  }, []);
+
 
   useEffect(() => {
     if (routeCoordinates.length > 0) {
@@ -202,24 +195,22 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          fare: fare
-        })
-      })
+        body: JSON.stringify({ fare }),
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to start the ride")
+        throw new Error("Failed to start the ride");
       }
 
-      const data = await response.json()
-      console.log("Ride started:", data.ride)
-      onRideStarted()
-      Alert.alert("Success", "Ride started successfully")
+      const data = await response.json();
+      console.log("Ride started:", data.ride);
+      onRideStarted();
+      Alert.alert("Success", "Ride started successfully");
     } catch (err) {
-      console.error("Error starting the ride:", err)
-      Alert.alert("Error", "Unable to start the ride")
+      console.error("Error starting the ride:", err);
+      Alert.alert("Error", "Unable to start the ride");
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -240,43 +231,13 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.mapContainer}>
-          {location ? (
-            <MapView
-              ref={mapRef}
-              style={styles.map}
-              region={region}
-              onRegionChangeComplete={setRegion}
-            >
-              {routeCoordinates.length > 0 && (
-                <Polyline
-                  coordinates={routeCoordinates}
-                  strokeWidth={4}
-                  strokeColor="#00f"
-                />
-              )}
-              <Marker
-                coordinate={{
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                }}
-                title="Your Location"
-                description="This is your current location"
-              >
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    backgroundColor: 'blue',
-                    borderRadius: 20,
-                    borderWidth: 2,
-                    borderColor: 'white',
-                  }}
-                />
-              </Marker>
+      <View style={styles.mapContainer}>
+          {region && (
+            <MapView ref={mapRef} style={styles.map} region={region}>
+              {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />}
+              <Marker coordinate={routeCoordinates[0]} title="Start" />
+              <Marker coordinate={routeCoordinates[1]} title="End" />
             </MapView>
-          ) : (
-            <Text>Loading map...</Text>
           )}
         </View>
 
@@ -289,12 +250,17 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
 
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Start Location</Text>
-              <Text style={styles.infoText}>{rideDetails.start}</Text>
+              <Text style={styles.infoText}>
+  {rideDetails.start?.coordinates ? `${rideDetails.start.coordinates[1]}, ${rideDetails.start.coordinates[0]}` : "Unknown"}
+</Text>
             </View>
 
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>End Location</Text>
-              <Text style={styles.infoText}>{rideDetails.end}</Text>
+              
+<Text style={styles.infoText}>
+  {rideDetails.end?.coordinates ? `${rideDetails.end.coordinates[1]}, ${rideDetails.end.coordinates[0]}` : "Unknown"}
+</Text>
             </View>
 
             <View style={styles.infoSection}>

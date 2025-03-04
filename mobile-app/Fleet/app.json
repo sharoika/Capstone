@@ -9,13 +9,30 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg"
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need access to your location for fleet tracking.",
+        "NSLocationAlwaysUsageDescription": "We need access to your location even when the app is in the background."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg"
+        }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -23,6 +40,13 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow MyApp to access your location at all times.",
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
@@ -39,7 +63,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "API_URL": "http://localhost:5000"
+      "API_URL": "http://10.0.2.2:5000"
     }
   }
 }

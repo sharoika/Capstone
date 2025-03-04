@@ -101,11 +101,11 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
             </View>
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Start Location</Text>
-              <Text style={styles.infoText}>{rideDetails.start}</Text>
+              <Text style={styles.infoText}></Text>
             </View>
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>End Location</Text>
-              <Text style={styles.infoText}>{rideDetails.end}</Text>
+              <Text style={styles.infoText}></Text>
             </View>
             <View style={styles.infoSection}>
               <Text style={styles.infoLabel}>Distance</Text>

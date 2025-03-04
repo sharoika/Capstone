@@ -16,6 +16,16 @@ router.post('/ride', authenticate, async (req, res) => {
     if (!riderID || !start || !end || !distance) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
+    if (
+        !start.coordinates || 
+        !Array.isArray(start.coordinates) || 
+        start.coordinates.length !== 2 || 
+        !end.coordinates || 
+        !Array.isArray(end.coordinates) || 
+        end.coordinates.length !== 2
+    ) {
+        return res.status(400).json({ message: 'Invalid location format' });
+    }
 
     const numericDistance = parseFloat(distance.replace(/[^\d.-]/g, ''));
 
@@ -26,8 +36,8 @@ router.post('/ride', authenticate, async (req, res) => {
     try {
         const ride = new Ride({
             riderID,
-            start,
-            end,
+            start: { type: 'Point', coordinates: start.coordinates },
+            end: { type: 'Point', coordinates: end.coordinates },
             distance: numericDistance, 
             status: RideStates.PROPOSED,
         });
@@ -264,6 +274,8 @@ router.get('/rides/:rideID/status', authenticate, async (req, res) => {
             status: ride.status, 
             isCompleted: ride.status === RideStates.COMPLETED, 
             isInProgress: ride.status === RideStates.INPROGRESS,
+            start: ride.start,
+            end: ride.end,
         });
     } catch (error) {
         console.error('Error checking ride status:', error.message);

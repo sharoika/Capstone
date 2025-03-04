@@ -14,10 +14,12 @@ const driverSchema = new mongoose.Schema({
     password: { type: String, required: true },
     homeLocation: { type: String },
     currentLocation: {
-        lat: { type: Number, required: true, default: 0 },
-        long: { type: Number, required: true, default: 0 }
-    },
-    
+      type: { type: String, enum: ['Point'], required: true },  
+      coordinates: {
+          type: [Number], 
+          required: true
+      }
+  },
     profilePicture: { type: String },
     
     farePrice: { type: Number, default: 0 },

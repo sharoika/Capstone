@@ -73,12 +73,11 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       style={styles.card}
       onPress={() => handleClaimRide(item._id)}
     >
-      <Text style={styles.cardTitle}>Start: {item.start}</Text>
-      <Text style={styles.cardSubtitle}>End: {item.end}</Text>
+      <Text style={styles.cardTitle}>Start: Lat {item.start.coordinates[0]}, Long {item.start.coordinates[1]}</Text>
+      <Text style={styles.cardSubtitle}>End: Lat {item.end.coordinates[0]}, Long {item.end.coordinates[1]}</Text>
       <Text style={styles.cardDetails}>Date: {item.date}</Text>
     </TouchableOpacity>
   );
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Rides for Driver</Text>

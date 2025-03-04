@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
-import * as Location from 'expo-location';
 import Constants from 'expo-constants'
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
@@ -14,38 +13,45 @@ interface TravelToRideStepProps {
 
 const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, token, onRideStarted }) => {
   const [rideInProgress, setRideInProgress] = useState(false);
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [region, setRegion] = useState<Region | null>(null);
+  const [location, setLocation] = useState<{ lat: number; long: number } | null>(null);
+  const [startLocation, setStartLocation] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchLocation = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permission Required',
-          'Location access is needed to show your position on the map.',
-        );
-        return;
+  const region: Region | undefined = location
+    ? {
+        latitude: location.lat,
+        longitude: location.long,
+        latitudeDelta: 0.0012,  
+        longitudeDelta: 0.0061, 
       }
+    : undefined;
 
-      const userLocation = await Location.getCurrentPositionAsync({});
-      setLocation(userLocation);
-      setRegion({
-        latitude: userLocation.coords.latitude,
-        longitude: userLocation.coords.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+  const fetchLocation = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/location/getOne?userId=${driverID}&userType=driver`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       });
-    };
 
-    fetchLocation();
-
-    const interval = setInterval(() => {
-      checkRideStatus();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.location) {
+          setLocation(data.location); 
+        } else {
+          Alert.alert('Error', 'Location not found.');
+        }
+      } else {
+        const errorData = await response.json();
+        console.error('Error fetching location:', errorData);
+        Alert.alert('Error', errorData.message || 'Failed to fetch location.');
+      }
+    } catch (error) {
+      console.error('Error fetching location:', error);
+      Alert.alert('Error', 'An error occurred while fetching location.');
+    }
+  };
 
   const checkRideStatus = async () => {
     try {
@@ -59,6 +65,9 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
       }
 
       const data = await response.json();
+      console.log(data);
+      setStartLocation(data.start);
+      console.log(startLocation);
       if (data.isInProgress) {
         setRideInProgress(true);
         onRideStarted(); 
@@ -67,6 +76,11 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
       console.error('Error checking ride status:', error);
     }
   };
+
+  useEffect(() => {
+    fetchLocation(); 
+    checkRideStatus();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -84,8 +98,8 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
           {location && (
             <Marker
               coordinate={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
+                latitude: location.lat,
+                longitude: location.long,
               }}
               title="You are here"
             />
