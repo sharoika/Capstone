@@ -1,0 +1,37 @@
+:root {
+    /* Light theme variables */
+    --primary-color: #4A90E2;
+    --secondary-color: #39c9c2;
+    --text-color: #333333;
+    --text-secondary: #666666;
+    --bg-color: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --border-color: #e0e0e0;
+    --toggle-bg: rgba(74, 144, 226, 0.1);
+    --gradient-primary: linear-gradient(135deg, #4A90E2 0%, #39c9c2 100%);
+    --gradient-secondary: linear-gradient(to right, #f8f9fa, #ffffff);
+    --hero-text-color: white;
+    --hero-text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --navbar-toggler-color: #333333;
+}
+
+/* Dark theme variables */
+[data-theme='dark'] {
+    --primary-color: #5a9ff0;
+    --secondary-color: #4ad8d1;
+    --text-color: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --bg-color: #121212;
+    --bg-secondary: #1e1e1e;
+    --card-bg: rgba(30, 30, 30, 0.9);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    --border-color: #333333;
+    --toggle-bg: rgba(255, 215, 0, 0.1);
+    --gradient-primary: linear-gradient(135deg, #5a9ff0 0%, #4ad8d1 100%);
+    --gradient-secondary: linear-gradient(to right, #1e1e1e, #121212);
+    --hero-text-color: white;
+    --hero-text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --navbar-toggler-color: #e0e0e0;
+} 

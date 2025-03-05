@@ -1,3 +1,5 @@
+@import '../styles/variables.css';
+
 .navbar {
   background-color: #ffffff !important;
 }
@@ -35,5 +37,97 @@
 .btn-primary:hover {
   background-color: #0056b3;
   border-color: #0056b3;
+}
+
+.navbar-custom {
+    background-color: var(--bg-color) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-height: 70px;
+    transition: all 0.3s ease;
+}
+
+.navbar-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.brand-text {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+.nav-link {
+    font-size: 1.2rem;
+    color: var(--text-color) !important;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Dark mode specific styles */
+[data-theme='dark'] .navbar-custom {
+    background-color: #121212 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .navbar-toggler {
+    border-color: var(--border-color);
+}
+
+[data-theme='dark'] .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* Fix for mobile dropdown menu */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background-color: var(--bg-color);
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .navbar-logo {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .brand-text {
+        font-size: 1.5rem;
+    }
+    
+    .nav-link {
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .nav-link:last-child {
+        border-bottom: none;
+    }
+    
+    /* Ensure the toggler button is visible */
+    .navbar-toggler {
+        border: 1px solid var(--border-color);
+        padding: 5px 10px;
+    }
+    
+    .navbar-toggler:focus {
+        box-shadow: none;
+        outline: none;
+    }
+    
+    /* Dark mode specific styles for mobile */
+    [data-theme='dark'] .navbar-collapse {
+        background-color: #121212;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
 }
 
