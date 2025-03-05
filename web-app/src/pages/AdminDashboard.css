@@ -18,11 +18,11 @@ css .admin-dashboard {
     border: none;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
+    transition: none;
 }
 
 .dashboard-card:hover {
-    transform: translateY(-5px);
+    transform: none;
 }
 
 .card-header {
@@ -35,9 +35,9 @@ css .admin-dashboard {
     font-weight: 500;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.admin-dashboard .btn:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 .table {
@@ -109,11 +109,14 @@ css .admin-dashboard {
     padding: 0.375rem 1rem;
     font-weight: 500;
     border-radius: 0.375rem;
+    transition: none;
 }
 
 .dropdown-toggle.btn-primary:hover {
     background-color: #1d4ed8;
     border-color: #1d4ed8;
+    transform: none;
+    box-shadow: none;
 }
 
 @media (max-width: 768px) {

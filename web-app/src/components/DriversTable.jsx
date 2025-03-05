@@ -2,7 +2,7 @@ import React from 'react';
 import { Dropdown, Button } from 'react-bootstrap';
 import SortableTable from './SortableTable';
 
-const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverClick, onDeleteDriver }) => {
+const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverClick, onDeleteDriver, tableId }) => {
   const columns = [
     { key: 'name', label: 'Name', sortable: true, accessor: (driver) => `${driver.firstName} ${driver.lastName}` },
     { key: 'email', label: 'Email', sortable: true },
@@ -14,7 +14,7 @@ const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverCl
   ];
 
   return (
-    <SortableTable columns={columns} data={drivers}>
+    <SortableTable columns={columns} data={drivers} tableId={tableId || "admin-drivers-table"}>
       {(sortedDrivers) => 
         sortedDrivers.map((driver) => (
           <tr key={driver._id}>

@@ -4,6 +4,8 @@ import axios from 'axios';
 import RiderEditModal from '../components/RiderEditModal';
 import AdminHeader from '../components/AdminHeader';
 import SortableTable from '../components/SortableTable';
+import '../styles/AdminButtonReset.css';
+import '../styles/AdminFadeReset.css';
 
 const AdminRiders = () => {
     const [riders, setRiders] = useState([]);
@@ -65,10 +67,10 @@ const AdminRiders = () => {
     ];
 
     return (
-        <div>
+        <div className="admin-dashboard">
             <AdminHeader title="Admin Panel: Riders" />
             <Container className="py-4">
-                <SortableTable columns={columns} data={riders}>
+                <SortableTable columns={columns} data={riders} tableId="admin-riders-table">
                     {(sortedRiders) => 
                         sortedRiders.map((rider) => (
                             <tr key={rider._id}>

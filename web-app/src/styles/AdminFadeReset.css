@@ -1,0 +1,108 @@
+/* Reset for fade-in animations in admin panels */
+
+/* Target Bootstrap fade animations */
+.admin-dashboard .fade,
+.admin-dashboard .fade.show,
+.admin-dashboard .fade.in,
+.admin-dashboard .collapse,
+.admin-dashboard .collapse.show,
+.admin-dashboard .collapsing {
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+}
+
+/* Target table rows to prevent any fade effects */
+.admin-dashboard table tr,
+.admin-dashboard .table tr,
+.admin-dashboard tbody tr {
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+}
+
+/* Target modal animations */
+.admin-dashboard .modal,
+.admin-dashboard .modal-dialog,
+.admin-dashboard .modal-content,
+.admin-dashboard .modal.fade .modal-dialog,
+.admin-dashboard .modal.show .modal-dialog {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+}
+
+/* Specific override for Bootstrap modal fade */
+.modal.fade .modal-dialog {
+    transition: none !important;
+    transform: none !important;
+}
+
+.modal.fade.show .modal-dialog {
+    transform: none !important;
+}
+
+/* Target dropdown animations */
+.admin-dashboard .dropdown-menu,
+.admin-dashboard .dropdown-menu.show {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+}
+
+/* Target any Bootstrap components that might have animations */
+.admin-dashboard .alert,
+.admin-dashboard .toast,
+.admin-dashboard .progress,
+.admin-dashboard .carousel,
+.admin-dashboard .spinner-border,
+.admin-dashboard .spinner-grow {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Ensure no animations on table loading or data changes */
+.admin-dashboard table {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Override any React transition group animations */
+.admin-dashboard .fade-enter,
+.admin-dashboard .fade-enter-active,
+.admin-dashboard .fade-exit,
+.admin-dashboard .fade-exit-active,
+.admin-dashboard .slide-enter,
+.admin-dashboard .slide-enter-active,
+.admin-dashboard .slide-exit,
+.admin-dashboard .slide-exit-active {
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+}
+
+/* Specifically target the riders and drivers tables */
+#admin-riders-table tr,
+#admin-drivers-table tr,
+.admin-riders-table tr,
+.admin-drivers-table tr {
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+}
+
+/* Override Bootstrap's fade transition for modals in admin pages */
+.admin-dashboard .modal-backdrop,
+.admin-dashboard .modal-backdrop.show,
+.admin-dashboard .modal-backdrop.fade {
+    transition: none !important;
+    opacity: 0.5 !important;
+}
+
+/* Ensure modal content appears immediately */
+.admin-dashboard .modal-content {
+    animation: none !important;
+    transition: none !important;
+} 

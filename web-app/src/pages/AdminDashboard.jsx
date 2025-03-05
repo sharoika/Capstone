@@ -5,6 +5,7 @@ import { Container, Row, Col, Card } from 'react-bootstrap';
 import ConfigModal from '../components/ConfigModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminDashboard.css';
+import '../styles/AdminButtonReset.css';
 import AdminHeader from '../components/AdminHeader';
 
 const AdminDashboard = () => {

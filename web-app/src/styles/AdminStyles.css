@@ -5,13 +5,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease-in-out;
+  transition: none;
   font-weight: 500;
 }
 
 .admin-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: none;
+  box-shadow: none;
 }
 
 .admin-btn.btn-sm {
@@ -25,4 +25,30 @@
 
 .card-body .admin-btn {
   margin: 0 0.5rem;
+}
+
+.admin-dashboard .btn {
+  transition: none !important;
+}
+
+.admin-dashboard .btn:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.admin-dashboard .dropdown-toggle.btn-primary {
+  transition: none !important;
+}
+
+.admin-dashboard .dropdown-toggle.btn-primary:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.admin-dashboard .dashboard-card {
+  transition: none !important;
+}
+
+.admin-dashboard .dashboard-card:hover {
+  transform: none !important;
 } 

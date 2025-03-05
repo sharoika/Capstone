@@ -3,6 +3,7 @@ import { Container } from 'react-bootstrap';
 import axios from 'axios';
 import AdminHeader from '../components/AdminHeader';
 import SortableTable from '../components/SortableTable';
+import '../styles/AdminButtonReset.css';
 
 const AdminPayments = () => {
     const [rides, setRides] = useState([]);

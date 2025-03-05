@@ -4,6 +4,8 @@ import axios from 'axios';
 import DriversTable from '../components/DriversTable';
 import DriverEditModal from '../components/DriverEditModal';
 import AdminHeader from '../components/AdminHeader';
+import '../styles/AdminButtonReset.css';
+import '../styles/AdminFadeReset.css';
 
 const AdminDrivers = () => {
     const [drivers, setDrivers] = useState([]);
@@ -102,7 +104,7 @@ const AdminDrivers = () => {
     };
 
     return (
-        <div>
+        <div className="admin-dashboard">
             <AdminHeader title="Admin Panel: Drivers" />
             <Container className="py-4">
                 <DriversTable 

@@ -1,0 +1,109 @@
+/* Admin Button Animation Reset */
+
+/* Target all buttons in admin sections */
+.admin-dashboard button,
+.admin-dashboard .btn,
+.admin-dashboard .admin-btn,
+.admin-dashboard .dropdown-toggle,
+.admin-dashboard a.btn {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Remove hover animations */
+.admin-dashboard button:hover,
+.admin-dashboard .btn:hover,
+.admin-dashboard .admin-btn:hover,
+.admin-dashboard .dropdown-toggle:hover,
+.admin-dashboard a.btn:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+/* Remove focus animations */
+.admin-dashboard button:focus,
+.admin-dashboard .btn:focus,
+.admin-dashboard .admin-btn:focus,
+.admin-dashboard .dropdown-toggle:focus,
+.admin-dashboard a.btn:focus {
+    transform: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+/* Remove active animations */
+.admin-dashboard button:active,
+.admin-dashboard .btn:active,
+.admin-dashboard .admin-btn:active,
+.admin-dashboard .dropdown-toggle:active,
+.admin-dashboard a.btn:active {
+    transform: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+/* Target Bootstrap specific button classes */
+.admin-dashboard .btn-primary,
+.admin-dashboard .btn-secondary,
+.admin-dashboard .btn-success,
+.admin-dashboard .btn-danger,
+.admin-dashboard .btn-warning,
+.admin-dashboard .btn-info,
+.admin-dashboard .btn-light,
+.admin-dashboard .btn-dark,
+.admin-dashboard .btn-outline-primary,
+.admin-dashboard .btn-outline-secondary,
+.admin-dashboard .btn-outline-success,
+.admin-dashboard .btn-outline-danger,
+.admin-dashboard .btn-outline-warning,
+.admin-dashboard .btn-outline-info,
+.admin-dashboard .btn-outline-light,
+.admin-dashboard .btn-outline-dark {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Target Bootstrap specific button classes on hover */
+.admin-dashboard .btn-primary:hover,
+.admin-dashboard .btn-secondary:hover,
+.admin-dashboard .btn-success:hover,
+.admin-dashboard .btn-danger:hover,
+.admin-dashboard .btn-warning:hover,
+.admin-dashboard .btn-info:hover,
+.admin-dashboard .btn-light:hover,
+.admin-dashboard .btn-dark:hover,
+.admin-dashboard .btn-outline-primary:hover,
+.admin-dashboard .btn-outline-secondary:hover,
+.admin-dashboard .btn-outline-success:hover,
+.admin-dashboard .btn-outline-danger:hover,
+.admin-dashboard .btn-outline-warning:hover,
+.admin-dashboard .btn-outline-info:hover,
+.admin-dashboard .btn-outline-light:hover,
+.admin-dashboard .btn-outline-dark:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+/* Target dropdown buttons specifically */
+.admin-dashboard .dropdown-toggle::after {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Target any button with an icon */
+.admin-dashboard .btn i,
+.admin-dashboard .btn svg,
+.admin-dashboard .admin-btn i,
+.admin-dashboard .admin-btn svg {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Ensure no animations on button children */
+.admin-dashboard .btn *,
+.admin-dashboard .admin-btn * {
+    transition: none !important;
+    animation: none !important;
+} 

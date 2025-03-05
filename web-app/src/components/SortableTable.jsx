@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Table } from 'react-bootstrap';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
-const SortableTable = ({ columns, data, children }) => {
+const SortableTable = ({ columns, data, children, tableId }) => {
   const [sortConfig, setSortConfig] = useState({
     key: null,
     direction: 'none'
@@ -72,7 +72,7 @@ const SortableTable = ({ columns, data, children }) => {
   }, [data, sortConfig, columns]);
 
   return (
-    <Table responsive hover className="mb-0">
+    <Table responsive hover className="mb-0" id={tableId}>
       <thead>
         <tr>
           {columns.map((column) => (
