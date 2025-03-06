@@ -228,6 +228,10 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
             }
         }
 
+        if (rider && driver) {
+            await chargePaymentMethod(rider.id, totalFare);
+        }
+
         res.json({
             message: 'Ride finished successfully',
             ride,
