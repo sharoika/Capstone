@@ -1,6 +1,7 @@
 const express = require("express")
 const Driver = require('../models/Driver');
 const Rider = require('../models/Rider');
+const Ride = require('../models/Ride');
 const { authenticate } = require("../middlewares/auth");
 const { selfAuthenticate } = require("../middlewares/auth");
 const router = express.Router();
@@ -260,6 +261,46 @@ router.post('/drivers/:id/profile-picture', selfAuthenticate, upload.single('pro
             message: 'Error uploading profile picture',
             error: error.message 
         });
+    }
+});
+
+router.get('/riders/:id/rides', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const rides = await Ride.find({ riderID: id })
+            .populate('riderID', 'firstName lastName email phone homeLocation profilePicture') 
+            .populate('driverID', 'firstName lastName email phone profilePicture vehicleMake vehicleModel') 
+            .exec();
+
+        if (!rides || rides.length === 0) {
+            return res.status(404).json({ message: 'No past rides found for this rider' });
+        }
+
+        res.json(rides);
+    } catch (error) {
+        console.error('Error fetching past rides for rider:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.get('/drivers/:id/rides', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const rides = await Ride.find({ driverID: id })
+            .populate('riderID', 'firstName lastName email phone homeLocation profilePicture') 
+            .populate('driverID', 'firstName lastName email phone profilePicture vehicleMake vehicleModel') 
+            .exec();
+
+        if (!rides || rides.length === 0) {
+            return res.status(404).json({ message: 'No past rides found for this driver' });
+        }
+
+        res.json(rides);
+    } catch (error) {
+        console.error('Error fetching past rides for driver:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

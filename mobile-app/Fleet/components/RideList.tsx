@@ -4,13 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import ThemedText from './ThemedText';
 import ThemedView from './ThemedView';
 
-interface Receipt {
+interface Ride {
   _id: string;
-  receiptNumber: string;
   timestamp: string;
-  totalAmount: number;
   pickupLocation: string;
   dropoffLocation: string;
+  status: string;
+  distance: number;
+  vehicleDetails?: string;
   driverID?: {
     firstName: string;
     lastName: string;
@@ -21,20 +22,20 @@ interface Receipt {
   };
 }
 
-interface ReceiptListProps {
-  receipts: Receipt[];
+interface RideListProps {
+  rides: Ride[];
   loading: boolean;
-  onSelectReceipt: (receiptId: string) => void;
+  onSelectRide: (rideId: string) => void;
   userType: 'rider' | 'driver';
   emptyMessage?: string;
 }
 
-const ReceiptList: React.FC<ReceiptListProps> = ({
-  receipts,
+const RideList: React.FC<RideListProps> = ({
+  rides,
   loading,
-  onSelectReceipt,
+  onSelectRide,
   userType,
-  emptyMessage = 'No receipts found'
+  emptyMessage = 'No rides found'
 }) => {
   if (loading) {
     return (
@@ -44,21 +45,21 @@ const ReceiptList: React.FC<ReceiptListProps> = ({
     );
   }
 
-  if (receipts.length === 0) {
+  if (rides.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="receipt-outline" size={64} color="#ccc" />
+        <Ionicons name="car-outline" size={64} color="#ccc" />
         <ThemedText style={styles.emptyText}>{emptyMessage}</ThemedText>
       </View>
     );
   }
 
-  const renderItem = ({ item }: { item: Receipt }) => {
+  const renderItem = ({ item }: { item: Ride }) => {
     const date = new Date(item.timestamp).toLocaleDateString();
     const time = new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    // Display the name of the other party (driver for rider, rider for driver)
-    const otherPartyName = userType === 'rider' && item.driverID 
+
+    // Determine the other party's name
+    const otherPartyName = userType === 'rider' && item.driverID
       ? `${item.driverID.firstName} ${item.driverID.lastName}`
       : userType === 'driver' && item.riderID
         ? `${item.riderID.firstName} ${item.riderID.lastName}`
@@ -66,33 +67,35 @@ const ReceiptList: React.FC<ReceiptListProps> = ({
 
     return (
       <TouchableOpacity 
-        style={styles.receiptItem} 
-        onPress={() => onSelectReceipt(item._id)}
+        style={styles.rideItem} 
+        onPress={() => onSelectRide(item._id)}
       >
-        <View style={styles.receiptHeader}>
-          <ThemedText style={styles.receiptDate}>{date}</ThemedText>
-          <ThemedText style={styles.receiptTime}>{time}</ThemedText>
+        <View style={styles.rideHeader}>
+          <ThemedText style={styles.rideDate}>{date}</ThemedText>
+          <ThemedText style={styles.rideTime}>{time}</ThemedText>
         </View>
         
-        <View style={styles.receiptDetails}>
+        <View style={styles.rideDetails}>
           <View style={styles.locationContainer}>
             <ThemedText numberOfLines={1} style={styles.locationText}>
               {item.pickupLocation} → {item.dropoffLocation}
             </ThemedText>
           </View>
-          
+
           {otherPartyName && (
             <ThemedText style={styles.personName}>
               {userType === 'rider' ? 'Driver' : 'Rider'}: {otherPartyName}
             </ThemedText>
           )}
+
+          <ThemedText style={styles.rideStatus}>Status: {item.status}</ThemedText>
         </View>
         
-        <View style={styles.receiptFooter}>
-          <ThemedText style={styles.receiptNumber}>#{item.receiptNumber}</ThemedText>
-          <ThemedText style={styles.receiptAmount}>${item.totalAmount.toFixed(2)}</ThemedText>
+        <View style={styles.rideFooter}>
+          <ThemedText style={styles.rideDistance}>{item.distance.toFixed(1)} km</ThemedText>
+          {item.vehicleDetails && <ThemedText style={styles.vehicleDetails}>{item.vehicleDetails}</ThemedText>}
         </View>
-        
+
         <Ionicons 
           name="chevron-forward" 
           size={20} 
@@ -106,7 +109,7 @@ const ReceiptList: React.FC<ReceiptListProps> = ({
   return (
     <ThemedView style={styles.container}>
       <FlatList
-        data={receipts}
+        data={rides}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
         showsVerticalScrollIndicator={false}
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
   },
-  receiptItem: {
+  rideItem: {
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
@@ -152,21 +155,21 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  receiptHeader: {
+  rideHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
   },
-  receiptDate: {
+  rideDate: {
     fontSize: 14,
     fontWeight: '500',
     color: '#173252',
   },
-  receiptTime: {
+  rideTime: {
     fontSize: 14,
     color: '#666',
   },
-  receiptDetails: {
+  rideDetails: {
     marginBottom: 12,
   },
   locationContainer: {
@@ -180,19 +183,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
-  receiptFooter: {
+  rideStatus: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#173252',
+  },
+  rideFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 8,
   },
-  receiptNumber: {
-    fontSize: 12,
+  rideDistance: {
+    fontSize: 14,
     color: '#666',
   },
-  receiptAmount: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#173252',
+  vehicleDetails: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
   },
   chevron: {
     position: 'absolute',
@@ -202,4 +211,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReceiptList;
+export default RideList;
