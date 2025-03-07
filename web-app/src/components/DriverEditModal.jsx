@@ -35,7 +35,7 @@ const DriverEditModal = ({ show, onHide, driver, onUpdate }) => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `${process.env.API_URL}/api/admin/drivers/${driver._id}`,
+                `${process.env.REACT_APP_API_URL}/api/admin/drivers/${driver._id}`,
                 formData,
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );

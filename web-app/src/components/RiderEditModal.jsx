@@ -29,7 +29,7 @@ const RiderEditModal = ({ show, onHide, rider, onUpdate }) => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `${process.env.API_URL}/api/admin/riders/${rider._id}`,
+                `${process.env.REACT_APP_API_URL}/api/admin/riders/${rider._id}`,
                 formData,
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
