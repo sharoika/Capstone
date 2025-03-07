@@ -1,190 +1,130 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Modal, View, TouchableOpacity, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react'; 
+import { StyleSheet, Modal, View, TouchableOpacity, FlatList, Text, Platform } from 'react-native';
 import { useColorScheme } from 'react-native';
 import ThemedText from '../../components/ThemedText';
 import ThemedView from '../../components/ThemedView';
-import ReceiptList from '../../components/ReceiptList';
-import Receipt from '../../components/Receipt';
 import { Ionicons } from '@expo/vector-icons';
-import axios from 'axios';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = Constants.expoConfig?.extra?.API_URL;
 
-// Utility function to get item from SecureStore (mobile) or localStorage (web)
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
+
+interface User {
+  _id: string;
+  type: string;
+}
+
+interface Ride {
+  _id: string;
+  start: { type: string; coordinates: [number, number] };
+  end: { type: string; coordinates: [number, number] };
+  status: string;
+  fare: number;
+  stripeTransactionId: string;
+  stripeTransactionTime: string;
+}
+
 const getItemAsync = async (key: string): Promise<string | null> => {
-  if (Platform.OS === 'web') {
-    return localStorage.getItem(key);
-  } else {
-    return await SecureStore.getItemAsync(key);
-  }
+  return Platform.OS === 'web' ? localStorage.getItem(key) : await SecureStore.getItemAsync(key);
 };
 
-export default function ReceiptsScreen() {
+export default function RidesScreen() {
   const colorScheme = useColorScheme();
   const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
-  const [receipts, setReceipts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedReceipt, setSelectedReceipt] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [error, setError] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [rides, setRides] = useState<Ride[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const loadAuthData = async () => {
       try {
-        const storedUserType = await getItemAsync('userType');
-        console.log('User type:', storedUserType);
-        
-        let storedToken, storedUserId;
-        
-        if (storedUserType === 'rider') {
-          storedToken = await getItemAsync('userToken');
-          storedUserId = await getItemAsync('userObjectId');
-          console.log('Rider ID from userObjectId:', storedUserId);
-        } else if (storedUserType === 'driver') {
-          storedToken = await getItemAsync('driverToken');
-          storedUserId = await getItemAsync('driverID');
-          console.log('Driver ID from driverID:', storedUserId);
+        const userType = await getItemAsync("userType");
+        if (!userType) return;
+
+        let userToken = null;
+        let userId = null;
+
+        if (userType === 'driver') {
+          userToken = await getItemAsync("driverToken");
+          userId = await getItemAsync("driverID");
+        } else {
+          userToken = await getItemAsync("userToken");
+          userId = await getItemAsync("userObjectId");
         }
-        
-        console.log('Token exists:', !!storedToken);
-        console.log('User ID:', storedUserId);
-        
-        if (storedToken && storedUserId) {
-          setToken(storedToken);
-          setUser({
-            _id: storedUserId,
-            type: storedUserType
-          });
+
+        if (userToken && userId) {
+          setToken(userToken);
+          setUser({ _id: userId, type: userType });
         }
       } catch (error) {
-        console.error('Error loading auth data:', error);
+        console.error("Error loading auth data:", error);
       }
     };
-    
     loadAuthData();
   }, []);
 
   useEffect(() => {
     if (token && user) {
-      fetchReceipts();
+      fetchRides();
     }
   }, [token, user]);
 
-  const fetchReceipts = async () => {
+  const fetchRides = async () => {
     if (!token || !user) return;
-    
     setLoading(true);
     setError('');
-    
     try {
-      let endpoint = '';
-      const userType = user.type?.toLowerCase() || 'rider';
-      
-      if (userType === 'rider') {
-        endpoint = `${API_URL}/api/receipt/receipts/rider/${user._id}`;
-      } else if (userType === 'driver') {
-        endpoint = `${API_URL}/api/receipt/receipts/driver/${user._id}`;
-      }
-      
-      console.log('Fetching receipts from:', endpoint);
-      console.log('Using token:', token.substring(0, 10) + '...');
-      
-      const response = await axios.get(endpoint, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const endpoint = user.type === 'driver' 
+        ? `${apiUrl}/api/user/drivers/${user._id}/rides` 
+        : `${apiUrl}/api/user/riders/${user._id}/rides`;
+
+      const response = await fetch(endpoint, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
-      console.log('Receipts response:', response.data);
-      setReceipts(response.data);
+      if (!response.ok) throw new Error('Failed to fetch rides');
+      const data: Ride[] = await response.json();
+      setRides(data);
     } catch (err) {
-      console.error('Error fetching receipts:', err);
-      setError('Failed to load receipts. Please try again later.');
+      console.error('Error fetching rides:', err);
+      setError('Failed to load rides. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectReceipt = async (receiptId) => {
-    try {
-      console.log(`Fetching receipt details for ID: ${receiptId}`);
-      
-      const response = await axios.get(`${API_URL}/api/receipt/receipts/${receiptId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      console.log('Receipt details response:', response.data);
-      
-      // Ensure driverID is populated properly
-      if (!response.data.driverID || typeof response.data.driverID !== 'object') {
-        console.warn('Driver information is missing or not properly populated');
-        // Create a placeholder if driverID is not populated
-        response.data.driverID = { 
-          firstName: 'Unknown',
-          lastName: 'Driver'
-        };
-      }
-      
-      setSelectedReceipt(response.data);
-      setModalVisible(true);
-    } catch (err) {
-      console.error('Error fetching receipt details:', err);
-      setError('Failed to load receipt details. Please try again.');
-    }
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setSelectedReceipt(null);
-  };
-
-  const userType = user?.type?.toLowerCase() || 'rider';
-
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <ThemedText style={styles.title}>Receipts</ThemedText>
-        <TouchableOpacity style={styles.refreshButton} onPress={fetchReceipts}>
-          <Ionicons 
-            name="refresh" 
-            size={22} 
-            color={colorScheme === 'dark' ? '#fff' : '#173252'} 
-          />
+        <ThemedText style={styles.title}>Rides</ThemedText>
+        <TouchableOpacity style={styles.refreshButton} onPress={fetchRides}>
+          <Ionicons name="refresh" size={22} color={colorScheme === 'dark' ? '#fff' : '#173252'} />
         </TouchableOpacity>
       </View>
-      
       {error ? (
         <View style={styles.errorContainer}>
           <ThemedText style={styles.errorText}>{error}</ThemedText>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchReceipts}>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchRides}>
             <ThemedText style={styles.retryButtonText}>Retry</ThemedText>
           </TouchableOpacity>
         </View>
       ) : (
-        <ReceiptList
-          receipts={receipts}
-          loading={loading}
-          onSelectReceipt={handleSelectReceipt}
-          userType={userType}
-          emptyMessage={`No receipts found for your ${userType === 'rider' ? 'rides' : 'trips'}`}
+        <FlatList
+          data={rides}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View style={styles.rideItem}>
+            <ThemedText>Status: {item.status}</ThemedText>
+            <ThemedText>Fare: ${item.fare / 100}</ThemedText>
+            <ThemedText>Transaction ID: {item.stripeTransactionId}</ThemedText>
+            <ThemedText>
+              Transaction Time: {item.stripeTransactionTime ? new Date(item.stripeTransactionTime).toLocaleString() : 'N/A'}
+            </ThemedText>
+          </View>
+          )}
         />
       )}
-      
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={closeModal}
-      >
-        {selectedReceipt && (
-          <Receipt receipt={selectedReceipt} onClose={closeModal} />
-        )}
-      </Modal>
     </ThemedView>
   );
 }
@@ -231,5 +171,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '500',
+  },
+  rideItem: {
+    backgroundColor: '#fff',
+    padding: 16,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
 });

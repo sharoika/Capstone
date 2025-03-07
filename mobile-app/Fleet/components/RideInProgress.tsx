@@ -22,7 +22,22 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
   
   const mapRef = useRef<MapView>(null)
   const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'
-
+  useEffect(() => {
+    if (routeCoordinates.length > 0 && mapRef.current) {
+      const startCoords = routeCoordinates[0];
+      const endCoords = routeCoordinates[routeCoordinates.length - 1];
+  
+      const region = {
+        latitude: (startCoords.latitude + endCoords.latitude) / 2,
+        longitude: (startCoords.longitude + endCoords.longitude) / 2,
+        latitudeDelta: Math.abs(startCoords.latitude - endCoords.latitude) * 1.5,
+        longitudeDelta: Math.abs(startCoords.longitude - endCoords.longitude) * 1.5,
+      };
+  
+      mapRef.current.animateToRegion(region, 1000);
+    }
+  }, [routeCoordinates]);
+  
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY)
     fetchRideDetails()
@@ -41,15 +56,17 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
       })
 
       if (!response.ok) {
-        throw new Error("Failed to fetch ride details")
+        throw new Error("Failed to fetch rid")
+       
       }
-
+      console.log(response);
       const data = await response.json()
       setRideDetails(data)
       await updateMapRoute(data.start, data.end)
     } catch (err) {
-      setError("Error fetching ride details")
+      setError("Error fetch details")
       console.error("Error:", err)
+      console.log(err);
     } finally {
       setLoading(false)
     }

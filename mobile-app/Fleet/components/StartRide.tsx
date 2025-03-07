@@ -28,45 +28,33 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   useEffect(() => {
     const fetchCoordinates = async () => {
       try {
-        if (!rideDetails?.start?.coordinates || !rideDetails?.end?.coordinates) {
-          console.error("Missing start or end coordinates:", rideDetails);
+        if (!rideDetails?.start?.coordinates || !rideDetails?.driver?.currentLocation?.coordinates) {
           return;
         }
-  
+    
+        const driverLocation = `${rideDetails.driver.currentLocation.coordinates[1]},${rideDetails.driver.currentLocation.coordinates[0]}`;
         const startLocation = `${rideDetails.start.coordinates[1]},${rideDetails.start.coordinates[0]}`;
-        const endLocation = `${rideDetails.end.coordinates[1]},${rideDetails.end.coordinates[0]}`;
-  
+        
         const directionsResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation}&destination=${endLocation}&key=${GOOGLE_API_KEY}`
+          `https://maps.googleapis.com/maps/api/directions/json?origin=${driverLocation}&destination=${startLocation}&key=${GOOGLE_API_KEY}`
         );
-  
+    
         const directionsData = await directionsResponse.json();
-  
+    
         if (directionsData.routes.length > 0) {
           const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
           const distance = directionsData.routes[0].legs[0].distance.text;
           const distanceValue = directionsData.routes[0].legs[0].distance.value / 1000; // Convert to km
-  
+    
           setDistance(distance);
-  
-          if (rideDetails.driver && typeof rideDetails.driver.farePrice === 'number' && typeof rideDetails.driver.baseFee === 'number') {
-            const validBaseFee = !isNaN(rideDetails.driver.baseFee) ? rideDetails.driver.baseFee : 2;
-            const validFarePrice = !isNaN(rideDetails.driver.farePrice) ? rideDetails.driver.farePrice : 0;
-  
-            const distanceFare = distanceValue * validFarePrice;
-            const totalFare = parseFloat((validBaseFee + distanceFare).toFixed(2));
-  
-            console.log('Recalculated fare:', totalFare, 'using baseFee:', validBaseFee, 'farePrice:', validFarePrice, 'distance:', distanceValue);
-            setFare(totalFare);
-          }
-  
+    
+          const [driverLat, driverLng] = driverLocation.split(',').map(Number);
           const [startLat, startLng] = startLocation.split(',').map(Number);
-          const [endLat, endLng] = endLocation.split(',').map(Number);
-  
+    
           setRouteCoordinates(points);
           setRegion({
-            latitude: startLat, 
-            longitude: startLng, 
+            latitude: driverLat, 
+            longitude: driverLng, 
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           });
@@ -76,6 +64,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         Alert.alert("Error", "Failed to retrieve route coordinates.");
       }
     };
+    
   
     fetchCoordinates();
   }, [rideDetails]); 
@@ -125,7 +114,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch ride details");
+          throw new Error("Failed to fetc");
         }
 
         const data = await response.json();
@@ -152,7 +141,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
           setDistance(`${data.distance} km`);
         }
 
-        // Calculate fare
         if (data.driver?.farePrice && data.driver?.baseFee && typeof data.distance === "number") {
           const baseFee = !isNaN(data.driver.baseFee) ? data.driver.baseFee : 2;
           const farePrice = !isNaN(data.driver.farePrice) ? data.driver.farePrice : 0;

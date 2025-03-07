@@ -9,6 +9,8 @@ const RideStates = require('../models/enums/RideStates');
 const router = express.Router();
 const { authenticate } = require("../middlewares/auth");
 const axios = require('axios');
+const { chargePaymentMethod} = require('../services/payment');
+
 
 router.post('/ride', authenticate, async (req, res) => {
     const { riderID, start, end, distance } = req.body;
@@ -195,14 +197,14 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
         }
 
         // Update driver's completed rides and ledger
-        const driver = await Driver.findById(driverID);
+        const driver = await Driver.findById(ride.driverID);
         if (driver) {
             driver.completedRides.push(ride._id);
             
             // Calculate fare components
             const baseFare = driver.baseFee || 2;
             const distanceFare = ride.distance * (driver.farePrice || 1.5);
-            const totalFare = baseFare + distanceFare + parseFloat(tipAmount);
+            const totalFare = parseInt(baseFare + distanceFare + parseFloat(tipAmount))* 100;
             
             // Update ride fare
             ride.fare = totalFare;
@@ -211,27 +213,19 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
             // Update driver ledger
             driver.ledger.availableBalance += totalFare;
             await driver.save();
-            
-            // Generate receipt
-            try {
-                // Call the receipt generation endpoint
-                await axios.post(`${process.env.API_URL || 'http://localhost:5000'}/api/receipt/receipts/generate`, {
-                    rideID: ride._id
-                }, {
-                    headers: {
-                        Authorization: `Bearer ${req.headers.authorization.split(' ')[1]}`
-                    }
-                });
-            } catch (receiptError) {
-                console.error('Error generating receipt:', receiptError);
-                // Continue even if receipt generation fails
-            }
-        }
-
+        
+        console.log(rider);
+        console.log(driver);
         if (rider && driver) {
-            await chargePaymentMethod(rider.id, totalFare);
-        }
+            console.log("charging payment method");
+            const paymentIntent= await chargePaymentMethod(rider.id, totalFare);
+            console.log(paymentIntent.id);
 
+            ride.stripeTransactionId = paymentIntent.id;
+            ride.stripeTransactionTime = new Date();
+            await ride.save();
+        }
+    }
         res.json({
             message: 'Ride finished successfully',
             ride,

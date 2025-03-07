@@ -24,7 +24,8 @@ const RideSchema = new mongoose.Schema({
     status: { type: String, enum: Object.values(RideStates), default: RideStates.PROPOSED },
     cancellationStatus: { type: String, enum: Object.values(UserTypes), default: 'none' },
     tipAmount: { type: Number, default: 0 },
-    stripeTransactionId: { type: String, required: false }
+    stripeTransactionId: { type: String, required: false },
+    stripeTransactionTime: { type: Date, required: false },
 });
 
 module.exports = mongoose.model('Ride', RideSchema);

@@ -10,10 +10,10 @@ const RiderSchema = new mongoose.Schema({
   homeLocation: { type: String },
   profilePicture: { type: String },
   currentLocation: {
-    type: { type: String, enum: ['Point'], required: true },  
+    type: { type: String, enum: ['Point'], required: false },  
     coordinates: {
         type: [Number], 
-        required: true
+        required: false
     }
 },
   completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],

@@ -35,7 +35,7 @@ router.post('/attach-payment-method', async (req, res) => {
     await attachPaymentMethodFromSetupIntent(riderId);
     res.status(200).send('Payment method attached successfully');
   } catch (error) {
-    console.error('Error in /attach-payment-method:', error);
+    console.log('Error in /attach-payment-method:', error);
     res.status(500).send('Failed to attach payment method');
   }
 });
