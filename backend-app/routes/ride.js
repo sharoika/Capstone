@@ -289,11 +289,19 @@ router.get('/rides/:rideID', authenticate, async (req, res) => {
     try {
         const ride = await Ride.findById(rideID)
             .populate('riderID')
-            .populate('driverID', 'firstName lastName profilePicture farePrice baseFee');
+            .populate('driverID', 'firstName lastName profilePicture farePrice baseFee currentLocation'); // Add currentLocation to populate
 
         if (!ride) {
             return res.status(404).json({ message: 'Ride not found' });
         }
+
+        // Format the driver's location (if available)
+        const driverLocation = ride.driverID && ride.driverID.currentLocation
+            ? {
+                type: ride.driverID.currentLocation.type,
+                coordinates: ride.driverID.currentLocation.coordinates
+            }
+            : null;
 
         res.json({
             rideID: ride._id,
@@ -309,7 +317,8 @@ router.get('/rides/:rideID', authenticate, async (req, res) => {
                 lastName: ride.driverID.lastName,
                 profilePicture: ride.driverID.profilePicture,
                 farePrice: ride.driverID.farePrice || 0,
-                baseFee: ride.driverID.baseFee || 2
+                baseFee: ride.driverID.baseFee || 2,
+                currentLocation: driverLocation, // Include current location here
             } : null,
             cancellationStatus: ride.cancellationStatus,
         });
@@ -318,6 +327,7 @@ router.get('/rides/:rideID', authenticate, async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
 // Cancel a trip
 router.post('/rides/:rideID/cancel', authenticate, async (req, res) => {
     const { rideID } = req.params;

@@ -1,36 +1,78 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
-import Constants from 'expo-constants'
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import MapView, { Marker, Polyline, Region } from "react-native-maps";
+import Constants from "expo-constants";
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
+
 interface TravelToRideStepProps {
   rideID: string;
   driverID: string;
   token: string;
-  onRideStarted: () => void; 
+  onRideStarted: () => void;
 }
+
+const GOOGLE_API_KEY =  'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
 
 const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, token, onRideStarted }) => {
   const [rideInProgress, setRideInProgress] = useState(false);
   const [location, setLocation] = useState<{ lat: number; long: number } | null>(null);
-  const [startLocation, setStartLocation] = useState<string | null>(null);
+  const [startLocation, setStartLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
+  const mapRef = useRef<MapView | null>(null);
 
   const region: Region | undefined = location
     ? {
         latitude: location.lat,
         longitude: location.long,
-        latitudeDelta: 0.0012,  
-        longitudeDelta: 0.0061, 
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
       }
     : undefined;
+
+  const decodePolyline = (encoded: string) => {
+    let points = [];
+    let index = 0,
+      len = encoded.length;
+    let lat = 0,
+      lng = 0;
+
+    while (index < len) {
+      let b,
+        shift = 0,
+        result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      let dlat = result & 1 ? ~(result >> 1) : result >> 1;
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      let dlng = result & 1 ? ~(result >> 1) : result >> 1;
+      lng += dlng;
+
+      points.push({
+        latitude: lat * 1e-5,
+        longitude: lng * 1e-5,
+      });
+    }
+    return points;
+  };
 
   const fetchLocation = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/location/getOne?userId=${driverID}&userType=driver`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
@@ -38,118 +80,92 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
       if (response.ok) {
         const data = await response.json();
         if (data.location) {
-          setLocation(data.location); 
+          setLocation(data.location);
         } else {
-          Alert.alert('Error', 'Location not found.');
+          Alert.alert("Error", "Location not found.");
         }
       } else {
-        const errorData = await response.json();
-        console.error('Error fetching location:', errorData);
-        Alert.alert('Error', errorData.message || 'Failed to fetch location.');
+        Alert.alert("Error", "Failed to fetch location.");
       }
     } catch (error) {
-      console.error('Error fetching location:', error);
-      Alert.alert('Error', 'An error occurred while fetching location.');
+      Alert.alert("Error", "An error occurred while fetching location.");
+    }
+  };
+
+  const fetchRoute = async () => {
+    if (!location || !startLocation) return;
+    const origin = `${location.lat},${location.long}`;
+    const destination = `${startLocation.latitude},${startLocation.longitude}`;
+
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${GOOGLE_API_KEY}`
+      );
+      const data = await response.json();
+
+      if (data.routes.length > 0) {
+        const points = decodePolyline(data.routes[0].overview_polyline.points);
+        setRouteCoordinates(points);
+      }
+    } catch (error) {
+      console.error("Error fetching route:", error);
     }
   };
 
   const checkRideStatus = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/status`, {
-        method: 'GET',
+        method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+        throw new Error("Error fetching ride status");
       }
 
       const data = await response.json();
-      console.log(data);
-      setStartLocation(data.start);
-      console.log(startLocation);
+      setStartLocation({ latitude: data.start.coordinates[1], longitude: data.start.coordinates[0] });
       if (data.isInProgress) {
         setRideInProgress(true);
-        onRideStarted(); 
+        onRideStarted();
       }
     } catch (error) {
-      console.error('Error checking ride status:', error);
+      console.error("Error checking ride status:", error);
     }
   };
 
   useEffect(() => {
-    fetchLocation(); 
+    fetchLocation();
     checkRideStatus();
   }, []);
+
+  useEffect(() => {
+    if (location && startLocation) fetchRoute();
+  }, [location, startLocation]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Travel to Ride</Text>
-      <Text style={styles.info}>Ride ID: {rideID}</Text>
-      <Text style={styles.info}>Driver ID: {driverID}</Text>
-      <Text style={styles.status}>{rideInProgress ? 'Ride Started' : 'Waiting for ride to start...'}</Text>
-
+      {region && (
+        <MapView ref={mapRef} style={styles.map} region={region}>
+          {location && <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver" />}
+          {startLocation && <Marker coordinate={startLocation} title="Start Location" />}
+          {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />}
+        </MapView>
+      )}
       <TouchableOpacity style={styles.button} onPress={checkRideStatus}>
         <Text style={styles.buttonText}>Refresh Status</Text>
       </TouchableOpacity>
-
-      {region ? (
-        <MapView style={styles.map} region={region} showsUserLocation>
-          {location && (
-            <Marker
-              coordinate={{
-                latitude: location.lat,
-                longitude: location.long,
-              }}
-              title="You are here"
-            />
-          )}
-        </MapView>
-      ) : (
-        <Text>Loading map...</Text>
-      )}
-
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  info: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  status: {
-    fontSize: 18,
-    marginVertical: 20,
-    color: 'blue',
-  },
-  button: {
-    marginTop: 20,
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-  },
-  map: {
-    width: '100%',
-    height: 300,
-    marginTop: 20,
-  },
+  container: { flex: 1, padding: 20 },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
+  button: { marginTop: 20, backgroundColor: "#007bff", padding: 15, borderRadius: 5 },
+  buttonText: { color: "#fff", fontSize: 18 },
+  map: { width: "100%", height: 300, marginTop: 20 },
 });
 
 export default TravelToRideStep;
