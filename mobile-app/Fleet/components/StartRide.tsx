@@ -24,6 +24,38 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   const [fare, setFare] = useState<number>(0);
 
   const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+  const decodePolyline = (encoded: string) => {
+    let points = [];
+    let index = 0, len = encoded.length;
+    let lat = 0, lng = 0;
+  
+    while (index < len) {
+      let b, shift = 0, result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      let dlat = result & 1 ? ~(result >> 1) : result >> 1;
+      lat += dlat;
+  
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      let dlng = result & 1 ? ~(result >> 1) : result >> 1;
+      lng += dlng;
+  
+      points.push({
+        latitude: lat * 1e-5,
+        longitude: lng * 1e-5
+      });
+    }
+    return points;
+  };
 
   useEffect(() => {
     const fetchCoordinates = async () => {
@@ -69,38 +101,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     fetchCoordinates();
   }, [rideDetails]); 
 
-  const decodePolyline = (encoded: string) => {
-    let points = [];
-    let index = 0, len = encoded.length;
-    let lat = 0, lng = 0;
-  
-    while (index < len) {
-      let b, shift = 0, result = 0;
-      do {
-        b = encoded.charCodeAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      let dlat = result & 1 ? ~(result >> 1) : result >> 1;
-      lat += dlat;
-  
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.charCodeAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      let dlng = result & 1 ? ~(result >> 1) : result >> 1;
-      lng += dlng;
-  
-      points.push({
-        latitude: lat * 1e-5,
-        longitude: lng * 1e-5
-      });
-    }
-    return points;
-  };
 
   useEffect(() => {
     const fetchRideDetails = async () => {
@@ -125,15 +125,14 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
             latitude: data.start.coordinates[1],
             longitude: data.start.coordinates[0],
           };
-          const endLocation = {
-            latitude: data.end.coordinates[1],
-            longitude: data.end.coordinates[0],
+          const driverLocation = {
+            latitude: data.driver.currentLocation.coordinates[1],
+            longitude: data.driver.currentLocation.coordinates[0],
           };
-
-          setRouteCoordinates([startLocation, endLocation]); 
+          setRouteCoordinates([driverLocation, startLocation]); 
           setRegion({
-            latitude: startLocation.latitude,
-            longitude: startLocation.longitude,
+            latitude: driverLocation.latitude,
+            longitude: driverLocation.longitude,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           });

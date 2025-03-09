@@ -5,6 +5,7 @@ import DriverSelection from '../../components/DriverSelection';
 import StartRide from '../../components/StartRide';
 import RideInProgress from '../../components/RideInProgress';
 import RideSummary from '../../components/RideSummary'; 
+import WaitingForConfirmation from '../../components/WaitingForConfirmation';
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
@@ -70,26 +71,35 @@ const HomeScreen: React.FC = () => {
         />
       )}
       {currentStep === 3 && (
+  <WaitingForConfirmation
+    rideID={rideID}
+    token={token}
+    onConfirmed={() => {
+      setCurrentStep(4); // Move to StartRide step after confirmation
+    }}
+  />
+)}
+      {currentStep === 4 && (
         <StartRide
           rideID={rideID}
           token={token}
           onRideStarted={() => {
-            setCurrentStep(4); // Move to RideInProgress step
+            setCurrentStep(5); // Move to RideInProgress step
           }}
         />
       )}
-      {currentStep === 4 && (
+      {currentStep === 5 && (
         <RideInProgress
           rideID={rideID}
           token={token}
           onRideFinished={(details: any) => {
             console.log('Ride finished', details);
             setRideDetails(details); // Store ride details for the summary
-            setCurrentStep(5); // Move to RideSummary step
+            setCurrentStep(6); // Move to RideSummary step
           }}
         />
       )}
-      {currentStep === 5 && (
+      {currentStep === 6 && (
         <RideSummary
           rideDetails={rideDetails}
           rideID={rideID}
