@@ -30,11 +30,11 @@ router.post('/receipts/generate', authenticate, async (req, res) => {
         } catch (error) {
             // Error checking for existing receipt
         }
-        
+
         if (existingReceipt) {
-            return res.status(200).json({ 
-                message: 'Receipt already exists', 
-                receipt: existingReceipt 
+            return res.status(200).json({
+                message: 'Receipt already exists',
+                receipt: existingReceipt
             });
         }
 
@@ -93,7 +93,7 @@ router.get('/receipts/rider/:riderId', authenticate, async (req, res) => {
     try {
         // Ensure valid ObjectId
         const validRiderId = ensureValidObjectId(riderId);
-        
+
         const receipts = await Receipt.find({ riderID: validRiderId })
             .populate('driverID', 'firstName lastName vehicleMake vehicleModel')
             .sort({ timestamp: -1 });
@@ -171,7 +171,7 @@ router.get('/receipts/:receiptId', authenticate, async (req, res) => {
                         receipt.driverID = driver;
                     }
                 }
-                
+
                 if (!receipt.riderID) {
                     const Rider = require('../models/Rider');
                     const rider = await Rider.findById(receipt.riderID);
