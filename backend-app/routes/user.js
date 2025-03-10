@@ -34,7 +34,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 // Create multer upload instance
-const upload = multer({ 
+const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
@@ -44,7 +44,7 @@ const upload = multer({
 
 router.get('/rider/:id', authenticate, async (req, res) => {
     const { id } = req.params;
-    
+
     try {
         const rider = await Rider.findById(id);
         if (!rider) {
@@ -100,7 +100,7 @@ router.get('/drivers', async (req, res) => {
     }
 });
 
-router.get('/riders/:id',  async (req, res) => {
+router.get('/riders/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -109,7 +109,7 @@ router.get('/riders/:id',  async (req, res) => {
             return res.status(404).json({ message: 'Rider not found' });
         }
 
-        res.json(rider); 
+        res.json(rider);
     } catch (error) {
         console.error('Error fetching rider:', error);
         res.status(500).json({ message: 'Server error' });
@@ -158,10 +158,10 @@ router.put('/riders/:id', selfAuthenticate, async (req, res) => {
 
 router.put('/drivers/:id', selfAuthenticate, async (req, res) => {
     const { id } = req.params;
-    const { 
-        firstName, 
-        lastName, 
-        email, 
+    const {
+        firstName,
+        lastName,
+        email,
         phone,
         vehicleMake,
         vehicleModel,
@@ -215,15 +215,15 @@ router.post('/riders/:id/profile-picture', selfAuthenticate, upload.single('prof
         rider.profilePicture = req.file.path;
         await rider.save();
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Profile picture uploaded successfully',
             profilePicture: `${req.protocol}://${req.get('host')}/${req.file.path}`
         });
     } catch (error) {
         console.error('Error uploading profile picture:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Error uploading profile picture',
-            error: error.message 
+            error: error.message
         });
     }
 });
@@ -251,15 +251,15 @@ router.post('/drivers/:id/profile-picture', selfAuthenticate, upload.single('pro
         driver.profilePicture = req.file.path;
         await driver.save();
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Profile picture uploaded successfully',
             profilePicture: `${req.protocol}://${req.get('host')}/${req.file.path}`
         });
     } catch (error) {
         console.error('Error uploading profile picture:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Error uploading profile picture',
-            error: error.message 
+            error: error.message
         });
     }
 });
@@ -269,8 +269,8 @@ router.get('/riders/:id/rides', async (req, res) => {
 
     try {
         const rides = await Ride.find({ riderID: id })
-            .populate('riderID', 'firstName lastName email phone homeLocation profilePicture') 
-            .populate('driverID', 'firstName lastName email phone profilePicture vehicleMake vehicleModel') 
+            .populate('riderID', 'firstName lastName email phone homeLocation profilePicture')
+            .populate('driverID', 'firstName lastName email phone profilePicture vehicleMake vehicleModel')
             .exec();
 
         if (!rides || rides.length === 0) {
@@ -289,8 +289,8 @@ router.get('/drivers/:id/rides', async (req, res) => {
 
     try {
         const rides = await Ride.find({ driverID: id })
-            .populate('riderID', 'firstName lastName email phone homeLocation profilePicture') 
-            .populate('driverID', 'firstName lastName email phone profilePicture vehicleMake vehicleModel') 
+            .populate('riderID', 'firstName lastName email phone homeLocation profilePicture')
+            .populate('driverID', 'firstName lastName email phone profilePicture vehicleMake vehicleModel')
             .exec();
 
         if (!rides || rides.length === 0) {

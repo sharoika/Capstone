@@ -52,7 +52,7 @@ const createSetupIntent = async (riderId) => {
       { customer: setupIntent.customer },
       { apiVersion: '2020-08-27' }
     );
-    
+
     return {
       setupIntentClientSecret: setupIntent.client_secret,
       customerId: setupIntent.customer,

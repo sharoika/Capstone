@@ -32,7 +32,7 @@ router.post('/location/update', authenticate, async (req, res) => {
 
         user.currentLocation = {
             type: "Point",
-            coordinates: [long, lat] 
+            coordinates: [long, lat]
         };
 
         await user.save();

@@ -14,22 +14,22 @@ const router = express.Router();
 
 router.get("/check-admin", async (req, res) => {
   const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
-  
+
   if (!token) {
-      return res.status(401).json({ isAdmin: false, message: "Unauthorized: No token provided" });
+    return res.status(401).json({ isAdmin: false, message: "Unauthorized: No token provided" });
   }
-  
+
   try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const isAdmin = await Admin.exists({ _id: decoded.id });
-      
-      if (!isAdmin) {
-          return res.status(403).json({ isAdmin: false, message: "Forbidden: Admin access required" });
-      }
-      
-      res.json({ isAdmin: true, message: "Token belongs to an admin" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const isAdmin = await Admin.exists({ _id: decoded.id });
+
+    if (!isAdmin) {
+      return res.status(403).json({ isAdmin: false, message: "Forbidden: Admin access required" });
+    }
+
+    res.json({ isAdmin: true, message: "Token belongs to an admin" });
   } catch (error) {
-      return res.status(401).json({ isAdmin: false, message: "Unauthorized: Invalid token" });
+    return res.status(401).json({ isAdmin: false, message: "Unauthorized: Invalid token" });
   }
 });
 
@@ -46,9 +46,9 @@ router.post('/rider/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { 
-        id: rider._id, 
-        email: rider.email 
+      {
+        id: rider._id,
+        email: rider.email
       },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
@@ -57,10 +57,10 @@ router.post('/rider/login', async (req, res) => {
     return res.status(200).json({
       message: 'Login successful',
       token: token,
-      user: { 
-        id: rider._id, 
-        email: rider.email, 
-        name: rider.name 
+      user: {
+        id: rider._id,
+        email: rider.email,
+        name: rider.name
       },
     });
   } catch (error) {
@@ -112,17 +112,17 @@ router.post('/driver/login', async (req, res) => {
 
   try {
     const driver = await Driver.findOne({ email });
-    
-      if (!driver || !(await bcrypt.compare(password, driver.password))) {
+
+    if (!driver || !(await bcrypt.compare(password, driver.password))) {
       return res.status(401).json({
         message: 'Invalid credentials',
       });
     }
-    
+
     const token = jwt.sign(
-      { 
-        id: driver._id, 
-        email: driver.email 
+      {
+        id: driver._id,
+        email: driver.email
       },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }

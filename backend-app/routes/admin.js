@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const Admin = require("../models/Admin");
-const Rider= require("../models/Rider");
+const Rider = require("../models/Rider");
 const Driver = require("../models/Driver");
 const Payout = require("../models/Payout");
 
@@ -11,32 +11,9 @@ const { adminAuthenticate } = require("../middlewares/auth");
 
 const router = express.Router();
 
-
-router.get("/check-admin", async (req, res) => {
-  const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
-  
-  if (!token) {
-      return res.status(401).json({ isAdmin: false, message: "Unauthorized: No token provided" });
-  }
-  
-  try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const isAdmin = await Admin.exists({ _id: decoded.id });
-      
-      if (!isAdmin) {
-          return res.status(403).json({ isAdmin: false, message: "Forbidden: Admin access required" });
-      }
-      
-      res.json({ isAdmin: true, message: "Token belongs to an admin" });
-  } catch (error) {
-      return res.status(401).json({ isAdmin: false, message: "Unauthorized: Invalid token" });
-  }
-});
-
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
     try {
+        const { username, password } = req.body;
         const admin = await Admin.findOne({ username });
         if (!admin || await !bcrypt.compare(password, admin.password)) {
             return res.status(401).json({ message: 'Invalid credentials' });
@@ -114,7 +91,6 @@ router.put('/riders/:id', adminAuthenticate, async (req, res) => {
             return res.status(404).json({ message: 'Rider not found' });
         }
 
-        // Update fields if they exist in request
         if (firstName) rider.firstName = firstName;
         if (lastName) rider.lastName = lastName;
         if (email) rider.email = email;
@@ -131,10 +107,10 @@ router.put('/riders/:id', adminAuthenticate, async (req, res) => {
 
 router.put('/drivers/:id', adminAuthenticate, async (req, res) => {
     const { id } = req.params;
-    const { 
-        firstName, 
-        lastName, 
-        email, 
+    const {
+        firstName,
+        lastName,
+        email,
         phone,
         vehicleMake,
         vehicleModel,
@@ -148,7 +124,6 @@ router.put('/drivers/:id', adminAuthenticate, async (req, res) => {
             return res.status(404).json({ message: 'Driver not found' });
         }
 
-        // Update fields if they exist in request
         if (firstName) driver.firstName = firstName;
         if (lastName) driver.lastName = lastName;
         if (email) driver.email = email;
@@ -167,33 +142,33 @@ router.put('/drivers/:id', adminAuthenticate, async (req, res) => {
 });
 
 router.delete('/drivers/:id', adminAuthenticate, async (req, res) => {
-  const { id } = req.params;
-  try {
-    const driver = await Driver.findById(id);
-    if (!driver) {
-      return res.status(404).json({ message: 'Driver not found' });
+    const { id } = req.params;
+    try {
+        const driver = await Driver.findById(id);
+        if (!driver) {
+            return res.status(404).json({ message: 'Driver not found' });
+        }
+        await Driver.findByIdAndDelete(id);
+        res.json({ message: 'Driver deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting driver:', error);
+        res.status(500).json({ message: 'Server error' });
     }
-    await Driver.findByIdAndDelete(id);
-    res.json({ message: 'Driver deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting driver:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
 });
 
 router.delete('/riders/:id', adminAuthenticate, async (req, res) => {
-  const { id } = req.params;
-  try {
-    const rider = await Rider.findById(id);
-    if (!rider) {
-      return res.status(404).json({ message: 'Rider not found' });
+    try {
+        const { id } = req.params;
+        const rider = await Rider.findById(id);
+        if (!rider) {
+            return res.status(404).json({ message: 'Rider not found' });
+        }
+        await Rider.findByIdAndDelete(id);
+        res.json({ message: 'Rider deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting rider:', error);
+        res.status(500).json({ message: 'Server error' });
     }
-    await Rider.findByIdAndDelete(id);
-    res.json({ message: 'Rider deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting rider:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
 });
 
 router.get('/payout-requests', adminAuthenticate, async (req, res) => {

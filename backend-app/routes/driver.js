@@ -10,7 +10,7 @@ router.get('/earnings', authenticate, async (req, res) => {
         const driver = await Driver.findById(req.user.id)
             .select('ledger')
             .populate('ledger.transactions.rideID');
-        
+
         if (!driver) {
             return res.status(404).json({ message: 'Driver not found' });
         }
@@ -26,7 +26,7 @@ router.post('/payout-request', authenticate, async (req, res) => {
 
     try {
         const driver = await Driver.findById(req.user.id);
-        
+
         if (!driver || driver.ledger.availableBalance < amount) {
             return res.status(400).json({ message: 'Insufficient balance' });
         }
@@ -41,11 +41,11 @@ router.post('/payout-request', authenticate, async (req, res) => {
 
         // Update driver's ledger
         driver.ledger.availableBalance -= amount;
-        
+
         await Promise.all([payout.save(), driver.save()]);
 
-        res.json({ 
-            message: 'Payout request submitted', 
+        res.json({
+            message: 'Payout request submitted',
             ledger: driver.ledger,
             payout: payout
         });
@@ -58,7 +58,7 @@ router.post('/payout-request', authenticate, async (req, res) => {
 router.put('/fare', authenticate, async (req, res) => {
     try {
         const { farePrice, baseFee } = req.body;
-        
+
         if (typeof farePrice !== 'number' || farePrice < 0 || typeof baseFee !== 'number' || baseFee < 0) {
             return res.status(400).json({ message: 'Invalid price values' });
         }
@@ -72,7 +72,7 @@ router.put('/fare', authenticate, async (req, res) => {
         driver.baseFee = baseFee;
         await driver.save();
 
-        res.json({ 
+        res.json({
             message: 'Prices updated successfully',
             driver: {
                 farePrice: driver.farePrice,
@@ -99,10 +99,10 @@ router.get('/drivers', authenticate, async (req, res) => {
 // Update driver profile
 router.put('/profile', authenticate, async (req, res) => {
     try {
-        const { 
-            firstName, 
-            lastName, 
-            email, 
+        const {
+            firstName,
+            lastName,
+            email,
             phone,
             vehicleMake,
             vehicleModel,
@@ -163,17 +163,17 @@ router.post('/test/add-earnings', authenticate, async (req, res) => {
 
         await driver.save();
 
-        return res.status(200).json({ 
+        return res.status(200).json({
             success: true,
             message: 'Test earnings added successfully',
-            ledger: driver.ledger 
+            ledger: driver.ledger
         });
     } catch (error) {
         console.error('Error adding test earnings:', error);
-        return res.status(500).json({ 
+        return res.status(500).json({
             success: false,
             message: 'Server error',
-            error: error.message 
+            error: error.message
         });
     }
 });

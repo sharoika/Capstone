@@ -24,7 +24,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 // Create multer upload instance
-const upload = multer({ 
+const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: {
@@ -61,16 +61,16 @@ const uploadDocument = async (req, res) => {
 
         await Driver.findByIdAndUpdate(driverId, updateField);
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'File uploaded successfully',
             filePath: req.file.path,
             documentType: type
         });
     } catch (error) {
         console.error('Error uploading file:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Error uploading file',
-            error: error.message 
+            error: error.message
         });
     }
 };
@@ -100,9 +100,9 @@ const getDocument = async (req, res) => {
         res.download(filePath);
     } catch (error) {
         console.error('Error downloading document:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Error downloading document',
-            error: error.message 
+            error: error.message
         });
     }
 };

@@ -9,7 +9,7 @@ const RideStates = require('../models/enums/RideStates');
 const router = express.Router();
 const { authenticate } = require("../middlewares/auth");
 const axios = require('axios');
-const { chargePaymentMethod} = require('../services/payment');
+const { chargePaymentMethod } = require('../services/payment');
 
 
 router.post('/ride', authenticate, async (req, res) => {
@@ -19,11 +19,11 @@ router.post('/ride', authenticate, async (req, res) => {
         return res.status(400).json({ message: 'Missing required fields' });
     }
     if (
-        !start.coordinates || 
-        !Array.isArray(start.coordinates) || 
-        start.coordinates.length !== 2 || 
-        !end.coordinates || 
-        !Array.isArray(end.coordinates) || 
+        !start.coordinates ||
+        !Array.isArray(start.coordinates) ||
+        start.coordinates.length !== 2 ||
+        !end.coordinates ||
+        !Array.isArray(end.coordinates) ||
         end.coordinates.length !== 2
     ) {
         return res.status(400).json({ message: 'Invalid location format' });
@@ -40,17 +40,17 @@ router.post('/ride', authenticate, async (req, res) => {
             riderID,
             start: { type: 'Point', coordinates: start.coordinates },
             end: { type: 'Point', coordinates: end.coordinates },
-            distance: numericDistance, 
+            distance: numericDistance,
             status: RideStates.PROPOSED,
         });
 
         await ride.save();
 
-        res.status(201).json({ 
-            message: 'Ride created successfully', 
-            ride: ride,      
-            rideID: ride._id, 
-            distance: numericDistance  
+        res.status(201).json({
+            message: 'Ride created successfully',
+            ride: ride,
+            rideID: ride._id,
+            distance: numericDistance
         });
     } catch (error) {
         console.error('Error creating ride:', error.message);
@@ -62,14 +62,14 @@ router.post('/ride', authenticate, async (req, res) => {
 router.post('/rides/:rideID/confirm', authenticate, async (req, res) => {
     const { rideID } = req.params;
     const { driverID } = req.body;
-console.log(rideID);
+    console.log(rideID);
     if (!driverID) {
         return res.status(400).json({ message: 'Driver ID is required' });
     }
 
     try {
         const driver = await Driver.findById(driverID);
-        if (!driver ) { //add this back || !driver.applicationApproved
+        if (!driver) { //add this back || !driver.applicationApproved
             return res.status(404).json({ message: 'Driver not found or not approved' });
         }
 
@@ -78,7 +78,7 @@ console.log(rideID);
             return res.status(400).json({ message: 'Invalid ride' });
         }
 
-        if (ride.status !== RideStates.PROPOSED) { 
+        if (ride.status !== RideStates.PROPOSED) {
             return res.status(400).json({ message: 'Ride cannot be confirmed at this stage' });
         }
         console.log("here");
@@ -115,7 +115,7 @@ router.post('/rides/:rideID/accept', authenticate, async (req, res) => {
             return res.status(403).json({ message: 'Driver not assigned to this ride' });
         }
 
-        ride.status = RideStates.ACCEPTED; 
+        ride.status = RideStates.ACCEPTED;
         await ride.save();
 
         res.json({ message: 'Ride accepted successfully', ride });
@@ -130,7 +130,7 @@ router.get('/rides/driver/:driverID', authenticate, async (req, res) => {
 
     try {
         const rides = await Ride.find({
-            driverID: driverID,  
+            driverID: driverID,
             status: RideStates.SELECTED,
         });
 
@@ -160,8 +160,8 @@ router.post('/rides/:rideID/start', authenticate, async (req, res) => {
         ride.fare = fare;
         await ride.save();
 
-        res.json({ 
-            message: 'Ride started successfully', 
+        res.json({
+            message: 'Ride started successfully',
             ride,
             fare: ride.fare
         });
@@ -200,32 +200,32 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
         const driver = await Driver.findById(ride.driverID);
         if (driver) {
             driver.completedRides.push(ride._id);
-            
+
             // Calculate fare components
             const baseFare = driver.baseFee || 2;
             const distanceFare = ride.distance * (driver.farePrice || 1.5);
-            const totalFare = parseInt(baseFare + distanceFare + parseFloat(tipAmount))* 100;
-            
+            const totalFare = parseInt(baseFare + distanceFare + parseFloat(tipAmount)) * 100;
+
             // Update ride fare
             ride.fare = totalFare;
             await ride.save();
-            
+
             // Update driver ledger
             driver.ledger.availableBalance += totalFare;
             await driver.save();
-        
-        console.log(rider);
-        console.log(driver);
-        if (rider && driver) {
-            console.log("charging payment method");
-            const paymentIntent= await chargePaymentMethod(rider.id, totalFare);
-            console.log(paymentIntent.id);
 
-            ride.stripeTransactionId = paymentIntent.id;
-            ride.stripeTransactionTime = new Date();
-            await ride.save();
+            console.log(rider);
+            console.log(driver);
+            if (rider && driver) {
+                console.log("charging payment method");
+                const paymentIntent = await chargePaymentMethod(rider.id, totalFare);
+                console.log(paymentIntent.id);
+
+                ride.stripeTransactionId = paymentIntent.id;
+                ride.stripeTransactionTime = new Date();
+                await ride.save();
+            }
         }
-    }
         res.json({
             message: 'Ride finished successfully',
             ride,
@@ -269,8 +269,8 @@ router.get('/rides/:rideID/status', authenticate, async (req, res) => {
 
         res.json({
             rideID: ride._id,
-            status: ride.status, 
-            isCompleted: ride.status === RideStates.COMPLETED, 
+            status: ride.status,
+            isCompleted: ride.status === RideStates.COMPLETED,
             isInProgress: ride.status === RideStates.INPROGRESS,
             start: ride.start,
             end: ride.end,
@@ -339,7 +339,7 @@ router.post('/rides/:rideID/cancel', authenticate, async (req, res) => {
 
     try {
         const ride = await Ride.findById(rideID);
-        if (!ride ) {
+        if (!ride) {
             return res.status(400).json({ message: 'Ride cannot be cancelled' });
         }
 

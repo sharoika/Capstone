@@ -23,7 +23,7 @@ const checkAdmin = async () => {
     }
 
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/api/admin/check-admin`,
+      `${process.env.REACT_APP_API_URL}/api/auth/check-admin`,
       { headers: { 'Authorization': `Bearer ${token}` } }
     );
 
