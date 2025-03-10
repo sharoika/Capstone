@@ -1,12 +1,13 @@
 import React, { useContext, useEffect } from "react";
-import Logo from "../assets/logo.png";
+import LightLogo from "../assets/light_logo.png";
+import DarkLogo from "../assets/dark_logo.png";
 import ThemeToggle from "./ThemeToggle";
 import { ThemeContext } from "../context/ThemeContext";
 import "./Header.css"; // We'll create this CSS file
 
 const Navbar = () => {
     const { theme } = useContext(ThemeContext);
-    
+
     // Update navbar classes when theme changes
     useEffect(() => {
         const navbar = document.querySelector('.navbar-custom');
@@ -20,21 +21,28 @@ const Navbar = () => {
             }
         }
     }, [theme]);
-    
+
+    var logo;
+    if (theme === 'dark') {
+        logo = DarkLogo;
+    } else {
+        logo = LightLogo;
+    }
+
     return (
         <nav className={`navbar navbar-expand-lg sticky-top navbar-custom ${theme === 'dark' ? 'navbar-dark' : 'navbar-light'}`}>
             <div className="container">
                 <a className="navbar-brand d-flex align-items-center" href="#home">
-                    <img src={Logo} alt="Logo" className="navbar-logo me-2" />
+                    <img src={logo} alt="Logo" className="navbar-logo me-2" />
                     <b className="ps-1 brand-text">Fleet</b>
                 </a>
-                <button 
-                    className="navbar-toggler" 
-                    type="button" 
-                    data-bs-toggle="collapse" 
-                    data-bs-target="#navbarNavAltMarkup" 
-                    aria-controls="navbarNavAltMarkup" 
-                    aria-expanded="false" 
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavAltMarkup"
+                    aria-controls="navbarNavAltMarkup"
+                    aria-expanded="false"
                     aria-label="Toggle navigation"
                 >
                     <span className="navbar-toggler-icon"></span>

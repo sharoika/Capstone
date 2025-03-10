@@ -98,11 +98,11 @@ const Home = () => {
                             ))}
                         </div>
                         
-                        <div className="text-center mt-5 animate-on-scroll">
+                        {/* <div className="text-center mt-5 animate-on-scroll">
                             <a href="/driver-signup" className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
                                 Join as a Driver
                             </a>
-                        </div>
+                        </div> */}
                     </div>
                 </section>
 
@@ -171,11 +171,6 @@ const Home = () => {
                                             </div>
                                         </div>
                                     ))}
-                                    <div className="text-center">
-                                        <a href="/register" className="btn btn-primary rounded-pill">
-                                            Join as a Rider
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
                         </div>

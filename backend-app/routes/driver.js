@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate } = require('../middleware/auth');
+const { authenticate } = require('../middlewares/auth');
 const Driver = require('../models/Driver');
 const Payout = require('../models/Payout');
 
