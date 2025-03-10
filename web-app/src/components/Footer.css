@@ -1,7 +1,7 @@
 @import '../styles/variables.css';
 
 .footer {
-    padding: 4rem 0 2rem;
+    padding: 2rem 0;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -15,107 +15,50 @@
     color: var(--text-color);
 }
 
-.footer h5 {
-    font-weight: 700;
-    margin-bottom: 1.5rem;
+.footer-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.footer-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+}
+
+.footer-link:hover {
     color: var(--primary-color);
 }
 
-.footer p {
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-.social-icons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.social-icons a {
+.footer-theme-toggle {
+    margin-left: 1rem;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: rgba(74, 144, 226, 0.1);
-    color: var(--primary-color);
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
-}
-
-.social-icons a:hover {
-    transform: translateY(-3px);
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.footer-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.footer-links li {
-    margin-bottom: 0.8rem;
-}
-
-.footer-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.footer hr {
-    margin: 2rem 0;
-    border-color: var(--border-color);
-    opacity: 0.2;
 }
 
 .copyright {
     color: var(--text-secondary);
     margin-bottom: 0;
-}
-
-.footer-bottom-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.5rem;
-}
-
-.footer-bottom-links li {
-    display: inline-block;
-}
-
-.footer-bottom-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
     font-size: 0.9rem;
-    transition: color 0.3s ease;
-}
-
-.footer-bottom-links a:hover {
-    color: var(--primary-color);
 }
 
 @media (max-width: 767px) {
     .footer {
-        padding: 3rem 0 1.5rem;
+        padding: 1.5rem 0;
     }
     
-    .footer-bottom-links {
-        justify-content: center;
-        flex-wrap: wrap;
+    .footer-nav {
+        flex-direction: column;
         gap: 1rem;
+    }
+    
+    .footer-theme-toggle {
+        margin-left: 0;
         margin-top: 1rem;
     }
 } 
