@@ -4,7 +4,6 @@ const maintenanceCheck = async (req, res, next) => {
     try {
         const config = await Configuration.findOne();
         if (config?.maintenanceMode) {
-            // Allow admin routes to bypass maintenance mode
             if (req.path.startsWith('/api/admin')) {
                 return next();
             }
