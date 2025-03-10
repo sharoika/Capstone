@@ -5,11 +5,11 @@ import axios from 'axios';
 const ConfigModal = ({ show, onHide }) => {
     const [config, setConfig] = useState({
         maintenanceMode: false,
-        locationUpdateFrequency: 30
+        locationFrequency: 30
     });
 
     useEffect(() => {
-        if (show) fetchConfig();
+        fetchConfig()
     }, [show]);
 
     const fetchConfig = async () => {
@@ -20,9 +20,9 @@ const ConfigModal = ({ show, onHide }) => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setConfig(response.data);
+            console.log(config);
         } catch (error) {
             console.error('Error fetching configuration:', error);
-            alert('Error fetching configuration');
         }
     };
 
@@ -35,11 +35,9 @@ const ConfigModal = ({ show, onHide }) => {
                 config,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Configuration updated successfully');
             onHide();
         } catch (error) {
             console.error('Error updating configuration:', error);
-            alert('Failed to update configuration');
         }
     };
 
@@ -67,10 +65,10 @@ const ConfigModal = ({ show, onHide }) => {
                         <Form.Label>Location Update Frequency (seconds)</Form.Label>
                         <Form.Control
                             type="number"
-                            value={config.locationUpdateFrequency}
+                            value={config.locationFrequency}
                             onChange={(e) => setConfig({
                                 ...config,
-                                locationUpdateFrequency: parseInt(e.target.value)
+                                locationFrequency: parseInt(e.target.value)
                             })}
                             min="5"
                             max="60"
@@ -82,7 +80,7 @@ const ConfigModal = ({ show, onHide }) => {
                 <Button variant="secondary" onClick={onHide}>
                     Close
                 </Button>
-                <Button variant="primary" onClick={handleSubmit}>
+                <Button variant="info" onClick={handleSubmit}>
                     Save Changes
                 </Button>
             </Modal.Footer>

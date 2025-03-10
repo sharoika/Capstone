@@ -40,14 +40,14 @@ const AdminDashboard = () => {
                             </Card.Header>
                             <Card.Body className="d-flex gap-3">
                                 <Button 
-                                    variant="primary" 
+                                    variant="info" 
                                     onClick={() => navigate('/admin/live-tracker')}
                                     style={buttonStyle}
                                 >
                                     Live Tracker
                                 </Button>
                                 <Button 
-                                    variant="warning" 
+                                    variant="info" 
                                     onClick={() => setShowConfigModal(true)}
                                     style={buttonStyle}
                                 >
