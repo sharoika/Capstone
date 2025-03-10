@@ -16,13 +16,18 @@ const authenticate = async (req, res, next) => {
 };
 
 const adminAuthenticate = async (req, res, next) => {
+    console.log("here");
     const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized: No token provided' });
     } else {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            console.log(decoded);
             const isAdmin = await Admin.exists({ _id: decoded.id });
+            console.log()
+            console.log(isAdmin)
             if (!isAdmin) {
                 return res.status(403).json({ message: 'Forbidden: Admin access required' });
             }
