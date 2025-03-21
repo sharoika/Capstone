@@ -4,6 +4,9 @@ import { useRouter } from 'expo-router';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
+
+
 
 export default function MainLayout() {
   const [userType, setUserType] = useState<string | null>(null);
@@ -11,6 +14,7 @@ export default function MainLayout() {
   const [token, setToken] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+  const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -55,7 +59,7 @@ export default function MainLayout() {
         timestamp: new Date().toISOString(),
       };
       try {
-        const response = await fetch('http://10.0.2.2:5000/api/location/location/update', {
+        const response = await fetch(`${apiUrl}/api/location/location/update`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -65,7 +69,7 @@ export default function MainLayout() {
         });
 
         const data = await response.json();
-        //console.log('Location update response:', data);
+        console.log('Location update response:', data);
       } catch (error) {
         console.error('Error sending location:', error);
       }
@@ -94,7 +98,7 @@ export default function MainLayout() {
 
     const interval = setInterval(() => {
       getLocation();
-    }, 5000);
+    }, 10000);
 
     return () => clearInterval(interval); 
   }, [userType, token, userId]);

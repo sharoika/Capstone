@@ -42,7 +42,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        console.log("response dataaaa", data.location);
         
         if (data.location && data.location.lat && data.location.long) {
           const mappedLocation = {
@@ -59,7 +59,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
             longitudeDelta: 0.01,
           });
         } else {
-          Alert.alert('Error', 'Location not found.');
+          Alert.alert('Error', 'Location not founddd.');
         }
       } else {
         const errorData = await response.json();
@@ -73,7 +73,13 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
   };
 
   useEffect(() => {
-    fetchLocation();
+    fetchLocation(); 
+    console.log("Updated Locationnnnnnnnnnnnnnnnnn: ", location);
+    const interval = setInterval(() => {
+      fetchLocation();
+    }, 10000);
+  
+    return () => clearInterval(interval); 
   }, []);
 
    const fetchCoordinatesAndRoute = async () => {
@@ -290,7 +296,6 @@ const handleLocationSelect = (data: any, details: any | null, type: 'start' | 'e
 
       if (response.ok) {
         const data = await response.json();
-        Alert.alert('Success', 'Ride created successfully!');
         onRideCreated(data.rideID); 
       } else {
         const errorData = await response.json();

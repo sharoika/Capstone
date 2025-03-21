@@ -192,7 +192,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
       const data = await response.json();
       console.log("Ride started:", data.ride);
       onRideStarted();
-      Alert.alert("Success", "Ride started successfully");
     } catch (err) {
       console.error("Error starting the ride:", err);
       Alert.alert("Error", "Unable to start the ride");

@@ -58,7 +58,6 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
         const message = data.driver.isOnline
           ? 'You are now online!'
           : 'You are now offline!';
-        Alert.alert('Status Updated', message);
 
         if (data.driver.isOnline) {
           onNextStep(); 

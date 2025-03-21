@@ -10,7 +10,7 @@ const RiderSchema = new mongoose.Schema({
   homeLocation: { type: String },
   profilePicture: { type: String },
   currentLocation: {
-    type: { type: String, enum: ['Point'], required: false },  
+    type: { type: String, enum: ['Point'], required: true },  
     coordinates: {
         type: [Number], 
         required: false

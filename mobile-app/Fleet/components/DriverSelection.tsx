@@ -163,7 +163,6 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
       );
       
       if (response.ok) {
-        Alert.alert('Success', 'Ride confirmed successfully');
         onDriverConfirmed();
       } else {
         const errorText = await response.text();

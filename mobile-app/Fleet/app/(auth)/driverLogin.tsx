@@ -42,7 +42,6 @@ export default function DriverLoginScreen() {
         await saveToStorage('driverID', driver.id);
         await saveToStorage('userType', 'driver');
         router.push('/(tabs)/driverHome');
-        Alert.alert('Success', message);
       } else {
         Alert.alert('Error', 'Login failed. Please try again.');
       }

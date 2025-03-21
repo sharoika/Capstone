@@ -91,6 +91,10 @@ router.post('/rider/register', async (req, res) => {
       phone: phone,
       password: password,
       homeLocation: homeLocation,
+      currentLocation: {
+        type: 'Point',
+        coordinates: [0, 0], 
+      },
     });
 
     await newRider.save();

@@ -57,7 +57,6 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       const data = await response.json();
 
       if (response.ok) {
-        Alert.alert('Success', 'Ride claimed successfully');
         onRideClaimed(rideID); 
       } else {
         Alert.alert('Error', data.message || 'Failed to claim ride');
