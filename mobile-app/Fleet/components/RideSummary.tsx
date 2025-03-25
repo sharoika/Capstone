@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   fareText: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#39c9c2",
+    color: "#4A90E2",
   },
   noDataText: {
     fontSize: 14,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   returnButton: {
-    backgroundColor: "#39c9c2",
+    backgroundColor: "#4A90E2",
     borderRadius: 12,
     padding: 14,
     alignItems: "center",

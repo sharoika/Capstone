@@ -210,34 +210,8 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
       </View>
 
       <View style={styles.detailsContainer}>
-        <View style={styles.driverInfo}>
-          <View style={styles.driverAvatar}>
-            <Text style={styles.driverInitial}>
-              {rideDetails?.driver?.firstName?.[0] || 'D'}
-            </Text>
-          </View>
-          <View style={styles.driverDetails}>
-            <Text style={styles.driverName}>
-              {rideDetails?.driver?.firstName} {rideDetails?.driver?.lastName}
-            </Text>
-            <Text style={styles.vehicleInfo}>
-              {rideDetails?.driver?.vehicleMake} {rideDetails?.driver?.vehicleModel}
-            </Text>
-          </View>
-        </View>
 
-        <View style={styles.locationContainer}>
-          <View style={styles.locationItem}>
-            <View style={[styles.dot, { backgroundColor: '#39C9C2' }]} />
-            <Text style={styles.locationText} numberOfLines={1}></Text>
-          </View>
-          <View style={styles.locationItem}>
-            <View style={[styles.dot, { backgroundColor: '#39C9C2' }]} />
-            <Text style={styles.locationText} numberOfLines={1}></Text>
-          </View>
-        </View>
-
-        <View style={styles.fareContainer}>
+       <View style={styles.fareContainer}>
           <View style={styles.fareItem}>
             <Text style={styles.fareLabel}>Distance</Text>
             <Text style={styles.fareValue}>{rideDetails.distance?.toFixed(2)} km</Text>
@@ -359,10 +333,10 @@ const styles = StyleSheet.create({
   fareValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#39C9C2',
+    color: '#4A90E2',
   },
   endRideButton: {
-    backgroundColor: '#39C9C2',
+    backgroundColor: '#4A90E2',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',

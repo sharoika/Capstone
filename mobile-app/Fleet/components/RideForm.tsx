@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
-import Geocoder from 'react-native-geocoding';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Constants from 'expo-constants';
-
+import { MaterialIcons } from 'react-native-vector-icons';
+import { customMapStyle } from '../styles/customMapStyle'
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface RideFormProps {
   token: string;
   riderID: string;
   onRideCreated: (rideID: string) => void;
 }
+const customPin = <MaterialIcons name="location-pin" size={40} color="#8EC3FF" />;
 
 const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) => {
   const [start, setStart] = useState<{ type: string; coordinates: [number, number] } | null>(null);
@@ -159,109 +160,8 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     return points;
   };
 
-  const customMapStyle = [ // these maps themes were sources from https://snazzymaps.com/style/91/muted-monotone
-    {
-        "stylers": [
-            {
-                "visibility": "on"
-            },
-            {
-                "saturation": -100
-            },
-            {
-                "gamma": 0.54
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "labels.icon",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "stylers": [
-            {
-                "color": "#FFFFFF"
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "labels.icon",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "labels.text",
-        "stylers": [
-            {
-                "visibility": "simplified"
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "geometry.fill",
-        "stylers": [
-            {
-                "color": "#ffffff"
-            }
-        ]
-    },
-    {
-        "featureType": "road.local",
-        "elementType": "labels.text",
-        "stylers": [
-            {
-                "visibility": "simplified"
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#ffffff"
-            }
-        ]
-    },
-    {
-        "featureType": "transit.line",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "gamma": 0.48
-            }
-        ]
-    },
-    {
-        "featureType": "transit.station",
-        "elementType": "labels.icon",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "geometry.stroke",
-        "stylers": [
-            {
-                "gamma": 7.18
-            }
-        ]
-    }
+  const customMapStyle = [ 
+   
 ];
 const handleLocationSelect = (data: any, details: any | null, type: 'start' | 'end') => {
   if (details && details.geometry && details.geometry.location) {
@@ -273,6 +173,12 @@ const handleLocationSelect = (data: any, details: any | null, type: 'start' | 'e
     }
   }
 };
+useEffect(() => {
+  if (start && end) {
+    fetchCoordinatesAndRoute();
+  }
+}, [start, end]);
+
   const handleConfirmRide = async () => {
     if (!start || !end ) {
       Alert.alert('Error', 'Please fill in all the fields.');
@@ -307,100 +213,91 @@ const handleLocationSelect = (data: any, details: any | null, type: 'start' | 'e
       Alert.alert('Error', 'An error occurred while creating the ride.');
     }
   };
+  
   return (
     <View style={styles.container}>
-      <Text>Start Location:</Text>
-      <GooglePlacesAutocomplete
-        placeholder="Enter start location"
-        onPress={(data, details) => handleLocationSelect(data, details, 'start')}
-        query={{
-          key: GOOGLE_API_KEY,
-          language: 'en',
-        }}
-        styles={{
-          container: { flex: 0 },
-          textInput: styles.input,
-        }}
-        fetchDetails={true}
-        debounce={300}
-      />
+      <MapView
+        ref={mapRef}
+        style={StyleSheet.absoluteFillObject}
+        region={region}
+         customMapStyle={customMapStyle} 
+      >
+        {location && (
+           <Marker coordinate={location} title="Your Location">
+           {customPin}  
+         </Marker>
+        )}
+                {start && (
+          <Marker coordinate={{ latitude: start.coordinates[1], longitude: start.coordinates[0] }} title="Start Location">
+           {customPin}
+          </Marker>
+        )}
 
-      <Text>End Location:</Text>
-      <GooglePlacesAutocomplete
-        placeholder="Enter end location"
-        onPress={(data, details) => handleLocationSelect(data, details, 'end')}
-        query={{
-          key: GOOGLE_API_KEY,
-          language: 'en',
-        }}
-        styles={{
-          container: { flex: 0 },
-          textInput: styles.input,
-        }}
-        fetchDetails={true}
-        debounce={300}
-      />
+        {end && (
+          <Marker coordinate={{ latitude: end.coordinates[1], longitude: end.coordinates[0] }} title="End Location">
+           {customPin}
+          </Marker>
+        )}
+        {routeCoordinates.length > 0 && (
+          <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2" />
+        )}
+      </MapView>
 
+      <View style={styles.overlayContainer}>
+        <View style={styles.overlay}>
+          <Text>Start Location:</Text>
+          <GooglePlacesAutocomplete
+            placeholder="Enter start location"
+            onPress={(data, details) => handleLocationSelect(data, details, 'start')}
+            query={{ key: GOOGLE_API_KEY, language: 'en' }}
+            styles={{ container: { flex: 0 }, textInput: styles.input }}
+            fetchDetails
+          />
 
-      <TouchableOpacity style={styles.button} onPress={fetchCoordinatesAndRoute}>
-        <Text style={styles.buttonText}>Show Route</Text>
-      </TouchableOpacity>
+          <Text>End Location:</Text>
+          <GooglePlacesAutocomplete
+            placeholder="Enter end location"
+            onPress={(data, details) => handleLocationSelect(data, details, 'end')}
+            query={{ key: GOOGLE_API_KEY, language: 'en' }}
+            styles={{ container: { flex: 0 }, textInput: styles.input }}
+            fetchDetails
+          />
 
-      {location ? (
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          region={region}
-          onRegionChangeComplete={setRegion}
-          customMapStyle={customMapStyle}
-        >
-          {routeCoordinates.length > 0 && (
-            <Polyline
-              coordinates={routeCoordinates}
-              strokeWidth={4}
-              strokeColor="#00f"
-            />
-          )}
-      <Marker
-  coordinate={{
-    latitude: location.latitude,
-    longitude: location.longitude,
-  }}
-  title="Your Location"
-  description="This is your current location"
->
-  <View
-    style={{
-      width: 40,
-      height: 40,
-      backgroundColor: 'blue',
-      borderRadius: 20, 
-      borderWidth: 2,
-      borderColor: 'white',
-    }}
-  />
-</Marker>
-        </MapView>
-      ) : (
-        <Text>Loading map...</Text>
-      )}
+   
 
-      <View style={styles.bottomCard}>
-        <Text>Estimated Time: {estimatedTime || 'Calculate route to see estimate'}</Text>
-        <Text>Distance: {distance || 'Calculate route to see distance'}</Text>
-        <TouchableOpacity style={styles.button} onPress={handleConfirmRide}>
-          <Text style={styles.buttonText}>Confirm Ride</Text>
-        </TouchableOpacity>
+          <Text>Estimated Time: {estimatedTime || 'N/A'}</Text>
+          <Text>Distance: {distance || 'N/A'}</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText} onPress={handleConfirmRide}>Confirm Ride</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
+    ...StyleSheet.absoluteFillObject, 
     flex: 1,
-    padding: 24,
-    backgroundColor: '#fff',
+    margin: 0,
+    padding: 0,
+  },
+  overlayContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+  },
+  overlay: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 20,
+    margin: 0,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  bottomCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 16,
   },
   input: {
     height: 40,
@@ -408,36 +305,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 16,
     paddingLeft: 8,
-    fontSize: 16,
   },
   button: {
-    backgroundColor: '#39C9C2',
+    backgroundColor: '#4A90E2',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
   },
-  map: {
-    flex: 1,
-    marginTop: 16,
-  },
-  bottomCard: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
 });
+
 
 export default RideForm;

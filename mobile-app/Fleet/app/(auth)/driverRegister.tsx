@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
-import { ScrollView, View, Image, Text, Alert } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { ScrollView, View, Image, Text, Alert, KeyboardAvoidingView } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import * as DocumentPicker from 'expo-document-picker';
 import BasicInfoPage from '../../components/BasicInfoPage';
 import VehicleInfoPage from '../../components/VehicleInfoPage';
 import DocumentsPage from '../../components/DocumentsPage';
+import LocationPage from '../../components/LocationPage';
 import PageIndicator from '../../components/PageIndicator';
 import styles from '../../styles/styles';
+import MapView from 'react-native-maps';
 
+const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 interface DocumentFile {
@@ -23,7 +26,8 @@ const DriverRegisterScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
-
+  const mapRef = useRef<MapView | null>(null);
+  
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -41,6 +45,30 @@ const DriverRegisterScreen = () => {
     backgroundCheckConsent: null as DocumentFile | null,
   });
 
+  const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  const handleLocationSelect = (data: any, details: any) => {
+    if (!details) {
+      console.error('No details returned');
+      return;
+    }
+  
+    const location = {
+      latitude: details.geometry.location.lat,
+      longitude: details.geometry.location.lng,
+    };
+  
+    setLocationCoords(location);
+  
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({
+        ...location,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    }
+  };
+  
   const handleInputChange = (name: string, value: string) => {
     setFormData({ ...formData, [name]: value });
 
@@ -74,37 +102,19 @@ const DriverRegisterScreen = () => {
     const newErrors: Record<string, boolean> = {};
     let isValid = true;
 
-    switch (page) {
-      case 1:
-        ['firstName', 'lastName', 'email', 'phone', 'password'].forEach((field) => {
-          if (!formData[field]) {
-            newErrors[field] = true;
-            isValid = false;
-          }
-        });
-        break;
+    const fieldsByPage = {
+      1: ['firstName', 'lastName', 'email', 'phone', 'password'],
+      2: ['vehicleMake', 'vehicleModel', 'vehicleYear', 'vehicleColor', 'licensePlate'],
+      3: [],
+      4: ['driversLicense', 'vehicleRegistration', 'insuranceDocument', 'backgroundCheckConsent'],
+     };
 
-      case 2:
-        ['vehicleMake', 'vehicleModel', 'vehicleYear', 'vehicleColor', 'licensePlate'].forEach((field) => {
-          if (!formData[field]) {
-            newErrors[field] = true;
-            isValid = false;
-          }
-        });
-        break;
-
-      case 3:
-        ['driversLicense', 'vehicleRegistration', 'insuranceDocument', 'backgroundCheckConsent'].forEach((field) => {
-          if (!formData[field]) {
-            newErrors[field] = true;
-            isValid = false;
-          }
-        });
-        break;
-
-      default:
-        return true;
-    }
+    (fieldsByPage[page] || []).forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = true;
+        isValid = false;
+      }
+    });
 
     if (!isValid) {
       setErrors(newErrors);
@@ -116,18 +126,18 @@ const DriverRegisterScreen = () => {
 
   const handleNextPage = () => {
     if (validatePage(currentPage)) {
-      setCurrentPage(currentPage + 1);
+      setCurrentPage((prev) => prev + 1);
       setErrors({});
     }
   };
 
   const handlePreviousPage = () => {
-    setCurrentPage(currentPage - 1);
+    setCurrentPage((prev) => prev - 1);
     setErrors({});
   };
 
   const handleRegister = async () => {
-    if (!validatePage(3)) return;
+    if (!validatePage(4)) return;
 
     setIsLoading(true);
 
@@ -135,10 +145,11 @@ const DriverRegisterScreen = () => {
       const formDataToSend = new FormData();
 
       // Append basic info
-      ['firstName', 'lastName', 'email', 'phone', 'password', 
-       'vehicleMake', 'vehicleModel', 'vehicleYear', 
-       'vehicleColor', 'licensePlate'].forEach((field) => {
-        formDataToSend.append(field, formData[field]);
+      Object.keys(formData).forEach((field) => {
+        const value = formData[field];
+        if (value && typeof value === 'string') {
+          formDataToSend.append(field, value);
+        }
       });
 
       // Append documents
@@ -198,6 +209,20 @@ const DriverRegisterScreen = () => {
         );
       case 3:
         return (
+          <LocationPage
+          formData={formData}
+          locationCoords={locationCoords}
+          handleLocationSelect={handleLocationSelect}
+          handleNextPage={handleNextPage}
+          handlePreviousPage={handlePreviousPage}
+          styles={styles}
+          GOOGLE_API_KEY={GOOGLE_API_KEY}
+          mapRef={mapRef}  
+        />
+        ); 
+      case 4:
+       
+        return (
           <DocumentsPage
             formData={formData}
             errors={errors}
@@ -209,12 +234,16 @@ const DriverRegisterScreen = () => {
           />
         );
       default:
-        return <BasicInfoPage formData={formData} errors={errors} handleInputChange={handleInputChange} handleNextPage={handleNextPage} styles={styles} />;
+        return null;
     }
   };
-
+  
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+
+    <KeyboardAvoidingView
+    style={{ flex: 1 }}
+  >
+    <ScrollView contentContainerStyle={styles.scrollContainer}   keyboardShouldPersistTaps="handled">
       <View style={styles.container}>
         <View style={styles.header}>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
@@ -230,6 +259,7 @@ const DriverRegisterScreen = () => {
         </View>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

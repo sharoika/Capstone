@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import MapView, { Marker, Polyline, Region } from "react-native-maps";
 import Constants from "expo-constants";
+import { customMapStyle } from '../styles/customMapStyle'; 
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -145,27 +146,40 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Travel to Ride</Text>
-      {region && (
-        <MapView ref={mapRef} style={styles.map} region={region}>
-          {location && <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver" />}
-          {startLocation && <Marker coordinate={startLocation} title="Start Location" />}
-          {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />}
-        </MapView>
-      )}
-      <TouchableOpacity style={styles.button} onPress={checkRideStatus}>
-        <Text style={styles.buttonText}>Refresh Status</Text>
-      </TouchableOpacity>
+      <MapView ref={mapRef} style={styles.map} region={region} customMapStyle={customMapStyle}>
+        {location && <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver" />}
+        {startLocation && <Marker coordinate={startLocation} title="Start Location" />}
+        {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />}
+      </MapView>
+
+      <View style={styles.overlay}>
+        <Text style={styles.title}>Travel to Ride</Text>
+        <TouchableOpacity style={styles.button} onPress={checkRideStatus}>
+          <Text style={styles.buttonText}>Refresh Status</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: { flex: 1 },
+  map: {
+    ...StyleSheet.absoluteFillObject, 
+  },
+  overlay: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.9)", 
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5, 
+  },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-  button: { marginTop: 20, backgroundColor: "#007bff", padding: 15, borderRadius: 5 },
+  button: { marginTop: 20, backgroundColor: "#4A90E2", padding: 15, borderRadius: 5 },
   buttonText: { color: "#fff", fontSize: 18 },
-  map: { width: "100%", height: 300, marginTop: 20 },
 });
 
 export default TravelToRideStep;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Constants from 'expo-constants';
 import MapView, { Marker } from 'react-native-maps';
+import { customMapStyle } from '../styles/customMapStyle'; 
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface GoOnlineStepProps {
@@ -72,17 +73,6 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
       Alert.alert('Error', 'An error occurred while updating your status.');
     }
   };
-  const renderLocation = () => {
-    if (location) {
-      return (
-        <Text style={styles.locationText}>
-          Current Location: Lat: {location.lat}, Long: {location.long}
-        </Text>
-      );
-    } else {
-      return <Text style={styles.locationText}>Fetching location...</Text>;
-    }
-  };
 
   useEffect(() => {
     fetchLocation(); 
@@ -99,19 +89,8 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
 
   return (
     <View style={styles.container}>
-      <Text style={styles.statusText}>
-        {isOnline ? 'You are Online' : 'You are Offline'}
-      </Text>
-      <TouchableOpacity
-        style={[styles.button, isOnline ? styles.offlineButton : styles.onlineButton]}
-        onPress={toggleOnlineStatus}
-      >
-        <Text style={styles.buttonText}>{'Go Online'}</Text>
-        
-      </TouchableOpacity>
-      {renderLocation()}
-      {location && (
-        <MapView style={styles.map} region={region}>
+      <MapView style={styles.map} region={region} customMapStyle={customMapStyle}>
+        {location && (
           <Marker
             coordinate={{
               latitude: location.lat,
@@ -119,8 +98,21 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
             }}
             title="Driver's Location"
           />
-        </MapView>
-      )}
+        )}
+      </MapView>
+
+      <View style={styles.overlay}>
+        <Text style={styles.statusText}>
+          {isOnline ? 'You are Online' : 'You are Offline'}
+        </Text>
+        <TouchableOpacity
+          style={[styles.button, isOnline ? styles.offlineButton : styles.onlineButton]}
+          onPress={toggleOnlineStatus}
+        >
+          <Text style={styles.buttonText}>{'Go Online'}</Text>
+        </TouchableOpacity>
+
+      </View>
     </View>
   );
 };
@@ -128,10 +120,19 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 24,
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  overlay: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5, 
   },
   statusText: {
     fontSize: 24,
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   onlineButton: {
-    backgroundColor: '#39C9C2',
+    backgroundColor: '#4A90E2',
   },
   offlineButton: {
     backgroundColor: '#FF5C5C',
@@ -161,11 +162,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
-  },
-  map: {
-    width: '100%',
-    height: 300,
-    marginTop: 20,
   },
 });
 

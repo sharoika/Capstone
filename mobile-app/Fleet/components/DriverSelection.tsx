@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,13 @@ import {
   Alert,
   ActivityIndicator,
   FlatList,
-  Image,
 } from 'react-native';
 import Constants from 'expo-constants';
+import * as SecureStore from 'expo-secure-store';
+import { router } from 'expo-router';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
+
 interface DriverSelectionProps {
   rideID: string;
   token: string;
@@ -34,134 +36,125 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
 }) => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [rideDetails, setRideDetails] = useState<{ distance: number }>({ distance: 0 });
-  const [selectedDriver, setSelectedDriver] = useState('');
+  const [selectedDriver, setSelectedDriver] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log('Fetching drivers for ride ID:', rideID);
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const rideResponse = await fetch(`${apiUrl}/api/ride/rides/${rideID}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const rideResponse = await fetch(`${apiUrl}/api/ride/rides/${rideID}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (rideResponse.ok) {
-          const rideData = await rideResponse.json();
-          setRideDetails({ distance: parseFloat(rideData.distance) });
-        } else {
-          Alert.alert('Error', 'Failed to fetch ride details');
-        }
-
-        const driverResponse = await fetch(`${apiUrl}/api/user/drivers`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (driverResponse.ok) {
-          const driverList = await driverResponse.json();
-          console.log('Fetched drivers:', driverList);
-          setDrivers(driverList.map(driver => ({
-            ...driver,
-            baseFee: typeof driver.baseFee === 'number' ? driver.baseFee : 2,
-            farePrice: typeof driver.farePrice === 'number' ? driver.farePrice : 0
-          })));
-        } else {
-          Alert.alert('Error', 'Failed to fetch drivers');
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        Alert.alert('Error', 'An error occurred while fetching data');
-      } finally {
-        setIsLoading(false);
+      if (rideResponse.ok) {
+        const rideData = await rideResponse.json();
+        setRideDetails({ distance: parseFloat(rideData.distance) });
+      } else {
+        throw new Error('Failed to fetch ride details');
       }
-    };
 
-    fetchData();
+      const driverResponse = await fetch(`${apiUrl}/api/user/drivers`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (driverResponse.ok) {
+        const driverList = await driverResponse.json();
+        setDrivers(driverList.map((driver: Driver) => ({
+          ...driver,
+          baseFee: driver.baseFee ?? 2,
+          farePrice: driver.farePrice ?? 0,
+        })));
+      } else {
+        throw new Error('Failed to fetch drivers');
+      }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   }, [token, rideID]);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const calculateTotalFare = (farePrice: number, baseFee: number) => {
-    // Ensure we have valid numbers
-    const validBaseFee = typeof baseFee === 'number' && !isNaN(baseFee) ? baseFee : 2;
-    const validFarePrice = typeof farePrice === 'number' && !isNaN(farePrice) ? farePrice : 0;
-    const validDistance = typeof rideDetails.distance === 'number' && !isNaN(rideDetails.distance) ? rideDetails.distance : 0;
-
-    const distanceFare = validDistance * validFarePrice;
-    return (validBaseFee + distanceFare).toFixed(2);
+    const validDistance = rideDetails.distance || 0;
+    const distanceFare = validDistance * farePrice;
+    return (baseFee + distanceFare).toFixed(2);
   };
 
-  const renderDriver = ({ item }: { item: Driver }) => {
-    // Ensure we have valid numbers for display
-    const validBaseFee = typeof item.baseFee === 'number' && !isNaN(item.baseFee) ? item.baseFee : 2;
-    const validFarePrice = typeof item.farePrice === 'number' && !isNaN(item.farePrice) ? item.farePrice : 0;
-    
-    const totalFare = calculateTotalFare(validFarePrice, validBaseFee);
-    
-    return (
-      <TouchableOpacity
-        style={[
-          styles.card,
-          selectedDriver === item._id && styles.selectedCard
-        ]}
-        onPress={() => setSelectedDriver(item._id)}
-      >
-        <View style={[styles.profileImage, { backgroundColor: '#E1E1E1', justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ fontSize: 24, color: '#666' }}>
-            {item.firstName.charAt(0)}
-          </Text>
-        </View>
-        <Text style={styles.driverName}>{`${item.firstName} ${item.lastName}`}</Text>
-        
-        <View style={styles.priceContainer}>
-          <View style={styles.priceItem}>
-            <Text style={styles.priceLabel}>Base Fee</Text>
-            <Text style={styles.priceValue}>${validBaseFee.toFixed(2)}</Text>
-          </View>
-          <View style={styles.priceDivider} />
-          <View style={styles.priceItem}>
-            <Text style={styles.priceLabel}>Rate per km</Text>
-            <Text style={styles.priceValue}>${validFarePrice.toFixed(2)}</Text>
-          </View>
-        </View>
-
-        <Text style={styles.driverDetails}>{`Distance: ${rideDetails.distance.toFixed(2)} km`}</Text>
-        <Text style={[styles.driverDetails, styles.fareText]}>{`Total Fare: $${totalFare}`}</Text>
-      </TouchableOpacity>
-    );
+  const checkPaymentMethod = async (): Promise<boolean> => {
+    try {
+      const riderId = await SecureStore.getItemAsync('userObjectId');
+  
+      if (!riderId) throw new Error('No rider ID found');
+  
+      const response = await fetch(`${apiUrl}/api/payment/payment-method`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ riderId }),
+      });
+  
+      if (!response.ok) throw new Error('Failed to retrieve payment method');
+  
+      const { paymentMethod } = await response.json();
+      return paymentMethod !== null;
+    } catch (error) {
+      console.error('Error checking payment method:', error);
+      return false;
+    }
   };
-
+  
+  const navigateToPayment = () => {
+    router.push('/paymentSettings'); 
+  };
   const handleConfirm = async () => {
     if (!selectedDriver) {
       Alert.alert('Error', 'Please select a driver');
       return;
     }
 
-    try {
-      const selectedDriverData = drivers.find(d => d._id === selectedDriver);
-      const totalFare = selectedDriverData ? calculateTotalFare(selectedDriverData.farePrice, selectedDriverData.baseFee) : '0';
+    const hasPayment = await checkPaymentMethod();
 
-      const response = await fetch(
-        `${apiUrl}/api/ride/rides/${rideID}/confirm`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ 
-            driverID: selectedDriver,
-            estimatedFare: parseFloat(totalFare)
-          }),
-        }
+    if (!hasPayment) {
+      Alert.alert(
+        'No Payment Method',
+        'You need to add a payment method before confirming the ride.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go to Payment', onPress: navigateToPayment }
+        ]
       );
-      
+      return;
+    }
+    try {
+      const driver = drivers.find((d) => d._id === selectedDriver);
+      const totalFare = driver ? calculateTotalFare(driver.farePrice, driver.baseFee) : '0';
+
+      const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/confirm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          driverID: selectedDriver,
+          estimatedFare: parseFloat(totalFare),
+        }),
+      });
+
       if (response.ok) {
         onDriverConfirmed();
       } else {
@@ -177,22 +170,64 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#39C9C2" />
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#4A90E2" />
       </View>
     );
   }
 
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity onPress={fetchData} style={styles.retryButton}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const DriverCard = ({ driver }: { driver: Driver }) => {
+    const totalFare = calculateTotalFare(driver.farePrice, driver.baseFee);
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.card,
+          selectedDriver === driver._id && styles.selectedCard,
+        ]}
+        onPress={() => setSelectedDriver(driver._id)}
+      >
+        <View style={styles.profile}>
+          <Text style={styles.profileInitial}>
+            {driver.firstName.charAt(0)}
+          </Text>
+        </View>
+
+        <View style={styles.cardContent}>
+          <Text style={styles.driverName}>
+            {`${driver.firstName} ${driver.lastName}`}
+          </Text>
+          <Text style={styles.details}>Base Fee: ${driver.baseFee.toFixed(2)}</Text>
+          <Text style={styles.details}>Rate per km: ${driver.farePrice.toFixed(2)}</Text>
+          <Text style={styles.totalFare}>Total Fare: ${totalFare}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Select a Driver</Text>
-      <Text style={styles.distanceText}>Trip Distance: {rideDetails.distance.toFixed(2)} km</Text>
+      <Text style={styles.distance}>Trip Distance: {rideDetails.distance.toFixed(2)} km</Text>
+
       <FlatList
         data={drivers}
-        renderItem={renderDriver}
+        renderItem={({ item }) => <DriverCard driver={item} />}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.list}
       />
+
       <TouchableOpacity
         style={[styles.confirmButton, !selectedDriver && styles.disabledButton]}
         onPress={handleConfirm}
@@ -205,101 +240,88 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: { 
+  container: {
     flex: 1,
-    marginTop: 24, 
-    padding: 16 
+    padding: 16,
   },
-  loadingContainer: {
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#333',
-  },
-  distanceText: {
+  errorText: {
+    color: '#E74C3C',
     fontSize: 16,
-    color: '#666',
+  },
+  retryButton: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#4A90E2',
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1A2242',
     marginBottom: 16,
+  },
+  distance: {
+    fontSize: 16,
+    color: '#4A90E2',
+    marginBottom: 12,
   },
   list: {
     flexGrow: 1,
   },
   card: {
+    flexDirection: 'row',
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    elevation: 4,
   },
   selectedCard: {
-    borderColor: '#39C9C2',
+    borderColor: '#4A90E2',
     borderWidth: 2,
   },
-  profileImage: {
+  profile: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 12,
+    backgroundColor: '#8EC3FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileInitial: {
+    fontSize: 24,
+    color: '#1A2242',
+  },
+  cardContent: {
+    marginLeft: 16,
   },
   driverName: {
     fontSize: 18,
+    color: '#1A2242',
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
   },
-  driverDetails: {
+  details: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 2,
   },
-  fareText: {
+  totalFare: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#39C9C2',
-    marginTop: 4
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 8,
-    paddingHorizontal: 4,
-  },
-  priceItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  priceDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#ddd',
-    marginHorizontal: 10,
-  },
-  priceLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-  priceValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#39C9C2',
+    color: '#4A90E2',
   },
   confirmButton: {
-    backgroundColor: '#39C9C2',
+    backgroundColor: '#4A90E2',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 16,
   },
   disabledButton: {
     backgroundColor: '#ccc',
@@ -307,7 +329,6 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
   },
 });
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import Constants from 'expo-constants';
 import MapView, { Marker, Polyline, Region } from 'react-native-maps';
+import { customMapStyle } from '../styles/customMapStyle'; 
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
@@ -120,38 +121,48 @@ const DriverInProgressStep: React.FC<DriverInProgressStepProps> = ({ rideID, dri
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Ride In Progress</Text>
-      <Text style={styles.info}>Ride ID: {rideID}</Text>
-      <Text style={styles.info}>Driver ID: {driverID}</Text>
-      <Text style={styles.status}>Driving passenger to destination...</Text>
-      {startLocation && endLocation && (
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          initialRegion={{
-            latitude: startLocation.latitude,
-            longitude: startLocation.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          }}
-        >
-          <Marker coordinate={startLocation} title="Start Location" />
-          <Marker coordinate={endLocation} title="End Location" />
-          {routeCoordinates.length > 0 && (
-            <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />
-          )}
-        </MapView>
-      )}
+      <MapView
+        ref={mapRef}
+        customMapStyle={customMapStyle}
+        style={styles.map}
+        initialRegion={{
+          latitude: startLocation?.latitude || 0,
+          longitude: startLocation?.longitude || 0,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+      >
+        {startLocation && <Marker coordinate={startLocation} title="Start Location" />}
+        {endLocation && <Marker coordinate={endLocation} title="End Location" />}
+        {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />}
+      </MapView>
+
+      <View style={styles.overlay}>
+        <Text style={styles.title}>Ride In Progress</Text>
+        <Text style={styles.status}>Driving passenger to destination...</Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff', padding: 20 },
+  container: { flex: 1 },
+  map: {
+    ...StyleSheet.absoluteFillObject, 
+  },
+  overlay: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5, 
+  },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   info: { fontSize: 18, marginBottom: 10 },
   status: { fontSize: 18, marginVertical: 20, color: 'blue' },
-  map: { width: '100%', height: 300, marginTop: 20 },
 });
 
 export default DriverInProgressStep;

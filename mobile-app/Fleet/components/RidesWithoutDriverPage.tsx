@@ -74,7 +74,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
     >
       <Text style={styles.cardTitle}>Start: Lat {item.start.coordinates[0]}, Long {item.start.coordinates[1]}</Text>
       <Text style={styles.cardSubtitle}>End: Lat {item.end.coordinates[0]}, Long {item.end.coordinates[1]}</Text>
-      <Text style={styles.cardDetails}>Date: {item.date}</Text>
+      <Text style={styles.cardDetails}>Fare: {item.fare}</Text>
     </TouchableOpacity>
   );
   return (
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#4A90E2',
   },
   cardSubtitle: {
     fontSize: 16,

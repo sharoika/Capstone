@@ -55,10 +55,10 @@ export default function DriverLoginScreen() {
     router.push('/(auth)/driverRegister');
   };
 
-  const handleRiderLogin = () => {
+
+  const handleBackToRiderLogin = () => {
     router.push('/(auth)/login');
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -67,7 +67,6 @@ export default function DriverLoginScreen() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Driver Login</Text>
       </View>
 
       <View style={styles.formContainer}>
@@ -88,49 +87,49 @@ export default function DriverLoginScreen() {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={[styles.button, styles.nextButton]} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.registerText}>Don't have an account?</Text>
-        <TouchableOpacity onPress={handleRegister}>
-          <Text style={styles.registerLink}>Register</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.riderButton} onPress={handleRiderLogin}>
-          <Text style={styles.riderButtonText}>Rider Login</Text>
-        </TouchableOpacity>
+        <View style={styles.footer}>
+          <Text style={styles.loginText}>Don't have an account?</Text>
+          <TouchableOpacity onPress={handleRegister}>
+            <Text style={styles.loginLink}>Register As A Driver</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.backToRiderButton]} onPress={handleBackToRiderLogin}>
+            <Text style={styles.buttonText}>Back to Rider Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    backgroundColor: '#FFFFFF',
+    padding: 24
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    padding: 24,
+    padding: 24
   },
   header: {
     alignItems: 'center',
-    marginTop: 80,
-    marginBottom: 60,
+    marginTop: 60,
+    marginBottom: 20
   },
   logo: {
-    width: 48,
-    height: 48,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#173252',
-    marginBottom: 0,
+    width: 196,
+    height: 144
   },
   formContainer: {
     width: '100%',
+    marginBottom: 20
   },
   input: {
     height: 48,
@@ -139,50 +138,45 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     marginBottom: 16,
-    color: '#000000',
+    color: '#000000'
   },
-  loginButton: {
-    backgroundColor: '#39C9C2',
+  buttonContainer: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  button: {
+    width: '100%',
     height: 48,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    marginBottom: 12,
   },
-  loginButtonText: {
+  nextButton: {
+    backgroundColor: '#4A90E2',
+  },
+  buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600'
   },
   footer: {
-    position: 'absolute',
-    bottom: 40,
-    left: 24,
-    right: 24,
+    marginTop: 48,
     alignItems: 'center',
+    paddingBottom: 32
   },
-  registerText: {
+  loginText: {
     fontSize: 14,
     color: '#6D6D6D',
-    marginBottom: 8,
+    marginBottom: 8
   },
-  registerLink: {
+  backToRiderButton: { 
+    marginTop: 12,
+    backgroundColor: '#8EC3FF',  
+  },
+  loginLink: {
     fontSize: 16,
-    color: '#39C9C2',
-    fontWeight: '600',
-  },
-  riderButton: {
-    marginTop: 16,
-    backgroundColor: '#173252',
-    height: 48,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  riderButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+    color: '#4A90E2',
+    fontWeight: '600'
+  }
 });

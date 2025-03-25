@@ -1,6 +1,6 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from "react-native"
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Dimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
@@ -12,6 +12,7 @@ interface StartRideProps {
   token: string
   onRideStarted: () => void
 }
+const { width, height } = Dimensions.get('window');
 
 const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) => {
   const [rideDetails, setRideDetails] = useState<any>(null);
@@ -22,6 +23,8 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
   const [distance, setDistance] = useState<string>("");
   const [fare, setFare] = useState<number>(0);
+  const [startAddress, setStartAddress] = useState<string>("Loading...");
+  const [driverAddress, setDriverAddress] = useState<string>("Loading...");
 
   const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
   const decodePolyline = (encoded: string) => {
@@ -213,169 +216,82 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
       </View>
     )
   }
+  return (    <View style={styles.container}>
+    {region && (
+      <MapView ref={mapRef} style={styles.map} region={region}>
+        {routeCoordinates.length > 0 && (
+          <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />
+        )}
+        <Marker coordinate={routeCoordinates[0]} title="Start" />
+        <Marker coordinate={routeCoordinates[1]} title="End" />
+      </MapView>
+    )}
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-      <View style={styles.mapContainer}>
-          {region && (
-            <MapView ref={mapRef} style={styles.map} region={region}>
-              {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />}
-              <Marker coordinate={routeCoordinates[0]} title="Start" />
-              <Marker coordinate={routeCoordinates[1]} title="End" />
-            </MapView>
-          )}
-        </View>
+    <View style={styles.card}>
+      <Text style={styles.cardTitle}>Ride Details</Text>
 
-        <View style={styles.detailsContainer}>
-          <View style={styles.rideInfoCard}>
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>Ride ID</Text>
-              <Text style={styles.infoText}>{rideDetails.rideID}</Text>
-            </View>
+{/*<Text style={styles.label}>Start Location Address:</Text>
+<Text style={styles.value}>{startAddress}</Text>
+<Text style={styles.label}>Driver Location Address:</Text>
+<Text style={styles.value}>{driverAddress}</Text>*/}
 
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>Start Location</Text>
-              <Text style={styles.infoText}>
-  {rideDetails.start?.coordinates ? `${rideDetails.start.coordinates[1]}, ${rideDetails.start.coordinates[0]}` : "Unknown"}
-</Text>
-            </View>
 
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>End Location</Text>
-              
-<Text style={styles.infoText}>
-  {rideDetails.end?.coordinates ? `${rideDetails.end.coordinates[1]}, ${rideDetails.end.coordinates[0]}` : "Unknown"}
-</Text>
-            </View>
 
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>Fare</Text>
-              <Text style={styles.fareText}>${fare.toFixed(2)}</Text>
-            </View>
+      <Text style={styles.label}>Fare:</Text>
+      <Text style={styles.value}>${fare.toFixed(2)}</Text>
 
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>Distance</Text>
-              <Text style={styles.infoText}>{distance}</Text>
-            </View>
+      <Text style={styles.label}>Distance:</Text>
+      <Text style={styles.value}>{distance}</Text>
 
-            <View style={styles.statusSection}>
-              <Text style={styles.infoLabel}>Ride Status</Text>
-              <View style={styles.statusRow}>
-                <Text style={styles.statusText}>Booked</Text>
-                <View style={[styles.statusIndicator, rideDetails.rideBooked && styles.statusActive]} />
-              </View>
-              <View style={styles.statusRow}>
-                <Text style={styles.statusText}>In Progress</Text>
-                <View style={[styles.statusIndicator, rideDetails.rideInProgress && styles.statusActive]} />
-              </View>
-              <View style={styles.statusRow}>
-                <Text style={styles.statusText}>Finished</Text>
-                <View style={[styles.statusIndicator, rideDetails.rideFinished && styles.statusActive]} />
-              </View>
-            </View>
-
-            {rideDetails.rider && (
-              <View style={styles.infoSection}>
-                <Text style={styles.infoLabel}>Rider</Text>
-                <Text style={styles.infoText}>{rideDetails.rider.firstName}</Text>
-              </View>
-            )}
-          </View>
-
-          <TouchableOpacity style={styles.startButton} onPress={handleStartRide} activeOpacity={0.8}>
-            <Text style={styles.startButtonText}>Start Ride</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </SafeAreaView>
-  )
-}
+      <TouchableOpacity style={styles.startButton} onPress={handleStartRide}>
+        <Text style={styles.startButtonText}>Start Ride</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+};
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#f6f7f9",
-  },
   container: {
     flex: 1,
-    padding: 12,
-  },
-  mapContainer: {
-    flex: 1,
+    margin: 0,
+    padding: 0,
+    ...StyleSheet.absoluteFillObject,
   },
   map: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10
+    ...StyleSheet.absoluteFillObject,
   },
-  detailsContainer: {
+  card: {
+    width: width * 0.8,
+    height: height * 0.6,
     backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderRadius: 12,
     elevation: 5,
-  },
-  rideInfoCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  infoSection: {
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 12,
   },
-  infoLabel: {
-    fontSize: 12,
+  label: {
+    fontSize: 14,
     color: "#6d6d6d",
-    marginBottom: 2,
+    marginTop: 8,
   },
-  infoText: {
-    fontSize: 14,
-    color: "#173252",
+  value: {
+    fontSize: 16,
     fontWeight: "500",
-  },
-  fareText: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#39c9c2",
-  },
-  statusSection: {
-    marginBottom: 12,
-  },
-  statusRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  statusText: {
-    fontSize: 14,
     color: "#173252",
-  },
-  statusIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#d9d9d9",
-  },
-  statusActive: {
-    backgroundColor: "#39c9c2",
   },
   startButton: {
-    backgroundColor: "#39c9c2",
+    backgroundColor: "#4A90E2",
     borderRadius: 12,
     padding: 14,
     alignItems: "center",
@@ -408,6 +324,6 @@ const styles = StyleSheet.create({
     color: "#ff4444",
     textAlign: "center",
   },
-})
+});
 
 export default StartRide
