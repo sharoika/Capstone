@@ -1,3 +1,6 @@
+# Fleet System UML Class Diagram
+
+```mermaid
 classDiagram
     class User {
         +String userId
@@ -76,3 +79,29 @@ classDiagram
     Driver "1" -- "*" Trip : fulfills
     Trip "1" -- "1" Payment : generates
     Trip "1" -- "2" Location : has
+```
+
+## Diagram Description
+
+This UML class diagram illustrates the core structure of the Fleet ride-sharing system. It shows the relationships between various components:
+
+1. **User Hierarchy**: 
+   - Base User class with common attributes
+   - Specialized Rider and Driver classes that inherit from User
+
+2. **Trip Management**:
+   - Riders request trips
+   - Drivers fulfill trips
+   - Each trip has pickup and dropoff locations
+
+3. **Vehicle Information**:
+   - Each driver is associated with a specific vehicle
+
+4. **Payment Processing**:
+   - Trip completion generates payment records
+   - Payment methods are associated with riders
+
+5. **Location Services**:
+   - Location tracking and distance calculation capabilities
+
+The diagram uses standard UML notation for inheritance, associations, and multiplicities to represent the system architecture.
