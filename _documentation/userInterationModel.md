@@ -116,7 +116,6 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[Login to Admin Portal] --> B[View Dashboard Statistics]
-    B --> C[Monitor Active Rides]
     B --> D[Review New Driver Applications]
     D --> E[Approve/Reject Drivers]
     B --> F[Manage User Accounts]
@@ -131,7 +130,7 @@ flowchart TD
 1. **Authentication Screens**
    - Login (Regular & Driver)
    - Registration (Regular & Driver)
-   - Password Recovery
+
 
 2. **Rider Screens**
    - Home (Map View)
@@ -158,11 +157,9 @@ flowchart TD
    - Driver Signup
    
 2. **Admin Dashboard**
-   - Analytics Overview
    - User Management
    - Driver Verification
    - Payment Processing
-   - Support Ticket Management
 
 ## Interaction Patterns
 
@@ -170,24 +167,12 @@ flowchart TD
    - Real-time location tracking
    - Map-based ride selection
    - Route visualization
-   - ETA calculations
 
-2. **Notification Patterns**
-   - Push notifications for ride status updates
-   - In-app alerts for payment confirmations
-   - Email notifications for account activities
-   - SMS verification codes
-
-3. **Payment Interactions**
+2. **Payment Interactions**
    - Credit card processing via Stripe
    - Receipt generation
    - Fare calculation
    - Payment history viewing
-
-4. **Rating System**
-   - Post-ride driver rating
-   - Feedback submission
-   - Rating visualization
 
 ## Security Considerations in User Interactions
 
@@ -205,17 +190,5 @@ flowchart TD
    - Secure payment processing
    - Receipt verification
    - Dispute resolution mechanisms
-
-## Accessibility Features
-
-1. **Visual Accessibility**
-   - High contrast mode
-   - Screen reader compatibility
-   - Adjustable text sizing
-
-2. **Input Accommodations**
-   - Voice commands
-   - Alternative input methods
-   - Simplified interface options
 
 This document provides a comprehensive overview of the user interaction patterns within the Fleet system, serving as a reference for understanding the flow of user experiences throughout the application.
