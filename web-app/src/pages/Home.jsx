@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import Navbar from '../components/Header';
 import Footer from '../components/Footer';
 import homeImage from '../assets/home.jpg';
@@ -12,6 +12,7 @@ import './Home.css';
 const Home = () => {
     console.log(process.env.REACT_APP_API_URL);
     const { theme } = useContext(ThemeContext);
+    const [showModal, setShowModal] = useState(false);
 
     // Add scroll animation effect
     useEffect(() => {
@@ -34,6 +35,11 @@ const Home = () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
+
+    // Function to handle button click and show modal
+    const handleAppButtonClick = () => {
+        setShowModal(true);
+    };
 
     return (
         <>
@@ -98,11 +104,13 @@ const Home = () => {
                             ))}
                         </div>
                         
-                        {/* <div className="text-center mt-5 animate-on-scroll">
-                            <a href="/driver-signup" className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
-                                Join as a Driver
-                            </a>
-                        </div> */}
+                        <div className="text-center mt-5 animate-on-scroll">
+                            <button 
+                                onClick={handleAppButtonClick} 
+                                className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
+                                Get Fleet
+                            </button>
+                        </div>
                     </div>
                 </section>
 
@@ -172,10 +180,38 @@ const Home = () => {
                                         </div>
                                     ))}
                                 </div>
+                                <div className="text-center mt-4 animate-on-scroll">
+                                    <button 
+                                        onClick={handleAppButtonClick} 
+                                        className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
+                                        Get Fleet
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
+                
+                {/* Modal for app availability */}
+                <div className={`modal fade ${showModal ? 'show' : ''}`} style={{display: showModal ? 'block' : 'none'}} tabIndex="-1">
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Coming Soon!</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p className="mb-0">Fleet is not launched yet, but it will be coming to iOS and Android store soon!</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {/* Modal backdrop */}
+                {showModal && <div className="modal-backdrop fade show" onClick={() => setShowModal(false)}></div>}
             </div>
             <Footer />
         </>
