@@ -5,6 +5,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import Constants from 'expo-constants';
 import { MaterialIcons } from 'react-native-vector-icons';
 import { customMapStyle } from '../styles/customMapStyle'
+
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface RideFormProps {
   token: string;
@@ -160,9 +161,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     return points;
   };
 
-  const customMapStyle = [ 
-   
-];
+  
 const handleLocationSelect = (data: any, details: any | null, type: 'start' | 'end') => {
   if (details && details.geometry && details.geometry.location) {
     const coordinates: [number, number] = [details.geometry.location.lng, details.geometry.location.lat];
@@ -178,6 +177,18 @@ useEffect(() => {
     fetchCoordinatesAndRoute();
   }
 }, [start, end]);
+
+useEffect(() => {
+  if (location && mapRef.current) {
+    mapRef.current.animateToRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    });
+    console.log("Map centered on updated location:", location);
+  }
+}, [location]);
 
   const handleConfirmRide = async () => {
     if (!start || !end ) {

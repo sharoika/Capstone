@@ -1,49 +1,32 @@
-import type React from "react"
-import { useState, useEffect, useRef } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import MapView, { Marker, Polyline } from 'react-native-maps'
-import Geocoder from 'react-native-geocoding'
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Dimensions } from "react-native";
+import MapView, { Marker, Polyline } from 'react-native-maps';
+import Geocoder from 'react-native-geocoding';
 import Constants from 'expo-constants';
+import { MaterialIcons } from 'react-native-vector-icons';
+import { customMapStyle } from '../styles/customMapStyle';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
-interface RideInProgressProps {
-  rideID: string
-  token: string
-  onRideFinished: () => void
-}
+const { width, height } = Dimensions.get('window');
 
-const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFinished }) => {
-  const [rideDetails, setRideDetails] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([])
-  const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null)
-  
-  const mapRef = useRef<MapView>(null)
-  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'
+const customPin = <MaterialIcons name="location-pin" size={40} color="#8EC3FF" />;
+
+const RideInProgress = ({ rideID, token, onRideFinished }) => {
+  const [rideDetails, setRideDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [region, setRegion] = useState(null);
+  const mapRef = useRef(null);
+
+  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+
   useEffect(() => {
-    if (routeCoordinates.length > 0 && mapRef.current) {
-      const startCoords = routeCoordinates[0];
-      const endCoords = routeCoordinates[routeCoordinates.length - 1];
-  
-      const region = {
-        latitude: (startCoords.latitude + endCoords.latitude) / 2,
-        longitude: (startCoords.longitude + endCoords.longitude) / 2,
-        latitudeDelta: Math.abs(startCoords.latitude - endCoords.latitude) * 1.5,
-        longitudeDelta: Math.abs(startCoords.longitude - endCoords.longitude) * 1.5,
-      };
-  
-      mapRef.current.animateToRegion(region, 1000);
-    }
-  }, [routeCoordinates]);
-  
-  useEffect(() => {
-    Geocoder.init(GOOGLE_API_KEY)
-    fetchRideDetails()
-    const interval = setInterval(fetchRideDetails, 10000) // Update every 10 seconds
-    return () => clearInterval(interval)
-  }, [rideID, token])
+    Geocoder.init(GOOGLE_API_KEY);
+    fetchRideDetails();
+    const interval = setInterval(fetchRideDetails, 10000); // Update every 10 sec
+    return () => clearInterval(interval);
+  }, [rideID, token]);
 
   const fetchRideDetails = async () => {
     try {
@@ -53,84 +36,83 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch rid")
-       
+        throw new Error("Failed to fetch ride details");
       }
-      console.log(response);
-      const data = await response.json()
-      setRideDetails(data)
-      await updateMapRoute(data.start, data.end)
-    } catch (err) {
-      setError("Error fetch details")
-      console.error("Error:", err)
-      console.log(err);
-    } finally {
-      setLoading(false)
-    }
-  }
 
-  const updateMapRoute = async (start: { coordinates: [number, number] }, end: { coordinates: [number, number] }) => {
+      const data = await response.json();
+      setRideDetails(data);
+      updateMapRoute(data.start, data.end);
+    } catch (err) {
+      setError("Failed to fetch ride details");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateMapRoute = async (start, end) => {
     try {
-      // Convert addresses to coordinates
-      const startCoords = start.coordinates; 
-      const endCoords = end.coordinates;  
-      // Fetch route from Google Directions API
+      const startCoords = start.coordinates;
+      const endCoords = end.coordinates;
+
       const directionsResponse = await fetch(
         `https://maps.googleapis.com/maps/api/directions/json?origin=${startCoords[1]},${startCoords[0]}&destination=${endCoords[1]},${endCoords[0]}&key=${GOOGLE_API_KEY}`
-    );
+      );
 
-      const directionsData = await directionsResponse.json()
-
+      const directionsData = await directionsResponse.json();
+      
       if (directionsData.routes.length) {
-        const points = decodePolyline(directionsData.routes[0].overview_polyline.points)
-        setRouteCoordinates(points)
+        const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
+        setRouteCoordinates(points);
 
-        // Set initial map region to show the entire route
         const region = {
           latitude: (startCoords[1] + endCoords[1]) / 2,
           longitude: (startCoords[0] + endCoords[0]) / 2,
           latitudeDelta: Math.abs(startCoords[1] - endCoords[1]) * 1.5,
           longitudeDelta: Math.abs(startCoords[0] - endCoords[0]) * 1.5,
-      };
-        mapRef.current?.animateToRegion(region)
+        };
+
+        setRegion(region);
       }
     } catch (error) {
-      console.error('Error updating map route:', error)
+      console.error('Error updating map route:', error);
     }
-  }
+  };
 
-  const decodePolyline = (t: string) => {
-    let points = []
-    let index = 0, len = t.length
-    let lat = 0, lng = 0
+  const decodePolyline = (encoded) => {
+    let points = [];
+    let index = 0, len = encoded.length;
+    let lat = 0, lng = 0;
 
     while (index < len) {
-      let b, shift = 0, result = 0
+      let b, shift = 0, result = 0;
       do {
-        b = t.charCodeAt(index++) - 63
-        result |= (b & 0x1f) << shift
-        shift += 5
-      } while (b >= 0x20)
-      let dlat = result & 1 ? ~(result >> 1) : result >> 1
-      lat += dlat
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
 
-      shift = 0
-      result = 0
+      let dlat = result & 1 ? ~(result >> 1) : result >> 1;
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
       do {
-        b = t.charCodeAt(index++) - 63
-        result |= (b & 0x1f) << shift
-        shift += 5
-      } while (b >= 0x20)
-      let dlng = result & 1 ? ~(result >> 1) : result >> 1
-      lng += dlng
+        b = encoded.charCodeAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
 
-      points.push({ latitude: lat / 1e5, longitude: lng / 1e5 })
+      let dlng = result & 1 ? ~(result >> 1) : result >> 1;
+      lng += dlng;
+
+      points.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
     }
-    return points
-  }
+    return points;
+  };
 
   const handleFinishRide = async () => {
     try {
@@ -140,27 +122,25 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to finish the ride")
+        throw new Error("Failed to finish the ride");
       }
 
-      const data = await response.json()
-      console.log("Ride finished:", data.ride)
-      onRideFinished()
+      onRideFinished();
     } catch (err) {
-      console.error("Error finishing the ride:", err)
-      Alert.alert("Error", "Unable to finish the ride")
+      console.error("Error finishing the ride:", err);
+      Alert.alert("Error", "Unable to finish the ride");
     }
-  }
+  };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#39c9c2" />
       </View>
-    )
+    );
   }
 
   if (error) {
@@ -168,202 +148,96 @@ const RideInProgress: React.FC<RideInProgressProps> = ({ rideID, token, onRideFi
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{error}</Text>
       </View>
-    )
+    );
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.mapContainer}>
+      {region && (
         <MapView
           ref={mapRef}
           style={styles.map}
-          showsUserLocation={true}
+          region={region}
+          customMapStyle={customMapStyle}
         >
           {routeCoordinates.length > 0 && (
-            <Polyline
-              coordinates={routeCoordinates}
-              strokeColor="#39C9C2"
-              strokeWidth={3}
-            />
+            <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2" />
           )}
-          {rideDetails && (
-            <>
-              <Marker
-                coordinate={{
-                  latitude: routeCoordinates[0]?.latitude || 0,
-                  longitude: routeCoordinates[0]?.longitude || 0,
-                }}
-                title="Pickup"
-               
-              />
-              <Marker
-                coordinate={{
-                  latitude: routeCoordinates[routeCoordinates.length - 1]?.latitude || 0,
-                  longitude: routeCoordinates[routeCoordinates.length - 1]?.longitude || 0,
-                }}
-                title="Destination"
-               
-              />
-            </>
-          )}
+          <Marker coordinate={routeCoordinates[0]} title="Start">
+            {customPin}
+          </Marker>
+          <Marker coordinate={routeCoordinates[routeCoordinates.length - 1]} title="End">
+            {customPin}
+          </Marker>
         </MapView>
-      </View>
+      )}
 
-      <View style={styles.detailsContainer}>
-
-       <View style={styles.fareContainer}>
-          <View style={styles.fareItem}>
-            <Text style={styles.fareLabel}>Distance</Text>
-            <Text style={styles.fareValue}>{rideDetails.distance?.toFixed(2)} km</Text>
-          </View>
-          <View style={styles.fareDivider} />
-          <View style={styles.fareItem}>
-            <Text style={styles.fareLabel}>Total Fare</Text>
-            <Text style={styles.fareValue}>${rideDetails.fare?.toFixed(2)}</Text>
-          </View>
+      <View style={styles.cardContainer}>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Ride Details</Text>
+          <Text style={styles.label}>Distance:</Text>
+          <Text style={styles.value}>{rideDetails?.distance?.toFixed(2)} km</Text>
+          <Text style={styles.label}>Total Fare:</Text>
+          <Text style={styles.value}>${rideDetails?.fare?.toFixed(2)}</Text>
+          <TouchableOpacity style={styles.endRideButton} onPress={handleFinishRide}>
+            <Text style={styles.endRideButtonText}>End Ride</Text>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          style={styles.endRideButton}
-          onPress={handleFinishRide}
-        >
-          <Text style={styles.endRideButtonText}>End Ride</Text>
-        </TouchableOpacity>
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  mapContainer: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
   },
   map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  cardContainer: {
+    position: 'absolute',
+    bottom: 0,
     width: '100%',
-    height: '100%',
+    alignItems: 'center',
+    padding: 10,
   },
-  detailsContainer: {
+  card: {
+    width: width * 0.9,
     backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderRadius: 12,
     elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
-  driverInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  driverAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#E8F7F7',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  driverInitial: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#39C9C2',
-  },
-  driverName: {
+  cardTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#173252',
-    marginBottom: 4,
+    fontWeight: 'bold',
   },
-  vehicleInfo: {
+  label: {
     fontSize: 14,
-    color: '#666',
+    color: "#6d6d6d",
+    marginTop: 8,
   },
-  locationContainer: {
-    marginBottom: 16,
-  },
-  locationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 4,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 8,
-  },
-  locationText: {
-    fontSize: 14,
-    color: '#333',
-    flex: 1,
-  },
-  fareContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 4,
-  },
-  fareItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  fareDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#E8F7F7',
-    marginHorizontal: 10,
-  },
-  fareLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-  fareValue: {
+  value: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#4A90E2',
+    fontWeight: "500",
   },
   endRideButton: {
-    backgroundColor: '#4A90E2',
-    padding: 16,
+    backgroundColor: "#4A90E2",
+    padding: 14,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
+    marginTop: 15,
   },
   endRideButtonText: {
-    color: 'white',
+    color: "#ffffff",
     fontSize: 16,
-    fontWeight: '600',
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f6f7f9",
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f6f7f9",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#ff4444",
-    textAlign: "center",
-  },
-})
+});
 
-export default RideInProgress
+export default RideInProgress;

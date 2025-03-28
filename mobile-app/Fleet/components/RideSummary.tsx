@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import Receipt from './Receipt';
+import Geocoder from 'react-native-geocoding';
+import MapView, { Marker } from "react-native-maps";
+import { customMapStyle } from '../styles/customMapStyle'
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
+const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+
+Geocoder.init(GOOGLE_API_KEY);
+const { width, height } = Dimensions.get('window');
+
 interface RideSummaryProps {
   rideID: string;
   token: string;
@@ -19,7 +27,15 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
   const [receipt, setReceipt] = useState<any>(null);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
   const [loadingReceipt, setLoadingReceipt] = useState(false);
-
+  const [startAddress, setStartAddress] = useState<string | null>(null);
+  const [endAddress, setEndAddress] = useState<string | null>(null);
+  const [region, setRegion] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+  const fadeAnim = new Animated.Value(0);
   useEffect(() => {
     const fetchRideDetails = async () => {
       try {
@@ -37,8 +53,12 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
 
         const data = await response.json();
         setRideDetails(data);
-        
-        // Check if the ride is completed, then try to fetch receipt
+
+        if (data.start?.coordinates && data.end?.coordinates) {
+          convertCoordinatesToAddress(data.start.coordinates, setStartAddress);
+          convertCoordinatesToAddress(data.end.coordinates, setEndAddress);
+        }
+
         if (data.status === 'COMPLETED') {
           fetchReceipt();
         }
@@ -52,6 +72,19 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
 
     fetchRideDetails();
   }, [rideID, token]);
+
+  const convertCoordinatesToAddress = async (coords: number[], setAddress: (address: string | null) => void) => {
+    try {
+      const { latitude, longitude } = { latitude: coords[1], longitude: coords[0] };
+      const response = await Geocoder.from(latitude, longitude);
+
+      const address = response.results[0]?.formatted_address || "Address not found";
+      setAddress(address);
+    } catch (error) {
+      console.error("Error converting coordinates:", error);
+      setAddress("Address not available");
+    }
+  };
 
   const fetchReceipt = async () => {
     setLoadingReceipt(true);
@@ -87,66 +120,55 @@ const RideSummary: React.FC<RideSummaryProps> = ({ rideID, token, onReturnHome }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.headerText}>Ride Summary</Text>
-        {loading ? (
-          <Text>Loading...</Text>
-        ) : error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : rideDetails ? (
-          <View style={styles.summaryCard}>
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>Ride ID</Text>
-              <Text style={styles.infoText}>{rideDetails.rideID}</Text>
-            </View>
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>Start Location</Text>
-              <Text style={styles.infoText}></Text>
-            </View>
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>End Location</Text>
-              <Text style={styles.infoText}></Text>
-            </View>
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>Distance</Text>
-              <Text style={styles.infoText}>{rideDetails.distance} km</Text>
-            </View>
-            <View style={styles.infoSection}>
-              <Text style={styles.infoLabel}>Total Fare</Text>
-              <Text style={styles.fareText}>${rideDetails.fare}</Text>
-            </View>
-            
-            {receipt && (
-              <TouchableOpacity 
-                style={styles.receiptButton} 
-                onPress={viewReceipt}
-                disabled={loadingReceipt}
-              >
-                <Ionicons name="receipt-outline" size={20} color="#ffffff" />
-                <Text style={styles.receiptButtonText}>
-                  {loadingReceipt ? "Loading Receipt..." : "View Receipt"}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        ) : (
-          <Text style={styles.noDataText}>No ride details available</Text>
-        )}
+      <MapView
+        style={StyleSheet.absoluteFillObject}
+        region={region}
+           customMapStyle={customMapStyle}
+      >
+      </MapView>
 
-        <TouchableOpacity style={styles.returnButton} onPress={onReturnHome} activeOpacity={0.8}>
-          <Text style={styles.returnButtonText}>Return to Home</Text>
-        </TouchableOpacity>
-      </View>
-      
+      <Animated.View style={[styles.overlayContainer]}>
+        <View style={styles.card}>
+          {error ? (
+            <Text>{error}</Text>
+          ) : (
+            <>
+              <Text style={styles.headerText}>Ride Summary</Text>
+              <Text style={styles.infoText}>From: {startAddress || "Loading..."}</Text>
+              <Text style={styles.infoText}>To: {endAddress || "Loading..."}</Text>
+              <Text style={styles.infoText}>Distance: {rideDetails?.distance || 'N/A'} km</Text>
+              <Text style={styles.fareText}>
+                Fare: ${rideDetails?.fare ? (rideDetails.fare / 100).toFixed(2) : '0.00'}
+              </Text>
+
+              {receipt && (
+                <TouchableOpacity
+                  style={styles.receiptButton}
+                  onPress={viewReceipt}
+                  disabled={loadingReceipt}
+                >
+                  <Ionicons name="receipt-outline" size={20} color="#ffffff" />
+                  <Text style={styles.receiptButtonText}>
+                    {loadingReceipt ? "Loading Receipt..." : "View Receipt"}
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity style={styles.returnButton} onPress={onReturnHome}>
+                <Text style={styles.returnButtonText}>Return to Home</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </Animated.View>
+
       <Modal
         animationType="slide"
         transparent={false}
         visible={receiptModalVisible}
         onRequestClose={closeReceiptModal}
       >
-        {receipt && (
-          <Receipt receipt={receipt} onClose={closeReceiptModal} />
-        )}
+        {receipt && <Receipt receipt={receipt} onClose={closeReceiptModal} />}
       </Modal>
     </SafeAreaView>
   );
@@ -156,86 +178,60 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#f6f7f9",
+    ...StyleSheet.absoluteFillObject,
   },
-  container: {
-    flex: 1,
-    padding: 12,
+  overlayContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...StyleSheet.absoluteFillObject,
+  },
+  card: {
+    width: width * 0.8,    
+    height: height * 0.8, 
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 12,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    justifyContent: 'center',  
+    alignItems: 'center',
   },
   headerText: {
     fontSize: 24,
-    fontWeight: "600",
-    color: "#173252",
+    fontWeight: "bold",
     marginBottom: 12,
-  },
-  summaryCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  infoSection: {
-    marginBottom: 12,
-  },
-  infoLabel: {
-    fontSize: 12,
-    color: "#6d6d6d",
-    marginBottom: 2,
   },
   infoText: {
-    fontSize: 14,
-    color: "#173252",
-    fontWeight: "500",
+    fontSize: 16,
+    marginBottom: 8,
   },
   fareText: {
     fontSize: 20,
     fontWeight: "600",
     color: "#4A90E2",
-  },
-  noDataText: {
-    fontSize: 14,
-    color: "#6d6d6d",
-    textAlign: "center",
-  },
-  errorText: {
-    fontSize: 14,
-    color: "red",
-    textAlign: "center",
-  },
-  returnButton: {
-    backgroundColor: "#4A90E2",
-    borderRadius: 12,
-    padding: 14,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  returnButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "600",
+    marginBottom: 12,
   },
   receiptButton: {
-    backgroundColor: "#173252",
-    borderRadius: 12,
+    backgroundColor: "#4A90E2",
     padding: 12,
-    flexDirection: "row",
-    justifyContent: "center",
+    borderRadius: 8,
     alignItems: "center",
-    marginTop: 8,
   },
   receiptButtonText: {
-    color: "#ffffff",
-    fontSize: 14,
-    fontWeight: "600",
-    marginLeft: 8,
+    color: "#fff",
+  },
+  returnButton: {
+    backgroundColor: "#173252",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 12,
+  },
+  returnButtonText: {
+    color: "#fff",
   },
 });
 

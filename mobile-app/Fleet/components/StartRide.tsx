@@ -5,6 +5,8 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import Constants from 'expo-constants';
+import { MaterialIcons } from 'react-native-vector-icons';
+import { customMapStyle } from '../styles/customMapStyle'
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface StartRideProps {
@@ -13,6 +15,7 @@ interface StartRideProps {
   onRideStarted: () => void
 }
 const { width, height } = Dimensions.get('window');
+const customPin = <MaterialIcons name="location-pin" size={40} color="#8EC3FF" />;
 
 const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) => {
   const [rideDetails, setRideDetails] = useState<any>(null);
@@ -25,8 +28,15 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   const [fare, setFare] = useState<number>(0);
   const [startAddress, setStartAddress] = useState<string>("Loading...");
   const [driverAddress, setDriverAddress] = useState<string>("Loading...");
-
+  const [driverLocation, setDriverLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [startLocation, setStartLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  
   const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+
+  useEffect(() => {
+    Geocoder.init(GOOGLE_API_KEY);
+  }, []);
+
   const decodePolyline = (encoded: string) => {
     let points = [];
     let index = 0, len = encoded.length;
@@ -60,6 +70,17 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     return points;
   };
 
+  const reverseGeocode = async (latitude: number, longitude: number, setAddress: (address: string) => void) => {
+    try {
+      const response = await Geocoder.from(latitude, longitude);
+      const address = response.results[0]?.formatted_address || "Unknown location";
+      setAddress(address);
+    } catch (error) {
+      console.error("Reverse geocoding failed:", error);
+      setAddress("Address not found");
+    }
+  };
+  
   useEffect(() => {
     const fetchCoordinates = async () => {
       try {
@@ -67,9 +88,19 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
           return;
         }
     
+        if (rideDetails.driver?.currentLocation?.coordinates && rideDetails.start?.coordinates) {
+          setDriverLocation({
+            latitude: rideDetails.driver.currentLocation.coordinates[1],
+            longitude: rideDetails.driver.currentLocation.coordinates[0],
+          });
+        
+          setStartLocation({
+            latitude: rideDetails.start.coordinates[1],
+            longitude: rideDetails.start.coordinates[0],
+          });
+        }
         const driverLocation = `${rideDetails.driver.currentLocation.coordinates[1]},${rideDetails.driver.currentLocation.coordinates[0]}`;
         const startLocation = `${rideDetails.start.coordinates[1]},${rideDetails.start.coordinates[0]}`;
-        
         const directionsResponse = await fetch(
           `https://maps.googleapis.com/maps/api/directions/json?origin=${driverLocation}&destination=${startLocation}&key=${GOOGLE_API_KEY}`
         );
@@ -104,6 +135,15 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     fetchCoordinates();
   }, [rideDetails]); 
 
+  useEffect(() => {
+    if (rideDetails?.start?.coordinates && rideDetails?.driver?.currentLocation?.coordinates) {
+      const [startLat, startLng] = rideDetails.start.coordinates;
+      const [driverLat, driverLng] = rideDetails.driver.currentLocation.coordinates;
+  
+      reverseGeocode(startLng, startLat, setStartAddress);
+      reverseGeocode(driverLng, driverLat, setDriverAddress);
+    }
+  }, [rideDetails]);
 
   useEffect(() => {
     const fetchRideDetails = async () => {
@@ -216,54 +256,67 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
       </View>
     )
   }
-  return (    <View style={styles.container}>
+  return (
+
+    <View style={styles.container}>
     {region && (
-      <MapView ref={mapRef} style={styles.map} region={region}>
+      <MapView ref={mapRef} style={styles.map} region={region} customMapStyle={customMapStyle} >
         {routeCoordinates.length > 0 && (
-          <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />
+          <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2"/>
         )}
-        <Marker coordinate={routeCoordinates[0]} title="Start" />
-        <Marker coordinate={routeCoordinates[1]} title="End" />
+       {driverLocation && (
+  <Marker coordinate={driverLocation} title="Driver Location">
+    {customPin}
+  </Marker>
+)}
+{startLocation && (
+  <Marker coordinate={startLocation} title="Start">
+    {customPin}
+  </Marker>
+)}
       </MapView>
     )}
 
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>Ride Details</Text>
 
-{/*<Text style={styles.label}>Start Location Address:</Text>
+
+<View style={styles.cardContainer}>
+        <View style={styles.card}>
+
+          <Text style={styles.cardTitle}>Ride Details</Text>
+          <Text style={styles.label}>Start Location Address:</Text>
 <Text style={styles.value}>{startAddress}</Text>
 <Text style={styles.label}>Driver Location Address:</Text>
-<Text style={styles.value}>{driverAddress}</Text>*/}
-
-
-
-      <Text style={styles.label}>Fare:</Text>
-      <Text style={styles.value}>${fare.toFixed(2)}</Text>
-
-      <Text style={styles.label}>Distance:</Text>
-      <Text style={styles.value}>{distance}</Text>
-
-      <TouchableOpacity style={styles.startButton} onPress={handleStartRide}>
-        <Text style={styles.startButtonText}>Start Ride</Text>
-      </TouchableOpacity>
+<Text style={styles.value}>{driverAddress}</Text>
+          <Text style={styles.label}>Fare:</Text>
+          <Text style={styles.value}>${fare.toFixed(2)}</Text>
+          <Text style={styles.label}>Distance:</Text>
+          <Text style={styles.value}>{distance}</Text>
+          <TouchableOpacity style={styles.startButton} onPress={handleStartRide}>
+            <Text style={styles.startButtonText}>Start Ride</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
-  </View>
 );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 0,
-    padding: 0,
     ...StyleSheet.absoluteFillObject,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  cardContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    alignItems: 'center',
+    padding: 10,
+  },
   card: {
-    width: width * 0.8,
-    height: height * 0.6,
+    width: width * 0.9,
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 12,
@@ -272,8 +325,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   cardTitle: {
     fontSize: 18,
@@ -295,11 +346,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    marginTop: 15,
   },
   startButtonText: {
     color: "#ffffff",
