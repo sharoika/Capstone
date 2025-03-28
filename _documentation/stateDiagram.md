@@ -20,21 +20,25 @@ stateDiagram-v2
     state UserActive {
         state RiderState {
             [*] --> Browsing
-            Browsing --> RequestingRide: Request Ride
-            RequestingRide --> WaitingForDriver: Confirm Request
-            RequestingRide --> Browsing: Cancel Request
-            WaitingForDriver --> RideInProgress: Driver Arrives
-            WaitingForDriver --> Browsing: Cancel Before Driver Assignment
-            RideInProgress --> RateAndPay: Arrive at Destination
-            RateAndPay --> Browsing: Complete Payment and Rating
+            Browsing --> Proposed: Enter Ride Details
+            Proposed --> Selected: Select Driver
+            Selected --> Accepted: Driver Accepts
+            Accepted --> InProgress: Start Ride
+            InProgress --> Completed: Arrive at Destination
+            Completed --> RateAndPay: Process Payment & Rate
+            RateAndPay --> Browsing: Return to Browsing
+            
+            Proposed --> Cancelled: Cancel Request
+            Selected --> Cancelled: Cancel Request
+            Accepted --> Cancelled: Cancel Request
         }
         
         state DriverState {
             [*] --> Offline
             Offline --> Available: Go Online
             Available --> Offline: Go Offline
-            Available --> AssignedToRide: Accept Ride Request
-            AssignedToRide --> EnRouteToPickup: Navigate to Pickup
+            Available --> Accepted: Accept Ride Request
+            Accepted --> EnRouteToPickup: Navigate to Pickup
             EnRouteToPickup --> ArrivedAtPickup: Reach Pickup Location
             ArrivedAtPickup --> InProgress: Start Ride
             InProgress --> Completed: End Ride
@@ -66,15 +70,18 @@ This state chart illustrates the various states and transitions within the Fleet
 
 ### Rider States
 - **Browsing**: Default state when rider is logged in but not actively using a ride
-- **RequestingRide**: Rider is in the process of requesting transportation
-- **WaitingForDriver**: Ride request is confirmed and awaiting driver assignment
-- **RideInProgress**: Rider is currently in a vehicle en route to destination
+- **Proposed**: Rider has entered ride details but not yet selected a driver
+- **Selected**: Rider has selected a driver but driver has not yet accepted
+- **Accepted**: Driver has accepted the ride request
+- **InProgress**: Rider is currently in a vehicle en route to destination
+- **Completed**: Ride has concluded at the destination
+- **Cancelled**: Ride was cancelled at some point in the process
 - **RateAndPay**: Post-ride state for payment processing and driver rating
 
 ### Driver States
 - **Offline**: Driver is logged in but not accepting ride requests
 - **Available**: Driver is online and ready to accept rides
-- **AssignedToRide**: Driver has accepted a specific ride request
+- **Accepted**: Driver has accepted a specific ride request
 - **EnRouteToPickup**: Driver is navigating to the rider's pickup location
 - **ArrivedAtPickup**: Driver has reached the pickup location
 - **InProgress**: Driver is transporting rider to destination

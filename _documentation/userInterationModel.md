@@ -137,7 +137,6 @@ flowchart TD
    - Ride Request Form
    - Driver Tracking
    - Ride History
-   - Receipt Details
    - Profile Management
    - Payment Methods
    

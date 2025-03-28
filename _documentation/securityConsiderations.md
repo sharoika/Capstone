@@ -6,15 +6,12 @@ This document outlines the security measures implemented in our application.
 
 - **JWT Implementation**: Our application uses JSON Web Tokens (JWT) for stateless authentication.
 - **Token Expiration**: All tokens have a defined expiration time to limit the window of opportunity for attacks.
-- **Secure Storage**: Tokens are stored in HTTP-only cookies to prevent access via JavaScript, mitigating XSS attacks.
-- **CSRF Protection**: Implemented to prevent Cross-Site Request Forgery attacks when using cookies.
 - **Token Revocation**: Mechanisms are in place to invalidate tokens when users log out or change passwords.
 
 ## MongoDB Security
 
 - **Authentication**: MongoDB instances require authentication with strong username/password combinations.
 - **Role-Based Access Control**: Users are assigned specific roles with least privilege principles.
-- **Network Isolation**: MongoDB is deployed within a private network, not exposed to public internet.
 - **TLS/SSL**: All connections to MongoDB use TLS/SSL encryption to secure data in transit.
 - **Data Encryption**: Sensitive data fields are encrypted at rest within MongoDB collections.
 - **Regular Updates**: Database servers are kept updated with the latest security patches.
@@ -32,10 +29,6 @@ This document outlines the security measures implemented in our application.
 ## Digital Ocean Security
 
 - **Firewalls**: DigitalOcean Cloud Firewalls are configured to restrict access to only necessary ports and services.
-- **VPC Network**: Resources are isolated within a Virtual Private Cloud network.
-- **Regular Backups**: Automated backups are performed and stored securely.
-- **Monitoring and Alerts**: Systems are monitored for suspicious activities with real-time alerts.
-- **Disk Encryption**: Volumes containing sensitive data are encrypted.
 - **IAM**: Identity and Access Management controls are implemented to limit access to cloud resources.
 - **Security Updates**: All systems receive automatic security updates.
 
@@ -44,7 +37,6 @@ This document outlines the security measures implemented in our application.
 - **Stripe Integration**: All payment processing is handled by Stripe, a PCI-DSS compliant provider.
 - **No Card Data Storage**: Our application never stores, processes, or transmits actual credit card data.
 - **Tokenization**: We only store tokenized references (Stripe IDs) to customers and payment methods.
-- **Webhook Signatures**: All Stripe webhooks are verified using cryptographic signatures.
 - **Secure API Keys**: Stripe API keys are securely stored as environment variables, never in code repositories.
 - **Audit Logging**: All payment-related actions are logged for audit purposes without sensitive data.
 
