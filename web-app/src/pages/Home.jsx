@@ -180,13 +180,6 @@ const Home = () => {
                                         </div>
                                     ))}
                                 </div>
-                                <div className="text-center mt-4 animate-on-scroll">
-                                    <button 
-                                        onClick={handleAppButtonClick} 
-                                        className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
-                                        Get Fleet
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
