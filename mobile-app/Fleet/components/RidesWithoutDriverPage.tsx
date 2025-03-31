@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Constants from 'expo-constants';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
@@ -8,11 +8,13 @@ interface RidesForDriverStepProps {
   token: string;
   driverID: string;
   onRideClaimed: (rideID: string) => void; 
+  onGoOffline: () => void; 
 }
 
-const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID, onRideClaimed }) => {
+const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID, onRideClaimed, onGoOffline }) => {
   const [ridesForDriver, setRidesForDriver] = useState<any[]>([]);
   const [selectedRide, setSelectedRide] = useState<string>('');
+  const [offlineLoading, setOfflineLoading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(fetchRidesForDriver, 5000);
@@ -66,6 +68,32 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       Alert.alert('Error', 'An error occurred while claiming the ride');
     }
   };
+  const toggleOffline = async () => {
+    setOfflineLoading(true);
+
+    try {
+      const response = await fetch(`${apiUrl}/api/user/driver/${driverID}/offline`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        Alert.alert('Status', 'You are now offline');
+        onGoOffline();
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.message || 'Failed to go offline');
+      }
+    } catch (error) {
+      console.error('Error going offline:', error);
+      Alert.alert('Error', 'An error occurred while changing your status');
+    } finally {
+      setOfflineLoading(false);
+    }
+  };
 
   const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity
@@ -88,7 +116,17 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
           renderItem={renderItem}
           keyExtractor={(item) => item._id}
         />
-      )}
+      )}<TouchableOpacity
+        style={styles.offlineButton}
+        onPress={toggleOffline}
+        disabled={offlineLoading}
+      >
+        {offlineLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.offlineButtonText}>Go Offline</Text>
+        )}
+      </TouchableOpacity>
     </View>
   );
 };
@@ -127,6 +165,19 @@ const styles = StyleSheet.create({
   cardDetails: {
     fontSize: 14,
     color: '#888',
+  },
+  offlineButton: {
+    marginTop: 20,
+    backgroundColor: '#FF5C5C',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  offlineButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
