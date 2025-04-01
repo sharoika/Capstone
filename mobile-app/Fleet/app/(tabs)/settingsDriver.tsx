@@ -370,7 +370,10 @@ export default function Settings() {
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.settingOption}>
+        <TouchableOpacity 
+          style={styles.settingOption} 
+          onPress={() => Alert.alert('Coming Soon', 'Notifications feature is coming soon!')}
+        >
           <View style={styles.settingOptionContent}>
             <Bell color='#4A90E2'size={24} />
             <Text style={styles.settingOptionText}>Notifications</Text>
