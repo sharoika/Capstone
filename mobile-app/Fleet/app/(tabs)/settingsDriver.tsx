@@ -348,7 +348,7 @@ export default function Settings() {
                   <Image source={{ uri: driver.profilePicture }} style={styles.profileImage} />
                 ) : (
                   <View style={styles.profileImagePlaceholder}>
-                    <User color="#39C9C2" size={40} />
+                    <User color='#4A90E2' size={40} />
                   </View>
                 )}
               </View>
@@ -364,7 +364,7 @@ export default function Settings() {
       <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingOption} onPress={() => router.push('/(pages)/editDriverProfile')}>
           <View style={styles.settingOptionContent}>
-            <Edit2 color="#39C9C2" size={24} />
+            <Edit2 color='#4A90E2' size={24} />
             <Text style={styles.settingOptionText}>Edit Profile</Text>
           </View>
           <ChevronRight color="#6D6D6D" size={24} />
@@ -372,7 +372,7 @@ export default function Settings() {
 
         <TouchableOpacity style={styles.settingOption}>
           <View style={styles.settingOptionContent}>
-            <Bell color="#39C9C2" size={24} />
+            <Bell color='#4A90E2'size={24} />
             <Text style={styles.settingOptionText}>Notifications</Text>
           </View>
           <ChevronRight color="#6D6D6D" size={24} />
@@ -380,7 +380,7 @@ export default function Settings() {
 
         <TouchableOpacity style={styles.settingOption}>
           <View style={styles.settingOptionContent}>
-            <Lock color="#39C9C2" size={24} />
+            <Lock color='#4A90E2' size={24} />
             <Text style={styles.settingOptionText}>Privacy Settings</Text>
           </View>
           <ChevronRight color="#6D6D6D" size={24} />
@@ -391,7 +391,7 @@ export default function Settings() {
           onPress={() => setShowPayoutModal(true)}
         >
           <View style={styles.settingOptionContent}>
-            <Banknote color="#39C9C2" size={24} />
+            <Banknote color='#4A90E2' size={24} />
             <View style={styles.earningsContainer}>
               <Text style={styles.settingOptionText}>Earnings & Payouts</Text>
               {driver?.ledger && (
@@ -409,7 +409,7 @@ export default function Settings() {
           onPress={() => setShowPriceModal(true)}
         >
           <View style={styles.settingOptionContent}>
-            <Banknote color="#39C9C2" size={24} />
+            <Banknote color='#4A90E2' size={24} />
             <Text style={styles.settingOptionText}>Set Prices</Text>
           </View>
           <View style={styles.rowRight}>
@@ -420,29 +420,6 @@ export default function Settings() {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.settingOption} 
-          onPress={createTestReceipt}
-        >
-          <View style={styles.settingOptionContent}>
-            <Receipt color="#39C9C2" size={24} />
-            <Text style={styles.settingOptionText}>Create Test Receipt</Text>
-          </View>
-          <ChevronRight color="#6D6D6D" size={24} />
-        </TouchableOpacity>
-
-        {__DEV__ && (
-          <TouchableOpacity 
-            style={styles.settingOption} 
-            onPress={addTestEarnings}
-          >
-            <View style={styles.settingOptionContent}>
-              <Banknote color="#39C9C2" size={24} />
-              <Text style={styles.settingOptionText}>Add Test $10</Text>
-            </View>
-            <ChevronRight color="#6D6D6D" size={24} />
-          </TouchableOpacity>
-        )}
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={() => router.push('/(auth)/login')}>
@@ -567,12 +544,12 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#173252',
+    color: '#4A90E2', 
     marginBottom: 4,
   },
   userEmail: {
     fontSize: 16,
-    color: '#6D6D6D',
+    color: '#4A90E2',
   },
   driverInfo: {
     marginTop: 16,
@@ -581,15 +558,15 @@ const styles = StyleSheet.create({
   driverName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#173252',
+    color: '#4A90E2', 
   },
   driverEmail: {
     fontSize: 16,
-    color: '#6D6D6D',
+    color: '#4A90E2',
   },
   driverVehicle: {
     fontSize: 16,
-    color: '#39C9C2',
+    color: '#4A90E2',
     marginTop: 4,
   },
   driverPlate: {
@@ -628,7 +605,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#39C9C2',
+    backgroundColor: '#4A90E2', 
     marginHorizontal: 24,
     marginTop: 24,
     marginBottom: 40,
@@ -649,11 +626,11 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   input: { width: '100%', borderBottomWidth: 1, padding: 10, marginBottom: 10 },
-  button: { backgroundColor: '#39C9C2', padding: 15, borderRadius: 8, width: '100%', alignItems: 'center' },
+  button: { backgroundColor: '#4A90E2', padding: 15, borderRadius: 8, width: '100%', alignItems: 'center' }, // Updated color
   buttonText: { color: 'white', fontSize: 16 },
   balanceInfo: {
     fontSize: 14,
-    color: '#39C9C2',
+    color: '#4A90E2', 
     marginLeft: 8,
   },
   earningsContainer: {
@@ -662,7 +639,7 @@ const styles = StyleSheet.create({
   },
   balanceText: {
     fontSize: 14,
-    color: '#39C9C2',
+    color: '#4A90E2',
     marginTop: 4,
   },
   row: {
@@ -715,7 +692,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   saveButton: {
-    backgroundColor: '#39C9C2',
+    backgroundColor: '#4A90E2', 
   },
   modalTitle: {
     fontSize: 20,
@@ -728,14 +705,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 8,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    width: '100%',
-  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -743,34 +712,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 20,
   },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    width: '100%',
-    maxWidth: 400,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-    gap: 10,
-  },
-  modalButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#ccc',
-  },
-  saveButton: {
-    backgroundColor: '#39C9C2',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
 });
+

@@ -42,34 +42,57 @@ const TabNavigator = () => {
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'home-outline';
 
-          if (route.name === 'Home') {
-            iconName = 'home-outline'; 
+          if (route.name === 'Ride') {
+            iconName = 'car-outline';
           } else if (route.name === 'Profile') {
             iconName = 'person-outline'; 
-          } else if (route.name === 'Driver Home') {
+          } else if (route.name === 'Drive') {
             iconName = 'car-outline';
           } else if (route.name === 'Driver Profile') {
             iconName = 'person-circle-outline';
-          } else if (route.name === 'Receipts') {
+          } else if (route.name === 'History') {
             iconName = 'receipt-outline';
           }
+          const iconColor = (route.name === "Ride" || route.name === "Drive") ? "white" : color;
 
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={size} color={iconColor} />;
+        },
+        tabBarStyle: {
+          borderTopWidth: 0,
+          height: 70,
+        },
+        tabBarItemStyle: {
+          justifyContent: "flex-end",
+          alignItems: "center",
+          paddingTop: 8, 
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
         },
       })}
     >
       {userType === "driver" && (
         <>
-          <Tab.Screen name="Driver Home" component={DriverHomeScreen} />
-          <Tab.Screen name="Receipts" component={ReceiptsScreen} />
-          <Tab.Screen name="Driver Profile" component={DriverProfileScreen} />
+              <Tab.Screen name="History" component={ReceiptsScreen} />
+       <Tab.Screen name="Drive" component={DriverHomeScreen}         options={{
+             tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10,   paddingTop: 8,  },
+             tabBarLabelStyle: { color: "white" ,  fontSize: 12, },
+        }} />
+
+      <Tab.Screen name="Profile" component={DriverProfileScreen} />
         </>
       )}
       {userType === "rider" && (
         <>
-          <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="Receipts" component={ReceiptsScreen} />
-          <Tab.Screen name="Profile" component={ProfileScreen} />
+          <Tab.Screen name="History" component={ReceiptsScreen} />
+         
+          <Tab.Screen name="Ride" component={HomeScreen}            options={{
+          tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10,   paddingTop: 8,  },
+          tabBarLabelStyle: { color: "white" ,  fontSize: 12, },
+        }}
+       
+            />
+           <Tab.Screen name="Profile" component={ProfileScreen} />
         </>
       )}
     </Tab.Navigator>
