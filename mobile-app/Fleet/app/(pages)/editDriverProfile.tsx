@@ -269,7 +269,7 @@ export default function EditDriverProfile() {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#39C9C2" style={styles.loader} />;
+    return <ActivityIndicator size="large" color="#4A90E2" style={styles.loader} />;
   }
 
   return (
@@ -285,12 +285,12 @@ export default function EditDriverProfile() {
         <View style={styles.profileImageContainer}>
           <TouchableOpacity style={styles.profileImageWrapper} onPress={pickImage} disabled={imageUploading}>
             {imageUploading ? (
-              <ActivityIndicator size="large" color="#39C9C2" />
+              <ActivityIndicator size="large" color="#4A90E2" />
             ) : formData.profilePicture ? (
               <Image source={{ uri: formData.profilePicture }} style={styles.profileImage} />
             ) : (
               <View style={styles.profileImagePlaceholder}>
-                <Camera color="#39C9C2" size={40} />
+                <Camera color="#4A90E2" size={40} />
               </View>
             )}
           </TouchableOpacity>
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   saveButton: {
-    backgroundColor: '#39C9C2',
+    backgroundColor: '#4A90E2',
     height: 50,
     borderRadius: 8,
     justifyContent: 'center',
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   },
   changePhotoText: {
     fontSize: 14,
-    color: '#39C9C2',
+    color: '#4A90E2',
     fontWeight: '500',
   },
 }); 
