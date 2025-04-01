@@ -29,6 +29,16 @@ export default function Settings() {
   const [rider, setRider] = useState<Rider | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Safe navigation helper
+  const navigateTo = (path: string) => {
+    try {
+      router.push(path as any);
+    } catch (error) {
+      console.error(`Error navigating to ${path}:`, error);
+      Alert.alert('Navigation Error', `Could not navigate to ${path}`);
+    }
+  };
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -63,7 +73,7 @@ export default function Settings() {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#39C9C2" style={styles.loader} />;
+    return <ActivityIndicator size="large" color="#4A90E2" style={styles.loader} />;
   }
 
   const handleLogout = () => {
@@ -128,22 +138,6 @@ export default function Settings() {
     }
   };
 
-  interface SettingOptionProps {
-    icon: JSX.Element;
-    title: string;
-    onPress: () => void;
-  }
-
-  const SettingOption: React.FC<SettingOptionProps> = ({ icon, title, onPress }) => (
-    <TouchableOpacity style={styles.settingOption} onPress={onPress}>
-      <View style={styles.settingOptionContent}>
-        {icon}
-        <Text style={styles.settingOptionText}>{title}</Text>
-      </View>
-      <ChevronRight color="#6D6D6D" size={24} />
-    </TouchableOpacity>
-  );
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -152,35 +146,62 @@ export default function Settings() {
             <Image source={{ uri: rider.profilePicture }} style={styles.profileImage} />
           ) : (
             <View style={styles.profileImagePlaceholder}>
-              <User color="#39C9C2" size={40} />
+              <User color="#4A90E2" size={40} />
             </View>
           )}
         </View>
         <Text style={styles.userName}>{rider?.firstName} {rider?.lastName}</Text>
         <Text style={styles.userEmail}>{rider?.email}</Text>
-        <Text style={styles.userPhone}>Phone: {rider?.phone || 'N/A'}</Text>
-        <Text style={styles.userHomeLocation}>Home Location: {rider?.homeLocation || 'N/A'}</Text>
-        <Text style={styles.userCompletedRides}>Completed Rides: {rider?.completedRides?.length || 0}</Text>
+        {rider?.phone && <Text style={styles.userPhone}>{rider.phone}</Text>}
+        {rider?.homeLocation && <Text style={styles.userHomeLocation}>{rider.homeLocation}</Text>}
       </View>
 
       <View style={styles.settingsContainer}>
-        <SettingOption icon={<Edit2 color="#39C9C2" size={24} />} title="Edit Profile" onPress={() => router.push('/(pages)/editProfile')} />
-        <SettingOption
-          icon={<Banknote color="#39C9C2" size={24} />}
-          title="Payment Settings"
-          onPress={() => router.push('/paymentSettings')}
-        />
-        <SettingOption 
-          icon={<Bell color="#39C9C2" size={24} />} 
-          title="Notifications" 
-          onPress={() => alert('Notifications Management Coming Soon')} 
-        />
-        <SettingOption icon={<Lock color="#39C9C2" size={24} />} title="Privacy Settings" onPress={() => { }} />
-        <SettingOption 
-          icon={<Receipt color="#39C9C2" size={24} />} 
-          title="Create Test Receipt" 
-          onPress={createTestReceipt} 
-        />
+        <TouchableOpacity style={styles.settingOption} onPress={() => navigateTo('/editProfile')}>
+          <View style={styles.settingOptionContent}>
+            <Edit2 color='#4A90E2' size={24} />
+            <Text style={styles.settingOptionText}>Edit Profile</Text>
+          </View>
+          <ChevronRight color="#6D6D6D" size={24} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.settingOption} onPress={() => navigateTo('/paymentSettings')}>
+          <View style={styles.settingOptionContent}>
+            <Banknote color='#4A90E2' size={24} />
+            <Text style={styles.settingOptionText}>Payment Settings</Text>
+          </View>
+          <ChevronRight color="#6D6D6D" size={24} />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.settingOption} 
+          onPress={() => Alert.alert('Coming Soon', 'Notifications feature is coming soon!')}
+        >
+          <View style={styles.settingOptionContent}>
+            <Bell color='#4A90E2' size={24} />
+            <Text style={styles.settingOptionText}>Notifications</Text>
+          </View>
+          <ChevronRight color="#6D6D6D" size={24} />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.settingOption}
+          onPress={() => navigateTo('/privacySettings')}
+        >
+          <View style={styles.settingOptionContent}>
+            <Lock color='#4A90E2' size={24} />
+            <Text style={styles.settingOptionText}>Privacy Settings</Text>
+          </View>
+          <ChevronRight color="#6D6D6D" size={24} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.settingOption} onPress={createTestReceipt}>
+          <View style={styles.settingOptionContent}>
+            <Receipt color='#4A90E2' size={24} />
+            <Text style={styles.settingOptionText}>Create Test Receipt</Text>
+          </View>
+          <ChevronRight color="#6D6D6D" size={24} />
+        </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -192,12 +213,20 @@ export default function Settings() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 0.5, backgroundColor: '#FFFFFF' },
-  header: { alignItems: 'center', padding: 24, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    alignItems: 'center',
+    padding: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5F5F5',
+  },
   profileImageContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     backgroundColor: '#F5F5F5',
     justifyContent: 'center',
     alignItems: 'center',
@@ -215,16 +244,67 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5F5F5',
   },
-  userName: { fontSize: 24, fontWeight: '600', color: '#173252', marginBottom: 4 },
-  userEmail: { fontSize: 16, color: '#6D6D6D' },
-  userPhone: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },
-  userHomeLocation: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },
-  userCompletedRides: { fontSize: 16, color: '#6D6D6D', marginTop: 4 },
-  settingsContainer: { padding: 24 },
-  settingOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#F5F5F5' },
-  settingOptionContent: { flexDirection: 'row', alignItems: 'center' },
-  settingOptionText: { fontSize: 16, color: '#173252', marginLeft: 16 },
-  logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#39C9C2', marginHorizontal: 24, marginTop: 24, marginBottom: 40, padding: 16, borderRadius: 8 },
-  logoutButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginLeft: 8 },
-  loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  userName: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#4A90E2',
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 16,
+    color: '#4A90E2',
+  },
+  userPhone: {
+    fontSize: 16,
+    color: '#6D6D6D',
+    marginTop: 4,
+  },
+  userHomeLocation: {
+    fontSize: 16,
+    color: '#6D6D6D',
+    marginTop: 4,
+  },
+  settingsContainer: {
+    padding: 24,
+  },
+  settingOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5',
+  },
+  settingOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  settingOptionText: {
+    fontSize: 16,
+    marginLeft: 12,
+    color: '#333333',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4A90E2',
+    marginHorizontal: 24,
+    marginTop: 24,
+    marginBottom: 40,
+    padding: 16,
+    borderRadius: 8,
+  },
+  logoutButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
