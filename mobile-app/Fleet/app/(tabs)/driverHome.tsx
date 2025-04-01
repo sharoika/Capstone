@@ -69,7 +69,6 @@ const DriverHome: React.FC = () => {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
-  // Check if token or driverID are still missing (for any reason)
   if (!token || !driverID) {
     return (
       <View style={styles.cardContainer}>
@@ -136,9 +135,11 @@ const DriverHome: React.FC = () => {
       )}
       {currentStep === 5 && (
         <RideFinishedStep
+        rideID={rideID}
+        token={token}
           onGoHome={() => {
             setRideID(null);
-            setCurrentStep(1);
+            setCurrentStep(2);
           }}
         />
       )}

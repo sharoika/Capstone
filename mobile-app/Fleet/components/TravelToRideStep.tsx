@@ -147,9 +147,9 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
   return (
     <View style={styles.container}>
       <MapView ref={mapRef} style={styles.map} region={region} customMapStyle={customMapStyle}>
-        {location && <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver" />}
-        {startLocation && <Marker coordinate={startLocation} title="Start Location" />}
-        {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#00f" />}
+        {location && <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver" pinColor="#FF5733" />}
+        {startLocation && <Marker coordinate={startLocation} title="Start Location" pinColor="#33C3FF" />}
+        {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2" />}
       </MapView>
 
       <View style={styles.overlay}>
