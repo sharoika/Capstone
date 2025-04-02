@@ -124,10 +124,7 @@ export default function RegisterScreen() {
     <KeyboardAvoidingView 
     style={{ flex: 1 }}
   >
-    <KeyboardAwareScrollView 
-      contentContainerStyle={styles.scrollContainer}
-      keyboardShouldPersistTaps="handled"
-    >
+    
       <View style={styles.container}>
         <View style={styles.header}>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
@@ -195,8 +192,6 @@ export default function RegisterScreen() {
         )}
         {step === 3 && (
           <View style={styles.formContainer}>
-            <Text style={styles.input}>{formData.homeLocation || 'Fetching location...'}</Text>
-            <Text>Home Location:</Text>
             <GooglePlacesAutocomplete
               placeholder="Search for home location"
               onPress={handleLocationSelect}
@@ -245,7 +240,6 @@ export default function RegisterScreen() {
           </TouchableOpacity>
         </View>
       </View>
-      </KeyboardAwareScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -267,7 +261,7 @@ const styles = StyleSheet.create({
   footer: { marginTop: 24, alignItems: 'center' },
   loginText: { fontSize: 14, color: '#6D6D6D', marginBottom: 8 },
   loginLink: { fontSize: 16, color: '#4A90E2', fontWeight: '600' },
-  map: { width: '100%', height: 200, borderRadius: 8, marginTop: 16 },
+  map: { width: '100%', height: 200, borderRadius: 8, marginTop: 16, marginBottom: 16, },
   actionButton: { backgroundColor: '#39C9C2', padding: 12, borderRadius: 8, alignItems: 'center' },
 })
 

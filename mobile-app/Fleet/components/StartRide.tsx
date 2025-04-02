@@ -204,7 +204,43 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     fetchRideDetails();
   }, [rideID, token]);
 
-
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch ride details");
+        }
+  
+        const data = await response.json();
+  
+        if (data.driver?.currentLocation?.coordinates) {
+          setDriverLocation({
+            latitude: data.driver.currentLocation.coordinates[1],
+            longitude: data.driver.currentLocation.coordinates[0],
+          });
+  
+          setRegion((prevRegion) => ({
+            ...prevRegion,
+            latitude: data.driver.currentLocation.coordinates[1],
+            longitude: data.driver.currentLocation.coordinates[0],
+          }));
+        }
+      } catch (error) {
+        console.error("Error updating driver location:", error);
+      }
+    }, 5000); 
+  
+    return () => clearInterval(interval); 
+  }, [rideID, token]);
+  
 
   useEffect(() => {
     if (routeCoordinates.length > 0) {

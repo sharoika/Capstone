@@ -166,12 +166,20 @@ const DriverRegisterScreen = () => {
 
       const response = await fetch(`${apiUrl}/api/auth/driver/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'multipart/form-data' },
         body: formDataToSend,
       });
 
+      const responseText = await response.text(); // Log response
+      console.log('Raw Response:', responseText);
+      
+      let errorData;
+      try {
+        errorData = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error('Invalid JSON response from server');
+      }
+      
       if (!response.ok) {
-        const errorData = await response.json();
         throw new Error(errorData.message || 'An error occurred during registration.');
       }
 
@@ -243,7 +251,7 @@ const DriverRegisterScreen = () => {
     <KeyboardAvoidingView
     style={{ flex: 1 }}
   >
-    <ScrollView contentContainerStyle={styles.scrollContainer}   keyboardShouldPersistTaps="handled">
+    <View style={styles.scrollContainer}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
@@ -258,7 +266,7 @@ const DriverRegisterScreen = () => {
           <Text style={styles.loginLink} onPress={() => router.push('/(auth)/driverLogin')}>Login</Text>
         </View>
       </View>
-    </ScrollView>
+    </View>
     </KeyboardAvoidingView>
   );
 };

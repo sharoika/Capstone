@@ -24,7 +24,7 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY);
     fetchRideDetails();
-    const interval = setInterval(fetchRideDetails, 10000); // Update every 10 sec
+    const interval = setInterval(fetchRideDetails, 5000); 
     return () => clearInterval(interval);
   }, [rideID, token]);
 

@@ -136,8 +136,14 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
   };
 
   useEffect(() => {
-    fetchLocation();
+    fetchLocation(); 
     checkRideStatus();
+  
+    const interval = setInterval(() => {
+      fetchLocation(); 
+    }, 5000);
+  
+    return () => clearInterval(interval); 
   }, []);
 
   useEffect(() => {

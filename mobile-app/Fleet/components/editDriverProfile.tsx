@@ -83,7 +83,7 @@ export default function editDriverProfile() {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#39C9C2" style={styles.loader} />;
+    return <ActivityIndicator size="large" color='#4A90E2' style={styles.loader} />;
   }
 
   return (
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#39C9C2',
+    backgroundColor: '#4A90E2',
     padding: 15,
     borderRadius: 8,
     width: '100%',

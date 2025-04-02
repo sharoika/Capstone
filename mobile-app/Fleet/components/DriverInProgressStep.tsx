@@ -24,7 +24,7 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY);
     fetchRideDetails();
-    const interval = setInterval(fetchRideDetails, 10000); // Update every 10 sec
+    const interval = setInterval(fetchRideDetails, 5000);
     return () => clearInterval(interval);
   }, [rideID, token]);
 
@@ -44,6 +44,7 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
 
       const data = await response.json();
       setRideDetails(data);
+      console.log(data);
       updateMapRoute(data.start, data.end);
     } catch (err) {
       setError("Failed to fetch ride details");

@@ -28,15 +28,16 @@ const LocationPage: React.FC<Props> = ({
     <View style={styles.formContainer}>
       <Text style={styles.pageTitle}>Home Location</Text>
 
-<GooglePlacesAutocomplete
+      <GooglePlacesAutocomplete
   placeholder="Search for home location"
   onPress={handleLocationSelect}
   query={{ key: GOOGLE_API_KEY, language: 'en' }}
   fetchDetails={true}
+  keyboardShouldPersistTaps="handled"
   styles={{
-    container: { flex: 0, zIndex: 1 }, 
+    container: { flex: 0 }, 
     textInput: styles.input,
-    listView: { zIndex: 2 }    
+    listView: { zIndex: 2, position: "absolute", top: 50, left: 0, right: 0 },
   }}
 />
 
