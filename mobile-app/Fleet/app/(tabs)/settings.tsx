@@ -186,7 +186,7 @@ export default function Settings() {
 
         <TouchableOpacity 
           style={styles.settingOption}
-          onPress={() => navigateTo('/privacySettings')}
+          onPress={() => Alert.alert('Coming Soon', 'Privacy settings coming soon')}
         >
           <View style={styles.settingOptionContent}>
             <Lock color='#4A90E2' size={24} />
