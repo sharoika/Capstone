@@ -111,8 +111,9 @@ export default function RegisterScreen() {
         const errorData = await response.json();
         throw new Error(errorData.message || 'An error occurred while registering.');
       }
-
-      router.push('/(auth)/login');
+      Alert.alert('Success', 'Registration successful!', [
+        { text: 'OK', onPress: () => router.push('/(auth)/login') }
+      ]);
     } catch (error: any) {
       console.error('Error during registration:', error.message);
       Alert.alert('Error', error.message);

@@ -132,7 +132,7 @@ router.get('/rides/driver/:driverID', authenticate, async (req, res) => {
         const rides = await Ride.find({
             driverID: driverID,
             status: RideStates.SELECTED,
-        });
+        }).select('start end fare distance status');
 
         res.json({ message: 'Rides found for driver', rides });
     } catch (error) {

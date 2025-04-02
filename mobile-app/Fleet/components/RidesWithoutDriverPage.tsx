@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Constants from 'expo-constants';
+import Geocoder from 'react-native-geocoding';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -15,11 +16,19 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
   const [ridesForDriver, setRidesForDriver] = useState<any[]>([]);
   const [selectedRide, setSelectedRide] = useState<string>('');
   const [offlineLoading, setOfflineLoading] = useState(false);
+  const [addresses, setAddresses] = useState<{start: string, end: string}[]>([]);
 
   useEffect(() => {
+    Geocoder.init('AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'); 
     const interval = setInterval(fetchRidesForDriver, 5000);
     return () => clearInterval(interval);
   }, [token, driverID]);
+
+  useEffect(() => {
+    if (ridesForDriver.length > 0) {
+      fetchAddresses(ridesForDriver);
+    }
+  }, [ridesForDriver]);
 
   const fetchRidesForDriver = async () => {
     try {
@@ -27,16 +36,46 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json(); 
         throw new Error(`Error ${response.status}: ${errorData.message || response.statusText}`);
       }
-  
+
       const data = await response.json();
+      console.log('Rides data:', data.rides);
       setRidesForDriver(data.rides);  
     } catch (error) {
       console.error('Error fetching rides:', error.message);
+    }
+  };
+
+  const fetchAddresses = async (rides: any[]) => {
+    const newAddresses = await Promise.all(rides.map(async (ride) => {
+      const startAddress = await getAddressFromCoordinates(ride.start.coordinates);
+      const endAddress = await getAddressFromCoordinates(ride.end.coordinates);
+      return {
+        start: startAddress,
+        end: endAddress
+      };
+    }));
+    setAddresses(newAddresses);
+  };
+
+  const getAddressFromCoordinates = async (coordinates: [number, number]) => {
+    try {
+      const [longitude, latitude] = coordinates;
+
+      if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+        throw new Error('Invalid coordinates');
+      }
+  
+      const result = await Geocoder.from(latitude, longitude);
+      const address = result.results[0]?.formatted_address || 'Address not found';
+      return address;
+    } catch (error) {
+      console.error('Error getting address:', error);
+      return 'Address not found';
     }
   };
 
@@ -68,6 +107,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       Alert.alert('Error', 'An error occurred while claiming the ride');
     }
   };
+
   const toggleOffline = async () => {
     setOfflineLoading(true);
 
@@ -95,16 +135,17 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
     }
   };
 
-  const renderItem = ({ item }: { item: any }) => (
+  const renderItem = ({ item, index }: { item: any, index: number }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => handleClaimRide(item._id)}
     >
-      <Text style={styles.cardTitle}>Start: Lat {item.start.coordinates[0]}, Long {item.start.coordinates[1]}</Text>
-      <Text style={styles.cardSubtitle}>End: Lat {item.end.coordinates[0]}, Long {item.end.coordinates[1]}</Text>
+      <Text style={styles.cardTitle}>Start: {addresses[index]?.start || `Lat ${item.start.coordinates[0]}, Long ${item.start.coordinates[1]}`}</Text>
+      <Text style={styles.cardSubtitle}>End: {addresses[index]?.end || `Lat ${item.end.coordinates[0]}, Long ${item.end.coordinates[1]}`}</Text>
       <Text style={styles.cardDetails}>Fare: {item.fare}</Text>
     </TouchableOpacity>
   );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Rides for Driver</Text>
@@ -116,7 +157,8 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
           renderItem={renderItem}
           keyExtractor={(item) => item._id}
         />
-      )}<TouchableOpacity
+      )}
+      <TouchableOpacity
         style={styles.offlineButton}
         onPress={toggleOffline}
         disabled={offlineLoading}

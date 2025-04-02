@@ -48,7 +48,6 @@ const HomeScreen: React.FC = () => {
   if (!token || !riderID) {
     return null; 
   }
-
   return (
     <View style={styles.container}>
       {currentStep === 1 && (
@@ -66,7 +65,7 @@ const HomeScreen: React.FC = () => {
           rideID={rideID}
           token={token}
           onDriverConfirmed={() => {
-            setCurrentStep(3); // Move to StartRide step
+            setCurrentStep(3); 
           }}
         />
       )}
@@ -99,18 +98,19 @@ const HomeScreen: React.FC = () => {
           }}
         />
       )}
-      {currentStep === 6 && (
-        <RideSummary
-          rideDetails={rideDetails}
-          rideID={rideID}
-          token={token}
-          onReturnHome={() => {
-            setCurrentStep(1); // Return to the home screen
-            setRideID('');
-            setRideDetails(null); // Reset ride details
-          }}
-        />
-      )}
+    {currentStep === 6 && (
+      <RideSummary
+        rideDetails={rideDetails}
+        rideID={rideID}
+        token={token}
+        onReturnHome={() => {
+          console.log('Returning to home...');
+          setCurrentStep(1);
+          setRideID('');
+          setRideDetails(null); 
+        }}
+      />
+    )}
     </View>
   );
 };

@@ -195,13 +195,6 @@ export default function Settings() {
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.settingOption} onPress={createTestReceipt}>
-          <View style={styles.settingOptionContent}>
-            <Receipt color='#4A90E2' size={24} />
-            <Text style={styles.settingOptionText}>Create Test Receipt</Text>
-          </View>
-          <ChevronRight color="#6D6D6D" size={24} />
-        </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

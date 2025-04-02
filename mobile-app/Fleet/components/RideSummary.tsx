@@ -10,12 +10,12 @@ const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
 Geocoder.init(GOOGLE_API_KEY);
 
 interface RideFinishedStepProps {
-  onGoHome: () => void;
+  onReturnHome: () => void;
   rideID: string;
   token: string;
 }
 
-const RideFinishedStep: React.FC<RideFinishedStepProps> = ({ rideID, token, onGoHome }) => {
+const RideFinishedStep: React.FC<RideFinishedStepProps> = ({ rideID, token,  onReturnHome}) => {
   const [rideDetails, setRideDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,9 +90,7 @@ const RideFinishedStep: React.FC<RideFinishedStepProps> = ({ rideID, token, onGo
 
               <TouchableOpacity
                 style={styles.returnButton}
-                onPress={onGoHome}
-                onPressIn={onPressIn}
-                onPressOut={onPressOut}
+                onPress={onReturnHome}
               >
                 <Text style={styles.returnButtonText}>Return to Home</Text>
               </TouchableOpacity>

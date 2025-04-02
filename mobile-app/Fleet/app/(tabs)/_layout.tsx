@@ -36,8 +36,9 @@ const TabNavigator = () => {
   }
 
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
+<Tab.Navigator
+  initialRouteName={userType === "rider" ? "Ride"  : "Drive"} 
+  screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'home-outline';

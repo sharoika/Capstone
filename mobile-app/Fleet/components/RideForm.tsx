@@ -179,7 +179,7 @@ useEffect(() => {
 }, [start, end]);
 
 useEffect(() => {
-  if (location && mapRef.current) {
+  if (location && mapRef.current && !start && !end) {
     mapRef.current.animateToRegion({
       latitude: location.latitude,
       longitude: location.longitude,
@@ -188,7 +188,7 @@ useEffect(() => {
     });
     console.log("Map centered on updated location:", location);
   }
-}, [location]);
+}, [location, start, end]);
 
   const handleConfirmRide = async () => {
     if (!start || !end ) {
