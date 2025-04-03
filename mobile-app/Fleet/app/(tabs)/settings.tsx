@@ -76,7 +76,10 @@ export default function Settings() {
     return <ActivityIndicator size="large" color="#4A90E2" style={styles.loader} />;
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync('userObjectId');
+    await SecureStore.deleteItemAsync('userToken');
+    await SecureStore.deleteItemAsync('userType');
     router.push('/(auth)/login');
   };
 

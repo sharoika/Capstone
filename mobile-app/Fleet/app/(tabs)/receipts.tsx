@@ -90,13 +90,19 @@ export default function RidesScreen() {
       });
       if (!response.ok) throw new Error('Failed to fetch rides');
       const data: Ride[] = await response.json();
+
+      if (data.length === 0) {
+        setRides([]); 
+        setLoading(false);
+        return; 
+      }
+
       setRides(await Promise.all(data.map(async (ride) => {
         const startAddress = await convertCoordinatesToAddress(ride.start.coordinates);
         const endAddress = await convertCoordinatesToAddress(ride.end.coordinates);
         return { ...ride, startAddress, endAddress };
       })));
     } catch (err) {
-      console.error('Error fetching rides:', err);
       setError('Failed to load rides. Please try again later.');
     } finally {
       setLoading(false);
@@ -127,41 +133,30 @@ export default function RidesScreen() {
           <Ionicons name="refresh" size={22} color={colorScheme === 'dark' ? '#fff' : '#173252'} />
         </TouchableOpacity>
       </View>
-      {error ? (
-        <View style={styles.errorContainer}>
-          <ThemedText style={styles.errorText}>{error}</ThemedText>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchRides}>
-            <ThemedText style={styles.retryButtonText}>Retry</ThemedText>
-          </TouchableOpacity>
-        </View>
-      ) : (
-<FlatList
-  data={rides}
-  keyExtractor={(item) => item._id}
-  renderItem={({ item }) => (
-    <TouchableOpacity style={styles.rideItem}>
-      <View style={styles.cardContent}>
-        <ThemedText style={styles.driverName}>Status: {item.status}</ThemedText>
-        <ThemedText style={styles.details}>Distance: {item.distance ? `${item.distance} km` : 'N/A'}</ThemedText>
-        <ThemedText style={styles.details}>Fare: ${item.fare / 100}</ThemedText>
-
-                <ThemedText style={styles.details}>
-                  Start Location: {item.startAddress || 'Loading...'}
-                </ThemedText>
-                
-                <ThemedText style={styles.details}>
-                  End Location: {item.endAddress || 'Loading...'}
-                </ThemedText>
-
-        <ThemedText style={styles.totalFare}>
-          Transaction Time: {item.stripeTransactionTime ? new Date(item.stripeTransactionTime).toLocaleString() : 'N/A'}
-        </ThemedText>
-      </View>
-    </TouchableOpacity>
-  )}
-/>
-
-      )}
+      {loading ? (
+          <ThemedText style={styles.loadingText}>Loading...</ThemedText>
+        ) : rides.length === 0 ? (
+          <View style={styles.noRidesContainer}>
+            <ThemedText style={styles.noRidesText}>No ride history found at this time.</ThemedText>
+          </View>
+        ) : (
+          <FlatList
+            data={rides}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.rideItem}>
+                <View style={styles.cardContent}>
+                  <ThemedText style={styles.driverName}>Status: {item.status}</ThemedText>
+                  <ThemedText style={styles.details}>Distance: {item.distance ? `${item.distance} km` : 'N/A'}</ThemedText>
+                  <ThemedText style={styles.details}>Fare: ${item.fare / 100}</ThemedText>
+                  <ThemedText style={styles.details}>Start Location: {item.startAddress || 'Loading...'}</ThemedText>
+                  <ThemedText style={styles.details}>End Location: {item.endAddress || 'Loading...'}</ThemedText>
+                  <ThemedText style={styles.totalFare}>Transaction Time: {item.stripeTransactionTime ? new Date(item.stripeTransactionTime).toLocaleString() : 'N/A'}</ThemedText>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        )}
     </ThemedView>
   );
 }
@@ -249,4 +244,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4A90E2',
   },
+  noRidesContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  noRidesText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#4A90E2',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  
 });

@@ -143,15 +143,16 @@ const DriverRegisterScreen = () => {
 
     try {    const formDataToSend = new FormData();
       if (locationCoords) {
-        formDataToSend.append("currentLocation[type]", "Point");
-        formDataToSend.append("currentLocation[coordinates][]", locationCoords.longitude.toString());
-        formDataToSend.append("currentLocation[coordinates][]", locationCoords.latitude.toString());
+        formDataToSend.append("currentLocation", JSON.stringify({
+          type: "Point",
+          coordinates: [locationCoords.longitude, locationCoords.latitude]
+        }));
       } else {
         Alert.alert("Error", "Please select your location.");
         setIsLoading(false);
         return;
       }
-      
+
       Object.keys(formData).forEach((field) => {
         const value = formData[field];
         if (value && typeof value === 'string') {

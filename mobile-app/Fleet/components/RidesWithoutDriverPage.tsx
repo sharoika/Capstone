@@ -5,6 +5,9 @@ import Geocoder from 'react-native-geocoding';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
+const calculateFare = (farePrice, baseFee, distance) => {
+  return (farePrice * distance) + baseFee;
+};
 interface RidesForDriverStepProps {
   token: string;
   driverID: string;
@@ -142,6 +145,8 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       <Text style={styles.cardTitle}>Start: {addresses[index]?.start || `Lat ${item.start.coordinates[0]}, Long ${item.start.coordinates[1]}`}</Text>
       <Text style={styles.cardSubtitle}>End: {addresses[index]?.end || `Lat ${item.end.coordinates[0]}, Long ${item.end.coordinates[1]}`}</Text>
       <Text style={styles.cardDetails}>Distance: {item.distance}km</Text>
+      <Text style={styles.cardDetails}>Distance: {item.distance} km</Text>
+      <Text style={styles.cardDetails}>Fare: {item.farePrice} {item.baseFee} {item.distance}</Text>
     </TouchableOpacity>
   );
 

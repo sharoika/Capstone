@@ -27,6 +27,7 @@ interface Driver {
   profilePicture: string;
   farePrice: number;
   baseFee: number;
+  isOnline: boolean;
 }
 
 const DriverSelection: React.FC<DriverSelectionProps> = ({
@@ -70,7 +71,9 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
 
       if (driverResponse.ok) {
         const driverList = await driverResponse.json();
-        setDrivers(driverList.map((driver: Driver) => ({
+      
+        const onlineDrivers = driverList.filter((driver: Driver) => driver.isOnline);
+        setDrivers(onlineDrivers.map((driver: Driver) => ({
           ...driver,
           baseFee: driver.baseFee ?? 2,
           farePrice: driver.farePrice ?? 0,

@@ -298,6 +298,17 @@ export default function Settings() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync('driverID');
+      await SecureStore.deleteItemAsync('driverToken');
+  
+      router.replace('/(auth)/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      Alert.alert('Error', 'Failed to log out. Please try again.');
+    }
+  };
   const handleUpdatePrice = async () => {
     try {
       const token = await getItemAsync('driverToken');
@@ -428,10 +439,10 @@ export default function Settings() {
 
       </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={() => router.push('/(auth)/login')}>
-        <LogOut color="#FFFFFF" size={24} />
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
+<TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+  <LogOut color="#FFFFFF" size={24} />
+  <Text style={styles.logoutButtonText}>Logout</Text>
+</TouchableOpacity>
 
       <Modal isVisible={isEditing} onBackdropPress={() => setIsEditing(false)}>
         <View style={styles.modalContent}>
