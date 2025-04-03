@@ -132,9 +132,20 @@ router.get('/rides/driver/:driverID', authenticate, async (req, res) => {
         const rides = await Ride.find({
             driverID: driverID,
             status: RideStates.SELECTED,
-        }).select('start end fare distance status farePrice baseFee');
+        }).select('start end fare distance status');
 
-        res.json({ message: 'Rides found for driver', rides });
+        const driver = await Driver.findById(driverID).select('farePrice baseFee');
+
+        if (!driver) {
+            return res.status(404).json({ message: 'Driver not found' });
+        }
+
+        res.json({ 
+            message: 'Rides found for driver', 
+            rides,
+            farePrice: driver.farePrice,
+            baseFee: driver.baseFee
+        });
     } catch (error) {
         console.error('Error fetching rides for driver:', error.message);
         res.status(500).json({ message: 'Server error' });
