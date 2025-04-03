@@ -121,6 +121,7 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
                   longitude: location.long,
                 }}
                 title="Your Location"
+                pinColor= '#4A90E2'
               />
             )}
           </MapView>
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   onlineButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4A90E2',
   },
   offlineButton: {
     backgroundColor: '#FF5C5C',

@@ -97,6 +97,8 @@ export default function RidesScreen() {
         return; 
       }
 
+      data.sort((a, b) => new Date(b.stripeTransactionTime).getTime() - new Date(a.stripeTransactionTime).getTime());
+
       setRides(await Promise.all(data.map(async (ride) => {
         const startAddress = await convertCoordinatesToAddress(ride.start.coordinates);
         const endAddress = await convertCoordinatesToAddress(ride.end.coordinates);
@@ -148,7 +150,7 @@ export default function RidesScreen() {
                 <View style={styles.cardContent}>
                   <ThemedText style={styles.driverName}>Status: {item.status}</ThemedText>
                   <ThemedText style={styles.details}>Distance: {item.distance ? `${item.distance} km` : 'N/A'}</ThemedText>
-                  <ThemedText style={styles.details}>Fare: ${item.fare / 100}</ThemedText>
+                  <ThemedText style={styles.details}>Fare: ${(item.fare / 100).toFixed(2)}</ThemedText>
                   <ThemedText style={styles.details}>Start Location: {item.startAddress || 'Loading...'}</ThemedText>
                   <ThemedText style={styles.details}>End Location: {item.endAddress || 'Loading...'}</ThemedText>
                   <ThemedText style={styles.totalFare}>Transaction Time: {item.stripeTransactionTime ? new Date(item.stripeTransactionTime).toLocaleString() : 'N/A'}</ThemedText>

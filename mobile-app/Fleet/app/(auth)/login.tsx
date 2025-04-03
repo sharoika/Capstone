@@ -37,7 +37,8 @@ export default function LoginScreen() {
       const { token, user, message } = response.data;
       if (token && user?.id) {
         router.push('/(tabs)/home');
-        console.log(token);
+        console.log("token:  ",token);
+        console.log("userId:  ",user.id);
         await Promise.all([
           saveToStorage('userToken', token),
           saveToStorage('userObjectId', user.id),

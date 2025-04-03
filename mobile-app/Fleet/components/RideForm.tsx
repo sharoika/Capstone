@@ -79,7 +79,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     console.log("Updated Locationnnnnnnnnnnnnnnnnn: ", location);
     const interval = setInterval(() => {
       fetchLocation();
-    }, 10000);
+    }, 1000);
   
     return () => clearInterval(interval); 
   }, []);
@@ -226,6 +226,7 @@ useEffect(() => {
   };
   
   return (
+    
     <View style={styles.container}>
       <MapView
         ref={mapRef}
@@ -256,6 +257,8 @@ useEffect(() => {
 
       <View style={styles.overlayContainer}>
         <View style={styles.overlay}>
+        <Text>Estimated Time: {estimatedTime || 'N/A'}</Text>
+        <Text>Distance: {distance || 'N/A'}</Text>
           <Text>Start Location:</Text>
           <GooglePlacesAutocomplete
             placeholder="Enter start location"
@@ -276,8 +279,7 @@ useEffect(() => {
 
    
 
-          <Text>Estimated Time: {estimatedTime || 'N/A'}</Text>
-          <Text>Distance: {distance || 'N/A'}</Text>
+    
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText} onPress={handleConfirmRide}>Confirm Ride</Text>
           </TouchableOpacity>

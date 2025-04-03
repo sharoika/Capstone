@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   },
   offlineButton: {
     marginTop: 20,
-    backgroundColor: '#FF5C5C',
+    backgroundColor: '#4339C9',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

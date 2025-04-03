@@ -243,7 +243,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
       } catch (error) {
         console.error("Error updating driver location:", error);
       }
-    }, 5000); 
+    }, 1000); 
   
     return () => clearInterval(interval); 
   }, [rideID, token]);

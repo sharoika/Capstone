@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import MapView, { Marker, Polyline, Region } from "react-native-maps";
 import Constants from "expo-constants";
-import { customMapStyle } from '../styles/customMapStyle'; 
+import { customMapStyle } from '../styles/customMapStyle';
+import { MaterialIcons } from "@expo/vector-icons";
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -13,7 +14,8 @@ interface TravelToRideStepProps {
   onRideStarted: () => void;
 }
 
-const GOOGLE_API_KEY =  'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+const customPin = <MaterialIcons name="location-pin" size={40} color="#8EC3FF" />; 
 
 const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, token, onRideStarted }) => {
   const [rideInProgress, setRideInProgress] = useState(false);
@@ -24,11 +26,11 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
 
   const region: Region | undefined = location
     ? {
-        latitude: location.lat,
-        longitude: location.long,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }
+      latitude: location.lat,
+      longitude: location.long,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    }
     : undefined;
 
   const decodePolyline = (encoded: string) => {
@@ -136,14 +138,14 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
   };
 
   useEffect(() => {
-    fetchLocation(); 
+    fetchLocation();
     checkRideStatus();
-  
+
     const interval = setInterval(() => {
-      fetchLocation(); 
+      fetchLocation();
     }, 5000);
-  
-    return () => clearInterval(interval); 
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -153,8 +155,8 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
   return (
     <View style={styles.container}>
       <MapView ref={mapRef} style={styles.map} region={region} customMapStyle={customMapStyle}>
-        {location && <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver" pinColor="#FF5733" />}
-        {startLocation && <Marker coordinate={startLocation} title="Start Location" pinColor="#33C3FF" />}
+        {location && <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver" > {customPin} </Marker>}
+        {startLocation && <Marker coordinate={startLocation} title="Start Location" > {customPin} </Marker>}
         {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2" />}
       </MapView>
 
@@ -171,17 +173,17 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: {
-    ...StyleSheet.absoluteFillObject, 
+    ...StyleSheet.absoluteFillObject,
   },
   overlay: {
     position: "absolute",
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)", 
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 10,
     padding: 20,
-    elevation: 5, 
+    elevation: 5,
   },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   button: { marginTop: 20, backgroundColor: "#4A90E2", padding: 15, borderRadius: 5 },

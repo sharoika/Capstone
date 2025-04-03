@@ -26,7 +26,7 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY);
     fetchRideDetails();
-    const interval = setInterval(fetchRideDetails, 5000); 
+    const interval = setInterval(fetchRideDetails, 1000);
     return () => clearInterval(interval);
   }, [rideID, token]);
 
@@ -43,12 +43,12 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
           1000
         );
       }
-    }, 5000); 
-  
+    }, 1000);
+
     return () => clearInterval(interval);
   }, [currentLocation]);
-  
-  
+
+
   const fetchRideDetails = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}`, {
@@ -88,7 +88,7 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
       );
 
       const directionsData = await directionsResponse.json();
-      
+
       if (directionsData.routes.length) {
         const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
         setRouteCoordinates(points);
@@ -194,10 +194,10 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
           <Marker coordinate={routeCoordinates[routeCoordinates.length - 1]} title="End">
             {customPin}
           </Marker>
-            <Marker coordinate={currentLocation} title="Current Location">
-              {customPin}
-            </Marker>
-   
+          <Marker coordinate={currentLocation} title="Current Location">
+            {customPin}
+          </Marker>
+
         </MapView>
       )}
 
@@ -206,8 +206,6 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
           <Text style={styles.cardTitle}>Ride Details</Text>
           <Text style={styles.label}>Distance:</Text>
           <Text style={styles.value}>{rideDetails?.distance?.toFixed(2)} km</Text>
-          <Text style={styles.label}>Total Fare:</Text>
-          <Text style={styles.value}>${rideDetails?.fare?.toFixed(2)}</Text>
           <TouchableOpacity style={styles.endRideButton} onPress={handleFinishRide}>
             <Text style={styles.endRideButtonText}>End Ride</Text>
           </TouchableOpacity>

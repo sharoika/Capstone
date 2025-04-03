@@ -215,7 +215,7 @@ router.post('/rides/:rideID/finish', authenticate, async (req, res) => {
             // Calculate fare components
             const baseFare = driver.baseFee || 2;
             const distanceFare = ride.distance * (driver.farePrice || 1.5);
-            const totalFare = parseInt(baseFare + distanceFare + parseFloat(tipAmount)) * 100;
+            const totalFare = parseInt((baseFare + distanceFare + parseFloat(tipAmount))  * 100);
 
             // Update ride fare
             ride.fare = totalFare;

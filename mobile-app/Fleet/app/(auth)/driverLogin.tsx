@@ -35,7 +35,10 @@ export default function DriverLoginScreen() {
         password,
       });
       console.log(response.data);
+     
       const { token, driver, message } = response.data;
+      console.log("driver token", token);
+      console.log("driver id", driver.id);
       if (token && driver.id) {
         console.log("Token received:", token);
         await saveToStorage('driverToken', token);
