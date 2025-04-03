@@ -92,9 +92,8 @@ const HomeScreen: React.FC = () => {
           rideID={rideID}
           token={token}
           onRideFinished={(details: any) => {
-            console.log('Ride finished', details);
-            setRideDetails(details); // Store ride details for the summary
-            setCurrentStep(6); // Move to RideSummary step
+            setRideDetails(details);
+            setCurrentStep(6);
           }}
         />
       )}

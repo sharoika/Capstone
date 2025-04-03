@@ -30,7 +30,8 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   const [driverAddress, setDriverAddress] = useState<string>("Loading...");
   const [driverLocation, setDriverLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [startLocation, setStartLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  
+  const [riderLocation, setRiderLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
   const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
 
   useEffect(() => {
@@ -161,7 +162,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         }
 
         const data = await response.json();
-        console.log("Ride details:", data);
 
         if (data.start?.coordinates && data.end?.coordinates) {
           const startLocation = {
@@ -172,6 +172,10 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
             latitude: data.driver.currentLocation.coordinates[1],
             longitude: data.driver.currentLocation.coordinates[0],
           };
+           setRiderLocation({
+          latitude: data.rider.currentLocation.coordinates[1],
+          longitude: data.rider.currentLocation.coordinates[0],
+        });
           setRouteCoordinates([driverLocation, startLocation]); 
           setRegion({
             latitude: driverLocation.latitude,
@@ -188,7 +192,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
           const farePrice = !isNaN(data.driver.farePrice) ? data.driver.farePrice : 0;
           const distanceFare = data.distance * farePrice;
           const totalFare = parseFloat((baseFee + distanceFare).toFixed(2));
-          console.log("Calculated fare:", totalFare);
           setFare(totalFare);
         }
 
@@ -226,7 +229,11 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
             latitude: data.driver.currentLocation.coordinates[1],
             longitude: data.driver.currentLocation.coordinates[0],
           });
-  
+
+          setRiderLocation({
+            latitude: data.rider.currentLocation.coordinates[1],
+            longitude: data.rider.currentLocation.coordinates[0],
+          });
           setRegion((prevRegion) => ({
             ...prevRegion,
             latitude: data.driver.currentLocation.coordinates[1],
@@ -269,7 +276,6 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
       }
 
       const data = await response.json();
-      console.log("Ride started:", data.ride);
       onRideStarted();
     } catch (err) {
       console.error("Error starting the ride:", err);
@@ -310,6 +316,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     {customPin}
   </Marker>
 )}
+ {riderLocation && <Marker coordinate={riderLocation} title="Rider Location" pinColor="blue" />}
       </MapView>
     )}
 

@@ -28,6 +28,7 @@ const DriverHome: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState<boolean>(false); 
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -48,8 +49,6 @@ const DriverHome: React.FC = () => {
             console.error('Unable to fetch driver details.');
           } else {
             const driverData = await response.json();
-            // Log the driverData to verify that applicationApproved is coming through as expected.
-            console.log('Driver Data:', driverData);
             setIsApproved(driverData.applicationApproved);
           }
         } else {
@@ -99,7 +98,6 @@ const DriverHome: React.FC = () => {
     driverID={driverID}
     onNextStep={() => setCurrentStep(2)}
     onStatusChange={(isOnline) => {
-      console.log('Driver is online:', isOnline);
       if (isOnline) {
         setCurrentStep(2);  
       }

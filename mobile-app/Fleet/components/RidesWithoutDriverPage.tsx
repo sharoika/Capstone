@@ -43,7 +43,6 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       }
 
       const data = await response.json();
-      console.log('Rides data:', data.rides);
       setRidesForDriver(data.rides);  
     } catch (error) {
       console.error('Error fetching rides:', error.message);
@@ -142,7 +141,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
     >
       <Text style={styles.cardTitle}>Start: {addresses[index]?.start || `Lat ${item.start.coordinates[0]}, Long ${item.start.coordinates[1]}`}</Text>
       <Text style={styles.cardSubtitle}>End: {addresses[index]?.end || `Lat ${item.end.coordinates[0]}, Long ${item.end.coordinates[1]}`}</Text>
-      <Text style={styles.cardDetails}>Fare: {item.fare}</Text>
+      <Text style={styles.cardDetails}>Distance: {item.distance}km</Text>
     </TouchableOpacity>
   );
 

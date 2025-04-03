@@ -164,7 +164,8 @@ router.post('/driver/register', upload.fields([
       phone,
       password,
       vehicleMake,
-      vehicleModel
+      vehicleModel,
+      currentLocation 
     } = req.body;
 
     const existingDriver = await Driver.findOne({ email });
@@ -188,7 +189,8 @@ router.post('/driver/register', upload.fields([
       abstractDoc: req.files?.abstractDoc?.[0]?.path,
       criminalRecordCheckDoc: req.files?.criminalRecordCheckDoc?.[0]?.path,
       vehicleRegistrationDoc: req.files?.vehicleRegistrationDoc?.[0]?.path,
-      safetyInspectionDoc: req.files?.safetyInspectionDoc?.[0]?.path
+      safetyInspectionDoc: req.files?.safetyInspectionDoc?.[0]?.path,
+      currentLocation: JSON.parse(currentLocation) 
     });
 
     await newDriver.save();

@@ -141,28 +141,42 @@ const DriverRegisterScreen = () => {
 
     setIsLoading(true);
 
-    try {
-      const formDataToSend = new FormData();
-
-      // Append basic info
+    try {    const formDataToSend = new FormData();
+      if (locationCoords) {
+        formDataToSend.append("currentLocation[type]", "Point");
+        formDataToSend.append("currentLocation[coordinates][]", locationCoords.longitude.toString());
+        formDataToSend.append("currentLocation[coordinates][]", locationCoords.latitude.toString());
+      } else {
+        Alert.alert("Error", "Please select your location.");
+        setIsLoading(false);
+        return;
+      }
+      
       Object.keys(formData).forEach((field) => {
         const value = formData[field];
         if (value && typeof value === 'string') {
           formDataToSend.append(field, value);
         }
       });
-
-      // Append documents
-      ['driversLicense', 'vehicleRegistration', 'insuranceDocument', 'backgroundCheckConsent'].forEach((doc) => {
-        const file = formData[doc];
+  
+      const documentFieldsMap = {
+        driversLicense: "licenseDoc",
+        vehicleRegistration: "vehicleRegistrationDoc",
+        insuranceDocument: "safetyInspectionDoc",
+        backgroundCheckConsent: "criminalRecordCheckDoc",
+      };
+  
+      Object.keys(documentFieldsMap).forEach((key) => {
+        const file = formData[key];
         if (file) {
-          formDataToSend.append(doc, {
+          formDataToSend.append(documentFieldsMap[key], {
             uri: file.uri,
             name: file.name,
-            type: file.mimeType
+            type: file.mimeType,
           } as any);
         }
       });
+   
 
       const response = await fetch(`${apiUrl}/api/auth/driver/register`, {
         method: 'POST',
@@ -178,7 +192,7 @@ const DriverRegisterScreen = () => {
       } catch (parseError) {
         throw new Error('Invalid JSON response from server');
       }
-      
+      console.log(response);
       if (!response.ok) {
         throw new Error(errorData.message || 'An error occurred during registration.');
       }
@@ -186,6 +200,7 @@ const DriverRegisterScreen = () => {
       router.push('/(auth)/driverLogin');
     } catch (error: any) {
       console.error('Error during registration:', error.message);
+      console.log('Error during registration:', error.message);
       Alert.alert('Error', error.message || 'Failed to register. Please try again.');
     } finally {
       setIsLoading(false);

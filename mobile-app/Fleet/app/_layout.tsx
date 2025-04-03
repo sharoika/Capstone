@@ -6,8 +6,6 @@ import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
-
-
 export default function MainLayout() {
   const [userType, setUserType] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -86,8 +84,7 @@ export default function MainLayout() {
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.High,
         });
-        //console.log("User Location:", location);
-
+        
         if (location.coords) {
           sendLocationToBackend(location.coords.latitude, location.coords.longitude);
         }
@@ -98,7 +95,7 @@ export default function MainLayout() {
 
     const interval = setInterval(() => {
       getLocation();
-    }, 10000);
+    }, 50000);
 
     return () => clearInterval(interval); 
   }, [userType, token, userId]);
