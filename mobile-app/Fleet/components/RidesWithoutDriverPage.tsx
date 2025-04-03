@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Alert, FlatList, Text, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import Constants from 'expo-constants';
 import Geocoder from 'react-native-geocoding';
 
@@ -20,6 +20,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
   const [selectedRide, setSelectedRide] = useState<string>('');
   const [offlineLoading, setOfflineLoading] = useState(false);
   const [addresses, setAddresses] = useState<{start: string, end: string}[]>([]);
+  const [driverFareDetails, setDriverFareDetails] = useState<{ farePrice: number, baseFee: number }>({ farePrice: 0, baseFee: 0 });
 
   useEffect(() => {
     Geocoder.init('AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'); 
@@ -46,7 +47,9 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       }
 
       const data = await response.json();
-      setRidesForDriver(data.rides);  
+
+      setRidesForDriver(data.rides);
+      setDriverFareDetails({ farePrice: data.farePrice, baseFee: data.baseFee });
     } catch (error) {
       console.error('Error fetching rides:', error.message);
     }
@@ -138,6 +141,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
   };
 
   const renderItem = ({ item, index }: { item: any, index: number }) => (
+    
     <TouchableOpacity
       style={styles.card}
       onPress={() => handleClaimRide(item._id)}
@@ -146,7 +150,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       <Text style={styles.cardSubtitle}>End: {addresses[index]?.end || `Lat ${item.end.coordinates[0]}, Long ${item.end.coordinates[1]}`}</Text>
       <Text style={styles.cardDetails}>Distance: {item.distance}km</Text>
       <Text style={styles.cardDetails}>Distance: {item.distance} km</Text>
-      <Text style={styles.cardDetails}>Fare: {item.farePrice} {item.baseFee} {item.distance}</Text>
+      <Text style={styles.cardDetails}> Fare: ${calculateFare(driverFareDetails.farePrice, driverFareDetails.baseFee, item.distance).toFixed(2)}</Text>
     </TouchableOpacity>
   );
 
@@ -187,6 +191,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
   },
   card: {
     backgroundColor: '#f9f9f9',

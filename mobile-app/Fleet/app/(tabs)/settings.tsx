@@ -220,6 +220,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F5F5F5',
   },
   profileImageContainer: {
+    paddingTop: Platform.OS === 'ios' ? 30 : 20,
     width: 120,
     height: 120,
     borderRadius: 60,
