@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '600',
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
   },
   refreshButton: {
     padding: 8,

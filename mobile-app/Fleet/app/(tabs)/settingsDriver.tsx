@@ -542,6 +542,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F5F5F5',
   },
   profileImageContainer: {
+    paddingTop: Platform.OS === 'ios' ? 30 : 20,
     alignItems: 'center',
     marginBottom: 16,
   },
