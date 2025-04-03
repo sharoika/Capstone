@@ -11,19 +11,19 @@ const calculateFare = (farePrice, baseFee, distance) => {
 interface RidesForDriverStepProps {
   token: string;
   driverID: string;
-  onRideClaimed: (rideID: string) => void; 
-  onGoOffline: () => void; 
+  onRideClaimed: (rideID: string) => void;
+  onGoOffline: () => void;
 }
 
 const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID, onRideClaimed, onGoOffline }) => {
   const [ridesForDriver, setRidesForDriver] = useState<any[]>([]);
   const [selectedRide, setSelectedRide] = useState<string>('');
   const [offlineLoading, setOfflineLoading] = useState(false);
-  const [addresses, setAddresses] = useState<{start: string, end: string}[]>([]);
+  const [addresses, setAddresses] = useState<{ start: string, end: string }[]>([]);
   const [driverFareDetails, setDriverFareDetails] = useState<{ farePrice: number, baseFee: number }>({ farePrice: 0, baseFee: 0 });
 
   useEffect(() => {
-    Geocoder.init('AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'); 
+    Geocoder.init('AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg');
     const interval = setInterval(fetchRidesForDriver, 5000);
     return () => clearInterval(interval);
   }, [token, driverID]);
@@ -42,7 +42,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       });
 
       if (!response.ok) {
-        const errorData = await response.json(); 
+        const errorData = await response.json();
         throw new Error(`Error ${response.status}: ${errorData.message || response.statusText}`);
       }
 
@@ -74,7 +74,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       if (typeof latitude !== 'number' || typeof longitude !== 'number') {
         throw new Error('Invalid coordinates');
       }
-  
+
       const result = await Geocoder.from(latitude, longitude);
       const address = result.results[0]?.formatted_address || 'Address not found';
       return address;
@@ -103,7 +103,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
       const data = await response.json();
 
       if (response.ok) {
-        onRideClaimed(rideID); 
+        onRideClaimed(rideID);
       } else {
         Alert.alert('Error', data.message || 'Failed to claim ride');
       }
@@ -141,7 +141,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
   };
 
   const renderItem = ({ item, index }: { item: any, index: number }) => (
-    
+
     <TouchableOpacity
       style={styles.card}
       onPress={() => handleClaimRide(item._id)}

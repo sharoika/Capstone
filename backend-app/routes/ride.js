@@ -140,8 +140,8 @@ router.get('/rides/driver/:driverID', authenticate, async (req, res) => {
             return res.status(404).json({ message: 'Driver not found' });
         }
 
-        res.json({ 
-            message: 'Rides found for driver', 
+        res.json({
+            message: 'Rides found for driver',
             rides,
             farePrice: driver.farePrice,
             baseFee: driver.baseFee

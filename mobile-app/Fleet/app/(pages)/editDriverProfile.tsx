@@ -91,21 +91,21 @@ export default function EditDriverProfile() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
     }
-    
+
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (formData.phone && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
       newErrors.phone = 'Phone number should be 10 digits';
     }
@@ -121,7 +121,7 @@ export default function EditDriverProfile() {
     if (!formData.vehiclePlate.trim()) {
       newErrors.vehiclePlate = 'License plate is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -159,7 +159,7 @@ export default function EditDriverProfile() {
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      
+
       // More detailed error handling
       if (axios.isAxiosError(error)) {
         if (error.response) {
@@ -191,12 +191,12 @@ export default function EditDriverProfile() {
     try {
       // Request permission
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
+
       if (status !== 'granted') {
         Alert.alert('Permission Required', 'Please allow access to your photo library to upload a profile picture.');
         return;
       }
-      
+
       // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -204,10 +204,10 @@ export default function EditDriverProfile() {
         aspect: [1, 1],
         quality: 0.7,
       });
-      
+
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const selectedImage = result.assets[0];
-        
+
         // Upload image to server
         await uploadImage(selectedImage.uri);
       }
@@ -216,31 +216,31 @@ export default function EditDriverProfile() {
       Alert.alert('Error', 'Failed to pick image. Please try again.');
     }
   };
-  
+
   const uploadImage = async (uri: string) => {
     setImageUploading(true);
     try {
       const driverId = await getItemAsync('driverID');
       const token = await getItemAsync('driverToken');
-      
+
       if (!driverId || !token) {
         Alert.alert('Error', 'You must be logged in to upload a profile picture');
         return;
       }
-      
+
       // Create form data for image upload
       const formData = new FormData();
       const filename = uri.split('/').pop() || 'photo.jpg';
       const match = /\.(\w+)$/.exec(filename);
       const type = match ? `image/${match[1]}` : 'image/jpeg';
-      
+
       // @ts-ignore
       formData.append('profilePicture', {
         uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
         name: filename,
         type,
       });
-      
+
       // Upload image
       const response = await axios.post(
         `${getApiUrl()}/api/user/drivers/${driverId}/profile-picture`,
@@ -252,7 +252,7 @@ export default function EditDriverProfile() {
           },
         }
       );
-      
+
       if (response.status === 200 && response.data.profilePicture) {
         setFormData(prev => ({
           ...prev,
@@ -392,8 +392,8 @@ export default function EditDriverProfile() {
           {errors.vehiclePlate ? <Text style={styles.errorText}>{errors.vehiclePlate}</Text> : null}
         </View>
 
-        <TouchableOpacity 
-          style={styles.saveButton} 
+        <TouchableOpacity
+          style={styles.saveButton}
           onPress={handleSave}
           disabled={saving}
         >

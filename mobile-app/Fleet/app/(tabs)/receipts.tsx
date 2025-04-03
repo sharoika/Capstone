@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Modal, View, TouchableOpacity, FlatList, Text, Platform } from 'react-native';
 import { useColorScheme } from 'react-native';
 import ThemedText from '../../components/ThemedText';
@@ -81,8 +81,8 @@ export default function RidesScreen() {
     setLoading(true);
     setError('');
     try {
-      const endpoint = user.type === 'driver' 
-        ? `${apiUrl}/api/user/drivers/${user._id}/rides` 
+      const endpoint = user.type === 'driver'
+        ? `${apiUrl}/api/user/drivers/${user._id}/rides`
         : `${apiUrl}/api/user/riders/${user._id}/rides`;
 
       const response = await fetch(endpoint, {
@@ -92,9 +92,9 @@ export default function RidesScreen() {
       const data: Ride[] = await response.json();
 
       if (data.length === 0) {
-        setRides([]); 
+        setRides([]);
         setLoading(false);
-        return; 
+        return;
       }
 
       data.sort((a, b) => new Date(b.stripeTransactionTime).getTime() - new Date(a.stripeTransactionTime).getTime());
@@ -115,7 +115,7 @@ export default function RidesScreen() {
     if (!coords || coords.length < 2 || coords[0] === undefined || coords[1] === undefined) {
       return "Address not available"; // Handle missing or invalid coordinates
     }
-    
+
     try {
       const { latitude, longitude } = { latitude: coords[1], longitude: coords[0] };
       const response = await Geocoder.from(latitude, longitude);
@@ -264,5 +264,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
-  
+
 });

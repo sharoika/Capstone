@@ -14,11 +14,11 @@ const AdminLiveTracker = () => {
         // Initial fetch
         fetchRides();
         fetchLocations();
-        
+
         // Set up polling every 5 seconds for rides and locations
         const ridesInterval = setInterval(fetchRides, 5000);
         const locationsInterval = setInterval(fetchLocations, 5000);
-        
+
         // Cleanup intervals on component unmount
         return () => {
             clearInterval(ridesInterval);
@@ -39,9 +39,9 @@ const AdminLiveTracker = () => {
             setError(prev => ({ ...prev, rides: null }));
         } catch (error) {
             console.error('Error fetching active rides:', error);
-            setError(prev => ({ 
-                ...prev, 
-                rides: 'Failed to load active rides. The API endpoint may not be available yet.' 
+            setError(prev => ({
+                ...prev,
+                rides: 'Failed to load active rides. The API endpoint may not be available yet.'
             }));
         } finally {
             setLoading(prev => ({ ...prev, rides: false }));
@@ -61,9 +61,9 @@ const AdminLiveTracker = () => {
             setError(prev => ({ ...prev, locations: null }));
         } catch (error) {
             console.error('Error fetching locations:', error);
-            setError(prev => ({ 
-                ...prev, 
-                locations: 'Failed to load locations. The API endpoint may not be available yet.' 
+            setError(prev => ({
+                ...prev,
+                locations: 'Failed to load locations. The API endpoint may not be available yet.'
             }));
         } finally {
             setLoading(prev => ({ ...prev, locations: false }));
@@ -89,12 +89,14 @@ const AdminLiveTracker = () => {
         { key: 'driver', label: 'Driver', sortable: true, accessor: (ride) => ride.driverID ? `${ride.driverID.firstName} ${ride.driverID.lastName}` : 'Not Assigned' },
         { key: 'pickupLocation', label: 'Pickup Location', sortable: true },
         { key: 'dropoffLocation', label: 'Dropoff Location', sortable: true },
-        { key: 'status', label: 'Status', sortable: true, accessor: (ride) => {
-            if (!ride.driverID) return 0;
-            if (!ride.rideStarted) return 1;
-            if (!ride.rideFinished) return 2;
-            return 3;
-        }},
+        {
+            key: 'status', label: 'Status', sortable: true, accessor: (ride) => {
+                if (!ride.driverID) return 0;
+                if (!ride.rideStarted) return 1;
+                if (!ride.rideFinished) return 2;
+                return 3;
+            }
+        },
         { key: 'currentLocation', label: 'Current Location', sortable: false },
         { key: 'rideStartTime', label: 'Time Started', sortable: true, accessor: (ride) => ride.rideStarted ? new Date(ride.rideStartTime).getTime() : 0 },
     ];
@@ -127,7 +129,7 @@ const AdminLiveTracker = () => {
 
         return (
             <SortableTable columns={rideColumns} data={rides}>
-                {(sortedRides) => 
+                {(sortedRides) =>
                     sortedRides.map((ride) => (
                         <tr key={ride._id}>
                             <td>{ride._id}</td>
@@ -135,8 +137,8 @@ const AdminLiveTracker = () => {
                                 {ride.riderID?.firstName} {ride.riderID?.lastName}
                             </td>
                             <td>
-                                {ride.driverID ? 
-                                    `${ride.driverID.firstName} ${ride.driverID.lastName}` : 
+                                {ride.driverID ?
+                                    `${ride.driverID.firstName} ${ride.driverID.lastName}` :
                                     'Not Assigned'
                                 }
                             </td>
@@ -144,13 +146,13 @@ const AdminLiveTracker = () => {
                             <td>{ride.dropoffLocation}</td>
                             <td>{getStatusBadge(ride)}</td>
                             <td>
-                                {ride.currentLocation ? 
+                                {ride.currentLocation ?
                                     `${ride.currentLocation.lat}, ${ride.currentLocation.lng}` :
                                     'N/A'
                                 }
                             </td>
                             <td>
-                                {ride.rideStarted ? 
+                                {ride.rideStarted ?
                                     new Date(ride.rideStartTime).toLocaleTimeString() :
                                     'Not Started'
                                 }
@@ -183,7 +185,7 @@ const AdminLiveTracker = () => {
 
         return (
             <SortableTable columns={locationColumns} data={locations}>
-                {(sortedLocations) => 
+                {(sortedLocations) =>
                     sortedLocations.map((location) => (
                         <tr key={location._id}>
                             <td>{location.userId}</td>

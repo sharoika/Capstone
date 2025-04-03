@@ -58,7 +58,7 @@ const AdminDrivers = () => {
     };
 
     const handleDriverUpdate = (updatedDriver) => {
-        setDrivers(drivers.map(driver => 
+        setDrivers(drivers.map(driver =>
             driver._id === updatedDriver._id ? updatedDriver : driver
         ));
     };
@@ -107,14 +107,14 @@ const AdminDrivers = () => {
         <div className="admin-dashboard">
             <AdminHeader title="Admin Panel: Drivers" />
             <Container className="py-4">
-                <DriversTable 
-                    drivers={drivers} 
+                <DriversTable
+                    drivers={drivers}
                     onApprovalChange={handleApprovalChange}
                     onDriverClick={handleDriverClick}
                     onDocumentDownload={handleDocumentDownload}
                     onDeleteDriver={handleDeleteDriver}
                 />
-                
+
                 <DriverEditModal
                     show={showEditModal}
                     onHide={() => setShowEditModal(false)}

@@ -39,15 +39,15 @@ const AdminDashboard = () => {
                                 Maintenance
                             </Card.Header>
                             <Card.Body className="d-flex gap-3">
-                                <Button 
-                                    variant="info" 
+                                <Button
+                                    variant="info"
                                     onClick={() => navigate('/admin/live-tracker')}
                                     style={buttonStyle}
                                 >
                                     Live Tracker
                                 </Button>
-                                <Button 
-                                    variant="info" 
+                                <Button
+                                    variant="info"
                                     onClick={() => setShowConfigModal(true)}
                                     style={buttonStyle}
                                 >
@@ -80,29 +80,29 @@ const AdminDashboard = () => {
                                 Administration
                             </Card.Header>
                             <Card.Body className="d-flex gap-3">
-                                <Button 
-                                    variant="info" 
+                                <Button
+                                    variant="info"
                                     onClick={() => navigate('/admin/riders')}
                                     style={buttonStyle}
                                 >
                                     Riders
                                 </Button>
-                                <Button 
-                                    variant="info" 
+                                <Button
+                                    variant="info"
                                     onClick={() => navigate('/admin/drivers')}
                                     style={buttonStyle}
                                 >
                                     Drivers
                                 </Button>
-                                <Button 
-                                    variant="info" 
+                                <Button
+                                    variant="info"
                                     onClick={() => navigate('/admin/payments')}
                                     style={buttonStyle}
                                 >
                                     Payments
                                 </Button>
-                                <Button 
-                                    variant="info" 
+                                <Button
+                                    variant="info"
                                     onClick={() => navigate('/admin/payouts')}
                                     style={buttonStyle}
                                 >
@@ -114,7 +114,7 @@ const AdminDashboard = () => {
                 </Row>
 
                 {/* Configuration Modal */}
-                <ConfigModal 
+                <ConfigModal
                     show={showConfigModal}
                     onHide={() => setShowConfigModal(false)}
                 />

@@ -74,7 +74,7 @@ const AdminPayouts = () => {
             <Container>
                 <h2 className="my-4">Payout Requests</h2>
                 <SortableTable columns={columns} data={payouts}>
-                    {(sortedPayouts) => 
+                    {(sortedPayouts) =>
                         sortedPayouts.map((payout) => (
                             <tr key={payout._id}>
                                 <td>{payout.driverID.firstName} {payout.driverID.lastName}</td>
@@ -82,7 +82,7 @@ const AdminPayouts = () => {
                                 <td>${payout.amount.toFixed(2)}</td>
                                 <td>{new Date(payout.requestedAt).toLocaleString()}</td>
                                 <td>
-                                    <select 
+                                    <select
                                         value={payout.status}
                                         onChange={(e) => handleStatusChange(payout._id, e.target.value)}
                                         className={`form-select ${payout.status === 'PAID' ? 'text-success' : 'text-warning'}`}

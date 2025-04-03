@@ -90,23 +90,23 @@ export default function DriverLoginScreen() {
           onChangeText={setPassword}
           secureTextEntry
         />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={[styles.button, styles.nextButton]} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.loginText}>Don't have an account?</Text>
-          <TouchableOpacity onPress={handleRegister}>
-            <Text style={styles.loginLink}>Register As A Driver</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.backToRiderButton]} onPress={handleBackToRiderLogin}>
-            <Text style={styles.buttonText}>Back to Rider Login</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={[styles.button, styles.nextButton]} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      <View style={styles.footer}>
+        <Text style={styles.loginText}>Don't have an account?</Text>
+        <TouchableOpacity onPress={handleRegister}>
+          <Text style={styles.loginLink}>Register As A Driver</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.backToRiderButton]} onPress={handleBackToRiderLogin}>
+          <Text style={styles.buttonText}>Back to Rider Login</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
@@ -173,9 +173,9 @@ const styles = StyleSheet.create({
     color: '#6D6D6D',
     marginBottom: 8
   },
-  backToRiderButton: { 
+  backToRiderButton: {
     marginTop: 12,
-    backgroundColor: '#8EC3FF',  
+    backgroundColor: '#8EC3FF',
   },
   loginLink: {
     fontSize: 16,

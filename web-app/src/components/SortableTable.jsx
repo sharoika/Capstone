@@ -10,7 +10,7 @@ const SortableTable = ({ columns, data, children, tableId }) => {
 
   const requestSort = (key) => {
     let direction = 'asc';
-    
+
     if (sortConfig.key === key) {
       if (sortConfig.direction === 'asc') {
         direction = 'desc';
@@ -18,7 +18,7 @@ const SortableTable = ({ columns, data, children, tableId }) => {
         direction = 'none';
       }
     }
-    
+
     setSortConfig({ key, direction });
   };
 
@@ -26,15 +26,15 @@ const SortableTable = ({ columns, data, children, tableId }) => {
     if (sortConfig.key !== columnKey) {
       return <FaSort className="ms-1 text-muted" size={12} />;
     }
-    
+
     if (sortConfig.direction === 'asc') {
       return <FaSortUp className="ms-1 text-primary" size={12} />;
     }
-    
+
     if (sortConfig.direction === 'desc') {
       return <FaSortDown className="ms-1 text-primary" size={12} />;
     }
-    
+
     return <FaSort className="ms-1 text-muted" size={12} />;
   };
 
@@ -45,17 +45,17 @@ const SortableTable = ({ columns, data, children, tableId }) => {
 
     return [...data].sort((a, b) => {
       const column = columns.find(col => col.key === sortConfig.key);
-      
+
       if (!column) return 0;
-      
+
       // Get values using accessor if provided, otherwise use key directly
       const aValue = column.accessor ? column.accessor(a) : a[sortConfig.key];
       const bValue = column.accessor ? column.accessor(b) : b[sortConfig.key];
-      
+
       // Handle different data types
       if (aValue === null || aValue === undefined) return 1;
       if (bValue === null || bValue === undefined) return -1;
-      
+
       // Compare based on data type
       if (typeof aValue === 'string') {
         if (sortConfig.direction === 'asc') {
@@ -76,8 +76,8 @@ const SortableTable = ({ columns, data, children, tableId }) => {
       <thead>
         <tr>
           {columns.map((column) => (
-            <th 
-              key={column.key} 
+            <th
+              key={column.key}
               onClick={() => column.sortable !== false && requestSort(column.key)}
               style={{ cursor: column.sortable !== false ? 'pointer' : 'default' }}
               className={column.className || ''}

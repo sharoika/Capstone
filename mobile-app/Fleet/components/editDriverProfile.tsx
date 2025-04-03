@@ -40,7 +40,7 @@ export default function editDriverProfile() {
         });
 
         if (!response.ok) throw new Error('Failed to fetch driver details');
-        
+
         const data: Driver = await response.json();
         setDriver(data);
       } catch (error) {

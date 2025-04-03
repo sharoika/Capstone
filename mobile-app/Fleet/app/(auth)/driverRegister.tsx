@@ -11,7 +11,7 @@ import PageIndicator from '../../components/PageIndicator';
 import styles from '../../styles/styles';
 import MapView from 'react-native-maps';
 
-const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 interface DocumentFile {
@@ -27,7 +27,7 @@ const DriverRegisterScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const mapRef = useRef<MapView | null>(null);
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -52,14 +52,14 @@ const DriverRegisterScreen = () => {
       console.error('No details returned');
       return;
     }
-  
+
     const location = {
       latitude: details.geometry.location.lat,
       longitude: details.geometry.location.lng,
     };
-  
+
     setLocationCoords(location);
-  
+
     if (mapRef.current) {
       mapRef.current.animateToRegion({
         ...location,
@@ -68,7 +68,7 @@ const DriverRegisterScreen = () => {
       });
     }
   };
-  
+
   const handleInputChange = (name: string, value: string) => {
     setFormData({ ...formData, [name]: value });
 
@@ -107,7 +107,7 @@ const DriverRegisterScreen = () => {
       2: ['vehicleMake', 'vehicleModel', 'vehicleYear', 'vehicleColor', 'licensePlate'],
       3: [],
       4: ['driversLicense', 'vehicleRegistration', 'insuranceDocument', 'backgroundCheckConsent'],
-     };
+    };
 
     (fieldsByPage[page] || []).forEach((field) => {
       if (!formData[field]) {
@@ -141,7 +141,8 @@ const DriverRegisterScreen = () => {
 
     setIsLoading(true);
 
-    try {    const formDataToSend = new FormData();
+    try {
+      const formDataToSend = new FormData();
       if (locationCoords) {
         formDataToSend.append("currentLocation", JSON.stringify({
           type: "Point",
@@ -159,14 +160,14 @@ const DriverRegisterScreen = () => {
           formDataToSend.append(field, value);
         }
       });
-  
+
       const documentFieldsMap = {
         driversLicense: "licenseDoc",
         vehicleRegistration: "vehicleRegistrationDoc",
         insuranceDocument: "safetyInspectionDoc",
         backgroundCheckConsent: "criminalRecordCheckDoc",
       };
-  
+
       Object.keys(documentFieldsMap).forEach((key) => {
         const file = formData[key];
         if (file) {
@@ -177,7 +178,7 @@ const DriverRegisterScreen = () => {
           } as any);
         }
       });
-   
+
 
       const response = await fetch(`${apiUrl}/api/auth/driver/register`, {
         method: 'POST',
@@ -186,7 +187,7 @@ const DriverRegisterScreen = () => {
 
       const responseText = await response.text(); // Log response
       console.log('Raw Response:', responseText);
-      
+
       let errorData;
       try {
         errorData = JSON.parse(responseText);
@@ -234,18 +235,18 @@ const DriverRegisterScreen = () => {
       case 3:
         return (
           <LocationPage
-          formData={formData}
-          locationCoords={locationCoords}
-          handleLocationSelect={handleLocationSelect}
-          handleNextPage={handleNextPage}
-          handlePreviousPage={handlePreviousPage}
-          styles={styles}
-          GOOGLE_API_KEY={GOOGLE_API_KEY}
-          mapRef={mapRef}  
-        />
-        ); 
+            formData={formData}
+            locationCoords={locationCoords}
+            handleLocationSelect={handleLocationSelect}
+            handleNextPage={handleNextPage}
+            handlePreviousPage={handlePreviousPage}
+            styles={styles}
+            GOOGLE_API_KEY={GOOGLE_API_KEY}
+            mapRef={mapRef}
+          />
+        );
       case 4:
-       
+
         return (
           <DocumentsPage
             formData={formData}
@@ -261,28 +262,28 @@ const DriverRegisterScreen = () => {
         return null;
     }
   };
-  
+
   return (
 
     <KeyboardAvoidingView
-    style={{ flex: 1 }}
-  >
-    <View style={styles.scrollContainer}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.title}>Driver Registration</Text>
-          <PageIndicator currentPage={currentPage} styles={styles} />
-        </View>
+      style={{ flex: 1 }}
+    >
+      <View style={styles.scrollContainer}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+            <Text style={styles.title}>Driver Registration</Text>
+            <PageIndicator currentPage={currentPage} styles={styles} />
+          </View>
 
-        {renderCurrentPage()}
+          {renderCurrentPage()}
 
-        <View style={styles.footer}>
-          <Text style={styles.loginText}>Already have an account?</Text>
-          <Text style={styles.loginLink} onPress={() => router.push('/(auth)/driverLogin')}>Login</Text>
+          <View style={styles.footer}>
+            <Text style={styles.loginText}>Already have an account?</Text>
+            <Text style={styles.loginLink} onPress={() => router.push('/(auth)/driverLogin')}>Login</Text>
+          </View>
         </View>
       </View>
-    </View>
     </KeyboardAvoidingView>
   );
 };

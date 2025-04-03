@@ -93,7 +93,7 @@ router.post('/rider/register', async (req, res) => {
       homeLocation: homeLocation,
       currentLocation: {
         type: 'Point',
-        coordinates: [0, 0], 
+        coordinates: [0, 0],
       },
     });
 
@@ -165,7 +165,7 @@ router.post('/driver/register', upload.fields([
       password,
       vehicleMake,
       vehicleModel,
-      currentLocation 
+      currentLocation
     } = req.body;
 
     const existingDriver = await Driver.findOne({ email });
@@ -190,7 +190,7 @@ router.post('/driver/register', upload.fields([
       criminalRecordCheckDoc: req.files?.criminalRecordCheckDoc?.[0]?.path,
       vehicleRegistrationDoc: req.files?.vehicleRegistrationDoc?.[0]?.path,
       safetyInspectionDoc: req.files?.safetyInspectionDoc?.[0]?.path,
-      currentLocation: JSON.parse(currentLocation) 
+      currentLocation: JSON.parse(currentLocation)
     });
 
     await newDriver.save();

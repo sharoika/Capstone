@@ -66,15 +66,15 @@ const RideList: React.FC<RideListProps> = ({
         : '';
 
     return (
-      <TouchableOpacity 
-        style={styles.rideItem} 
+      <TouchableOpacity
+        style={styles.rideItem}
         onPress={() => onSelectRide(item._id)}
       >
         <View style={styles.rideHeader}>
           <ThemedText style={styles.rideDate}>{date}</ThemedText>
           <ThemedText style={styles.rideTime}>{time}</ThemedText>
         </View>
-        
+
         <View style={styles.rideDetails}>
           <View style={styles.locationContainer}>
             <ThemedText numberOfLines={1} style={styles.locationText}>
@@ -90,17 +90,17 @@ const RideList: React.FC<RideListProps> = ({
 
           <ThemedText style={styles.rideStatus}>Status: {item.status}</ThemedText>
         </View>
-        
+
         <View style={styles.rideFooter}>
           <ThemedText style={styles.rideDistance}>{item.distance.toFixed(1)} km</ThemedText>
           {item.vehicleDetails && <ThemedText style={styles.vehicleDetails}>{item.vehicleDetails}</ThemedText>}
         </View>
 
-        <Ionicons 
-          name="chevron-forward" 
-          size={20} 
-          color="#173252" 
-          style={styles.chevron} 
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color="#173252"
+          style={styles.chevron}
         />
       </TouchableOpacity>
     );

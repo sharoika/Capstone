@@ -24,7 +24,7 @@ function PaymentScreen() {
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [hasStripeId, setHasStripeId] = useState(false); 
+  const [hasStripeId, setHasStripeId] = useState(false);
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -50,22 +50,22 @@ function PaymentScreen() {
 
         const userData = await response.json();
         setHasStripeId(!!userData.stripeCustomerId);
-        if(!hasStripeId){
+        if (!hasStripeId) {
           const riderId = await SecureStore.getItemAsync('userObjectId');
           if (!riderId) {
             console.error('No riderId found, cannot proceed.');
             setLoading(false);
             return;
           }
-      
+
           console.log('Retrieved riderId:', riderId);
-      
+
           const response = await fetch(`${apiUrl}/api/payment/create-setup-intent`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ riderId }),
           });
-      
+
         }
       } catch (error) {
         console.error('Error fetching rider data:', error);
@@ -107,32 +107,32 @@ function PaymentScreen() {
         setLoading(false);
         return;
       }
-  
+
       console.log('Retrieved riderId:', riderId);
-  
+
       const response = await fetch(`${apiUrl}/api/payment/create-setup-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ riderId }),
       });
-  
+
       if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(`Failed to create SetupIntent: ${errorMessage}`);
       }
-  
+
       const { paymentIntent, customer, ephemeralKey } = await response.json();
-  
+
       // If no customer ID is returned, retry once to ensure it's created
       if (!customer && !retry) {
         console.log("Retrying after Stripe customer ID creation...");
         return initializePaymentSheet(true);
       }
-  
+
       if (!paymentIntent || !customer || !ephemeralKey) {
         throw new Error('Missing required fields from the API response.');
       }
-  
+
       const { error } = await initPaymentSheet({
         merchantDisplayName: "Example, Inc.",
         customerId: customer,
@@ -143,27 +143,27 @@ function PaymentScreen() {
           name: 'Jane Doe',
         },
       });
-  
+
       if (error) {
         console.error('Error initializing PaymentSheet:', error);
         return;
       }
-  
+
       const { error: presentError } = await presentPaymentSheet();
-  
+
       if (presentError) {
         console.log('Error presenting PaymentSheet:', presentError);
       } else {
         console.log('PaymentSheet presented successfully');
       }
-  
+
     } catch (error) {
       console.log('Error in initializePaymentSheet:', error);
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>

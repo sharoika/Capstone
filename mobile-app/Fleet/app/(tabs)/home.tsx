@@ -4,7 +4,7 @@ import RideForm from '../../components/RideForm';
 import DriverSelection from '../../components/DriverSelection';
 import StartRide from '../../components/StartRide';
 import RideInProgress from '../../components/RideInProgress';
-import RideSummary from '../../components/RideSummary'; 
+import RideSummary from '../../components/RideSummary';
 import WaitingForConfirmation from '../../components/WaitingForConfirmation';
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
@@ -23,7 +23,7 @@ const HomeScreen: React.FC = () => {
   const [rideID, setRideID] = useState('');
   const [token, setToken] = useState<string>('');
   const [riderID, setRiderID] = useState<string>('');
-  const [rideDetails, setRideDetails] = useState<any>(null); 
+  const [rideDetails, setRideDetails] = useState<any>(null);
 
   useEffect(() => {
     const fetchTokenAndRiderID = async () => {
@@ -46,7 +46,7 @@ const HomeScreen: React.FC = () => {
   }, []);
 
   if (!token || !riderID) {
-    return null; 
+    return null;
   }
   return (
     <View style={styles.container}>
@@ -65,19 +65,19 @@ const HomeScreen: React.FC = () => {
           rideID={rideID}
           token={token}
           onDriverConfirmed={() => {
-            setCurrentStep(3); 
+            setCurrentStep(3);
           }}
         />
       )}
       {currentStep === 3 && (
-  <WaitingForConfirmation
-    rideID={rideID}
-    token={token}
-    onConfirmed={() => {
-      setCurrentStep(4); // Move to StartRide step after confirmation
-    }}
-  />
-)}
+        <WaitingForConfirmation
+          rideID={rideID}
+          token={token}
+          onConfirmed={() => {
+            setCurrentStep(4); // Move to StartRide step after confirmation
+          }}
+        />
+      )}
       {currentStep === 4 && (
         <StartRide
           rideID={rideID}
@@ -97,19 +97,19 @@ const HomeScreen: React.FC = () => {
           }}
         />
       )}
-    {currentStep === 6 && (
-      <RideSummary
-        rideDetails={rideDetails}
-        rideID={rideID}
-        token={token}
-        onReturnHome={() => {
-          console.log('Returning to home...');
-          setCurrentStep(1);
-          setRideID('');
-          setRideDetails(null); 
-        }}
-      />
-    )}
+      {currentStep === 6 && (
+        <RideSummary
+          rideDetails={rideDetails}
+          rideID={rideID}
+          token={token}
+          onReturnHome={() => {
+            console.log('Returning to home...');
+            setCurrentStep(1);
+            setRideID('');
+            setRideDetails(null);
+          }}
+        />
+      )}
     </View>
   );
 };

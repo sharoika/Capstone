@@ -26,7 +26,7 @@ const DriverHome: React.FC = () => {
   const [rideID, setRideID] = useState<string | null>(null);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isOnline, setIsOnline] = useState<boolean>(false); 
+  const [isOnline, setIsOnline] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -92,28 +92,28 @@ const DriverHome: React.FC = () => {
   // Render the driver steps if approved
   return (
     <View style={styles.container}>
-{currentStep === 1 && (
-  <GoOnlineStep
-    token={token}
-    driverID={driverID}
-    onNextStep={() => setCurrentStep(2)}
-    onStatusChange={(isOnline) => {
-      if (isOnline) {
-        setCurrentStep(2);  
-      }
-    }}
-  />
-)}
+      {currentStep === 1 && (
+        <GoOnlineStep
+          token={token}
+          driverID={driverID}
+          onNextStep={() => setCurrentStep(2)}
+          onStatusChange={(isOnline) => {
+            if (isOnline) {
+              setCurrentStep(2);
+            }
+          }}
+        />
+      )}
       {currentStep === 2 && token && driverID && (
         <RidesWithoutDriverStep
-        token={token}
-        driverID={driverID}
-        onRideClaimed={(ride) => {
-          setRideID(ride);
-          setCurrentStep(3);
-        }}
-        onGoOffline={() => setCurrentStep(1)}
-      />
+          token={token}
+          driverID={driverID}
+          onRideClaimed={(ride) => {
+            setRideID(ride);
+            setCurrentStep(3);
+          }}
+          onGoOffline={() => setCurrentStep(1)}
+        />
       )}
       {currentStep === 3 && rideID && (
         <TravelToRideStep
@@ -133,8 +133,8 @@ const DriverHome: React.FC = () => {
       )}
       {currentStep === 5 && (
         <RideFinishedStep
-        rideID={rideID}
-        token={token}
+          rideID={rideID}
+          token={token}
           onGoHome={() => {
             setRideID(null);
             setCurrentStep(2);

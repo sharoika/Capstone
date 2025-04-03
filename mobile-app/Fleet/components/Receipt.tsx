@@ -56,11 +56,11 @@ const Receipt: React.FC<ReceiptProps> = ({ receipt, onClose }) => {
 
   const shareReceipt = async () => {
     try {
-      const driverInfo = safeReceipt.driverID && safeReceipt.driverID.firstName 
+      const driverInfo = safeReceipt.driverID && safeReceipt.driverID.firstName
         ? `Driver: ${safeReceipt.driverID.firstName} ${safeReceipt.driverID.lastName || ''}
 ${safeReceipt.driverID.vehicleMake ? `Vehicle: ${safeReceipt.driverID.vehicleMake} ${safeReceipt.driverID.vehicleModel || ''}` : ''}`
         : 'Driver information not available';
-      
+
       const shareContent = `
 Fleet Ride Receipt
 Receipt #: ${safeReceipt.receiptNumber}

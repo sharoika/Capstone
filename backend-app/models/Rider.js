@@ -5,22 +5,22 @@ const RiderSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  phone: { type: String, required: false},
+  phone: { type: String, required: false },
   password: { type: String, required: true },
   homeLocation: { type: String },
   profilePicture: { type: String },
   currentLocation: {
-    type: { type: String, enum: ['Point'], required: true },  
+    type: { type: String, enum: ['Point'], required: true },
     coordinates: {
-        type: [Number], 
-        required: false
+      type: [Number],
+      required: false
     }
-},
+  },
   completedRides: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ride' }],
 
-  stripeCustomerId: { type: String, required: false},
-  stripeSetupIntentId:{ type: String, required: false},
-  stripePaymentMethodId:{ type: String, required: false}
+  stripeCustomerId: { type: String, required: false },
+  stripeSetupIntentId: { type: String, required: false },
+  stripePaymentMethodId: { type: String, required: false }
 });
 
 RiderSchema.pre('save', async function (next) {

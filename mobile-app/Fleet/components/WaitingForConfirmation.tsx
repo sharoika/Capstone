@@ -14,7 +14,7 @@ const WaitingForConfirmation: React.FC<WaitingForConfirmationProps> = ({ rideID,
   const [status, setStatus] = useState<string>('selected');
   const [loading, setLoading] = useState(true);
   const fadeAnim = new Animated.Value(0);
-  
+
   const [region, setRegion] = useState({
     latitude: 37.78825,
     longitude: -122.4324,
@@ -55,14 +55,14 @@ const WaitingForConfirmation: React.FC<WaitingForConfirmationProps> = ({ rideID,
 
         if (data.status === 'accepted') {
           setLoading(false);
-          onConfirmed(); 
+          onConfirmed();
         }
       } catch (error) {
         console.error("Error checking ride status:", error);
       }
     };
 
-    const interval = setInterval(checkRideStatus, 3000); 
+    const interval = setInterval(checkRideStatus, 3000);
 
     return () => clearInterval(interval);
   }, [rideID, token, onConfirmed]);
@@ -79,17 +79,17 @@ const WaitingForConfirmation: React.FC<WaitingForConfirmationProps> = ({ rideID,
 
       <View style={styles.overlayContainer}>
         <View style={styles.card}>
-        <Text style={styles.text}>
+          <Text style={styles.text}>
             {loading ? "Waiting for driver confirmation..." : "Ride Confirmed!"}
           </Text>
-        <Animated.View style={ { opacity: fadeAnim }}>
-                  {loading && (
-            <View style={{ transform: [{ scale: 2.4 }] }}>
-            <ActivityIndicator size="large" color="#4A90E2" />
-          </View>
-          )}
+          <Animated.View style={{ opacity: fadeAnim }}>
+            {loading && (
+              <View style={{ transform: [{ scale: 2.4 }] }}>
+                <ActivityIndicator size="large" color="#4A90E2" />
+              </View>
+            )}
 
-        </Animated.View>
+          </Animated.View>
         </View>
       </View>
     </View>
@@ -97,10 +97,12 @@ const WaitingForConfirmation: React.FC<WaitingForConfirmationProps> = ({ rideID,
 };
 
 const styles = StyleSheet.create({
-  container: {    ...StyleSheet.absoluteFillObject, 
+  container: {
+    ...StyleSheet.absoluteFillObject,
     flex: 1,
     margin: 0,
-    padding: 0,},
+    padding: 0,
+  },
   text: {
     fontSize: 20,
     color: '#8EC3FF',
@@ -120,8 +122,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: width * 0.8,    
-    height: height * 0.8, 
+    width: width * 0.8,
+    height: height * 0.8,
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 12,
@@ -130,7 +132,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    justifyContent: 'center',  
+    justifyContent: 'center',
     alignItems: 'center',
   },
   details: {

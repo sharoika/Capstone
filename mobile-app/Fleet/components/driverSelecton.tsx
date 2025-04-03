@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Picker, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Platform} from 'react-native';
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 
@@ -49,13 +49,13 @@ const ConfirmTripScreen = ({ rideID }) => {
   // Handle trip confirmation
   const handleConfirm = async () => {
     if (!selectedDriver) {
-       
+
       Alert.alert('Error', 'Please select a driver');
       return;
     }
 
     try {
-        console.log(selectedDriver);
+      console.log(selectedDriver);
       const token = await getItemAsync('userToken');
       const response = await fetch(
         `${apiUrl}/api/rides/${rideID}/confirm`,

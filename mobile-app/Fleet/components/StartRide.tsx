@@ -32,7 +32,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   const [startLocation, setStartLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [riderLocation, setRiderLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
-  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
 
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY);
@@ -42,7 +42,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
     let points = [];
     let index = 0, len = encoded.length;
     let lat = 0, lng = 0;
-  
+
     while (index < len) {
       let b, shift = 0, result = 0;
       do {
@@ -52,7 +52,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
       } while (b >= 0x20);
       let dlat = result & 1 ? ~(result >> 1) : result >> 1;
       lat += dlat;
-  
+
       shift = 0;
       result = 0;
       do {
@@ -62,7 +62,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
       } while (b >= 0x20);
       let dlng = result & 1 ? ~(result >> 1) : result >> 1;
       lng += dlng;
-  
+
       points.push({
         latitude: lat * 1e-5,
         longitude: lng * 1e-5
@@ -81,20 +81,20 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
       setAddress("Address not found");
     }
   };
-  
+
   useEffect(() => {
     const fetchCoordinates = async () => {
       try {
         if (!rideDetails?.start?.coordinates || !rideDetails?.driver?.currentLocation?.coordinates) {
           return;
         }
-    
+
         if (rideDetails.driver?.currentLocation?.coordinates && rideDetails.start?.coordinates) {
           setDriverLocation({
             latitude: rideDetails.driver.currentLocation.coordinates[1],
             longitude: rideDetails.driver.currentLocation.coordinates[0],
           });
-        
+
           setStartLocation({
             latitude: rideDetails.start.coordinates[1],
             longitude: rideDetails.start.coordinates[0],
@@ -105,23 +105,23 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         const directionsResponse = await fetch(
           `https://maps.googleapis.com/maps/api/directions/json?origin=${driverLocation}&destination=${startLocation}&key=${GOOGLE_API_KEY}`
         );
-    
+
         const directionsData = await directionsResponse.json();
-    
+
         if (directionsData.routes.length > 0) {
           const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
           const distance = directionsData.routes[0].legs[0].distance.text;
           const distanceValue = directionsData.routes[0].legs[0].distance.value / 1000; // Convert to km
-    
+
           setDistance(distance);
-    
+
           const [driverLat, driverLng] = driverLocation.split(',').map(Number);
           const [startLat, startLng] = startLocation.split(',').map(Number);
-    
+
           setRouteCoordinates(points);
           setRegion({
-            latitude: driverLat, 
-            longitude: driverLng, 
+            latitude: driverLat,
+            longitude: driverLng,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           });
@@ -131,16 +131,16 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         Alert.alert("Error", "Failed to retrieve route coordinates.");
       }
     };
-    
-  
+
+
     fetchCoordinates();
-  }, [rideDetails]); 
+  }, [rideDetails]);
 
   useEffect(() => {
     if (rideDetails?.start?.coordinates && rideDetails?.driver?.currentLocation?.coordinates) {
       const [startLat, startLng] = rideDetails.start.coordinates;
       const [driverLat, driverLng] = rideDetails.driver.currentLocation.coordinates;
-  
+
       reverseGeocode(startLng, startLat, setStartAddress);
       reverseGeocode(driverLng, driverLat, setDriverAddress);
     }
@@ -172,11 +172,11 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
             latitude: data.driver.currentLocation.coordinates[1],
             longitude: data.driver.currentLocation.coordinates[0],
           };
-           setRiderLocation({
-          latitude: data.rider.currentLocation.coordinates[1],
-          longitude: data.rider.currentLocation.coordinates[0],
-        });
-          setRouteCoordinates([driverLocation, startLocation]); 
+          setRiderLocation({
+            latitude: data.rider.currentLocation.coordinates[1],
+            longitude: data.rider.currentLocation.coordinates[0],
+          });
+          setRouteCoordinates([driverLocation, startLocation]);
           setRegion({
             latitude: driverLocation.latitude,
             longitude: driverLocation.longitude,
@@ -217,13 +217,13 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
             "Content-Type": "application/json",
           },
         });
-  
+
         if (!response.ok) {
           throw new Error("Failed to fetch ride details");
         }
-  
+
         const data = await response.json();
-  
+
         if (data.driver?.currentLocation?.coordinates) {
           setDriverLocation({
             latitude: data.driver.currentLocation.coordinates[1],
@@ -247,7 +247,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   
     return () => clearInterval(interval); 
   }, [rideID, token]);
-  
+
 
   useEffect(() => {
     if (routeCoordinates.length > 0) {
@@ -301,35 +301,35 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
   return (
 
     <View style={styles.container}>
-    {region && (
-      <MapView ref={mapRef} style={styles.map} region={region} customMapStyle={customMapStyle} >
-        {routeCoordinates.length > 0 && (
-          <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2"/>
-        )}
-       {driverLocation && (
-  <Marker coordinate={driverLocation} title="Driver Location">
-    {customPin}
-  </Marker>
-)}
-{startLocation && (
-  <Marker coordinate={startLocation} title="Start">
-    {customPin}
-  </Marker>
-)}
- {riderLocation && <Marker coordinate={riderLocation} title="Rider Location" pinColor="blue" />}
-      </MapView>
-    )}
+      {region && (
+        <MapView ref={mapRef} style={styles.map} region={region} customMapStyle={customMapStyle} >
+          {routeCoordinates.length > 0 && (
+            <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2" />
+          )}
+          {driverLocation && (
+            <Marker coordinate={driverLocation} title="Driver Location">
+              {customPin}
+            </Marker>
+          )}
+          {startLocation && (
+            <Marker coordinate={startLocation} title="Start">
+              {customPin}
+            </Marker>
+          )}
+          {riderLocation && <Marker coordinate={riderLocation} title="Rider Location" pinColor="blue" />}
+        </MapView>
+      )}
 
 
 
-<View style={styles.cardContainer}>
+      <View style={styles.cardContainer}>
         <View style={styles.card}>
 
           <Text style={styles.cardTitle}>Ride Details</Text>
           <Text style={styles.label}>Start Location Address:</Text>
-<Text style={styles.value}>{startAddress}</Text>
-<Text style={styles.label}>Driver Location Address:</Text>
-<Text style={styles.value}>{driverAddress}</Text>
+          <Text style={styles.value}>{startAddress}</Text>
+          <Text style={styles.label}>Driver Location Address:</Text>
+          <Text style={styles.value}>{driverAddress}</Text>
           <Text style={styles.label}>Fare:</Text>
           <Text style={styles.value}>${fare.toFixed(2)}</Text>
           <Text style={styles.label}>Distance:</Text>
@@ -340,7 +340,7 @@ const StartRide: React.FC<StartRideProps> = ({ rideID, token, onRideStarted }) =
         </View>
       </View>
     </View>
-);
+  );
 };
 
 const styles = StyleSheet.create({

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import Constants from 'expo-constants';
 import MapView, { Marker } from 'react-native-maps';
-import { customMapStyle } from '../styles/customMapStyle'; 
+import { customMapStyle } from '../styles/customMapStyle';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -57,7 +57,7 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -91,17 +91,17 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
 
   const region = location
     ? {
-        latitude: location.lat,
-        longitude: location.long,
-        latitudeDelta: 0.0012,
-        longitudeDelta: 0.0061,
-      }
+      latitude: location.lat,
+      longitude: location.long,
+      latitudeDelta: 0.0012,
+      longitudeDelta: 0.0061,
+    }
     : {
-        latitude: 37.78825,  
-        longitude: -122.4324,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      };
+      latitude: 37.78825,
+      longitude: -122.4324,
+      latitudeDelta: 0.05,
+      longitudeDelta: 0.05,
+    };
 
   return (
     <View style={styles.container}>
@@ -109,9 +109,9 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
         <ActivityIndicator size="large" color="#4A90E2" style={styles.loader} />
       ) : (
         <>
-          <MapView 
-            style={styles.map} 
-            region={region} 
+          <MapView
+            style={styles.map}
+            region={region}
             customMapStyle={customMapStyle}
           >
             {location && (
@@ -130,10 +130,10 @@ const GoOnlineStep: React.FC<GoOnlineStepProps> = ({ token, driverID, onNextStep
             <Text style={styles.statusText}>
               {isOnline ? 'You are Online' : 'You are Offline'}
             </Text>
-            
+
             <TouchableOpacity
               style={[
-                styles.button, 
+                styles.button,
                 isOnline ? styles.offlineButton : styles.onlineButton
               ]}
               onPress={toggleOnlineStatus}

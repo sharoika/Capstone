@@ -8,8 +8,8 @@ const maintenanceCheck = async (req, res, next) => {
             if (req.path.startsWith('/api/admin')) {
                 return next();
             }
-            return res.status(503).json({ 
-                message: 'System is currently under maintenance. Please try again later.' 
+            return res.status(503).json({
+                message: 'System is currently under maintenance. Please try again later.'
             });
         }
         next();

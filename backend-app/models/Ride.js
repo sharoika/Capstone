@@ -6,16 +6,16 @@ const RideSchema = new mongoose.Schema({
     riderID: { type: mongoose.Schema.Types.ObjectId, ref: 'Rider', required: true },
     driverID: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: false },
     start: {
-        type: { type: String, enum: ['Point'], required: true },  
+        type: { type: String, enum: ['Point'], required: true },
         coordinates: {
-            type: [Number], 
+            type: [Number],
             required: true
         }
     },
-    end:{
-        type: { type: String, enum: ['Point'], required: true },  
+    end: {
+        type: { type: String, enum: ['Point'], required: true },
         coordinates: {
-            type: [Number], 
+            type: [Number],
             required: true
         }
     },

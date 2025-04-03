@@ -12,7 +12,7 @@ const MapScreen: React.FC = () => {
     (async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
-        
+
         if (status !== "granted") {
           Alert.alert(
             "Permission Required",

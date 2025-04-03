@@ -21,7 +21,7 @@ const Home = () => {
             elements.forEach(element => {
                 const position = element.getBoundingClientRect();
                 // If element is in viewport
-                if(position.top < window.innerHeight * 0.8) {
+                if (position.top < window.innerHeight * 0.8) {
                     element.classList.add('animated');
                 }
             });
@@ -30,7 +30,7 @@ const Home = () => {
         window.addEventListener('scroll', handleScroll);
         // Trigger once on load
         handleScroll();
-        
+
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
@@ -61,7 +61,7 @@ const Home = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Animated scroll indicator */}
                     <div className="scroll-indicator">
                         <div className="mouse">
@@ -83,7 +83,7 @@ const Home = () => {
                             <h2 className="display-4 font-weight-bold">Why Drive with Us?</h2>
                             <div className="divider mx-auto"></div>
                         </div>
-                        
+
                         <div className="row">
                             {[
                                 { icon: FaClock, title: "Flexible Hours", text: "Work when you want, with the flexibility to choose your own schedule. Drive part-time, full-time, or whenever you're available." },
@@ -91,7 +91,7 @@ const Home = () => {
                                 { icon: FaUsers, title: "Supportive Community", text: "Join a community of supportive drivers and a company that values your feedback. We're here to support you on and off the road." }
                             ].map((card, index) => (
                                 <div key={index} className="col-md-4 mb-4">
-                                    <div className="card h-100 shadow-sm hover-card animate-on-scroll" style={{animationDelay: `${index * 0.2}s`}}>
+                                    <div className="card h-100 shadow-sm hover-card animate-on-scroll" style={{ animationDelay: `${index * 0.2}s` }}>
                                         <div className="card-body text-center d-flex flex-column justify-content-center">
                                             <div className="icon-wrapper">
                                                 <card.icon className={`card-icon mb-3 ${theme === 'dark' ? 'icon-dark' : ''}`} />
@@ -103,10 +103,10 @@ const Home = () => {
                                 </div>
                             ))}
                         </div>
-                        
+
                         <div className="text-center mt-5 animate-on-scroll">
-                            <button 
-                                onClick={handleAppButtonClick} 
+                            <button
+                                onClick={handleAppButtonClick}
                                 className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
                                 Get Fleet
                             </button>
@@ -122,14 +122,14 @@ const Home = () => {
                             <h2 className="display-4 font-weight-bold">Powerful Features</h2>
                             <div className="divider mx-auto"></div>
                         </div>
-                        
+
                         <div className="row g-4">
                             {[
                                 { icon: FaCarAlt, title: "Multiple Vehicle Options", text: "Choose from a variety of vehicle types to suit your needs and budget." },
                                 { icon: FaMobileAlt, title: "Easy Mobile Booking", text: "Book rides with just a few taps on our intuitive mobile application." },
                                 { icon: FaRoute, title: "Optimized Routes", text: "Get to your destination faster with our smart route optimization." }
                             ].map((feature, index) => (
-                                <div key={index} className="col-md-4 animate-on-scroll" style={{animationDelay: `${index * 0.2}s`}}>
+                                <div key={index} className="col-md-4 animate-on-scroll" style={{ animationDelay: `${index * 0.2}s` }}>
                                     <div className="feature-card">
                                         <div className="feature-icon-wrapper">
                                             <feature.icon className={`feature-card-icon ${theme === 'dark' ? 'icon-dark' : ''}`} />
@@ -151,12 +151,12 @@ const Home = () => {
                             <h2>Experience the Fleet Difference</h2>
                             <div className="divider mx-auto"></div>
                         </div>
-                        
+
                         <div className="row align-items-center">
                             <div className="col-lg-6 animate-on-scroll">
-                                <img 
-                                    src={riderImage || "/placeholder.svg"} 
-                                    alt="Rider experience" 
+                                <img
+                                    src={riderImage || "/placeholder.svg"}
+                                    alt="Rider experience"
                                     className="img-fluid"
                                 />
                             </div>
@@ -184,9 +184,9 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
-                
+
                 {/* Modal for app availability */}
-                <div className={`modal fade ${showModal ? 'show' : ''}`} style={{display: showModal ? 'block' : 'none'}} tabIndex="-1">
+                <div className={`modal fade ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }} tabIndex="-1">
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -202,7 +202,7 @@ const Home = () => {
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Modal backdrop */}
                 {showModal && <div className="modal-backdrop fade show" onClick={() => setShowModal(false)}></div>}
             </div>

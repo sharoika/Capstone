@@ -9,7 +9,6 @@ import PaymentSettingsScreen from '../(pages)/paymentSettings';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { View, Text, ActivityIndicator } from 'react-native';
-
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -20,7 +19,7 @@ const TabNavigator = () => {
     const fetchUserType = async () => {
       const type = await SecureStore.getItemAsync("userType");
       setUserType(type);
-      setLoading(false); 
+      setLoading(false);
     };
 
     fetchUserType();
@@ -36,9 +35,8 @@ const TabNavigator = () => {
   }
 
   return (
-<Tab.Navigator
-  initialRouteName={userType === "rider" ? "Ride"  : "Drive"} 
-  screenOptions={({ route }) => ({
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'home-outline';
@@ -46,7 +44,7 @@ const TabNavigator = () => {
           if (route.name === 'Ride') {
             iconName = 'car-outline';
           } else if (route.name === 'Profile') {
-            iconName = 'person-outline'; 
+            iconName = 'person-outline';
           } else if (route.name === 'Drive') {
             iconName = 'car-outline';
           } else if (route.name === 'Driver Profile') {
@@ -65,7 +63,7 @@ const TabNavigator = () => {
         tabBarItemStyle: {
           justifyContent: "flex-end",
           alignItems: "center",
-          paddingTop: 8, 
+          paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -74,26 +72,33 @@ const TabNavigator = () => {
     >
       {userType === "driver" && (
         <>
-              <Tab.Screen name="History" component={ReceiptsScreen} />
-       <Tab.Screen name="Drive" component={DriverHomeScreen}         options={{
-             tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10,   paddingTop: 8,  },
-             tabBarLabelStyle: { color: "white" ,  fontSize: 12, },
-        }} />
+          <Tab.Screen name="Drive_Initial" component={DriverHomeScreen} options={{
+            tabBarItemStyle: { display: "none" },
+          }} />
+          <Tab.Screen name="History" component={ReceiptsScreen} />
+          <Tab.Screen name="Drive" component={DriverHomeScreen} options={{
+            tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10, paddingTop: 8, },
+            tabBarLabelStyle: { color: "white", fontSize: 12, },
+          }} />
 
-      <Tab.Screen name="Profile" component={DriverProfileScreen} />
+          <Tab.Screen name="Profile" component={DriverProfileScreen} />
         </>
       )}
       {userType === "rider" && (
         <>
+          <Tab.Screen name="Ride_Initial" component={HomeScreen} options={{
+            tabBarItemStyle: { display: "none" },
+          }} />
+
           <Tab.Screen name="History" component={ReceiptsScreen} />
-         
-          <Tab.Screen name="Ride" component={HomeScreen}            options={{
-          tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10,   paddingTop: 8,  },
-          tabBarLabelStyle: { color: "white" ,  fontSize: 12, },
-        }}
-       
-            />
-           <Tab.Screen name="Profile" component={ProfileScreen} />
+
+          <Tab.Screen name="Ride" component={HomeScreen} options={{
+            tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10, paddingTop: 8, },
+            tabBarLabelStyle: { color: "white", fontSize: 12, },
+          }}
+
+          />
+          <Tab.Screen name="Profile" component={ProfileScreen} />
         </>
       )}
     </Tab.Navigator>
