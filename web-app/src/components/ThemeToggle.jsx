@@ -7,8 +7,8 @@ const ThemeToggle = () => {
     const { theme, toggleTheme } = useContext(ThemeContext);
 
     return (
-        <button 
-            className="theme-toggle-btn" 
+        <button
+            className="theme-toggle-btn"
             onClick={toggleTheme}
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
         >

@@ -5,7 +5,7 @@ import './Footer.css';
 
 const Footer = () => {
     const { theme } = useContext(ThemeContext);
-    
+
     return (
         <footer className={`footer ${theme === 'dark' ? 'footer-dark' : 'footer-light'}`}>
             <div className="container">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Constants from 'expo-constants';
@@ -19,7 +19,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
   const [end, setEnd] = useState<{ type: string; coordinates: [number, number] } | null>(null);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [region, setRegion] = useState({
-    latitude: 37.7749, 
+    latitude: 37.7749,
     longitude: -122.4194,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
@@ -30,7 +30,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
 
   const mapRef = useRef<MapView>(null);
 
-  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
 
   const fetchLocation = async () => {
     try {
@@ -45,14 +45,14 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
       if (response.ok) {
         const data = await response.json();
         console.log("response dataaaa", data.location);
-        
+
         if (data.location && data.location.lat && data.location.long) {
           const mappedLocation = {
-            latitude: data.location.lat, 
-            longitude: data.location.long, 
+            latitude: data.location.lat,
+            longitude: data.location.long,
           };
           console.log("mapped: ", mappedLocation);
-          setLocation(mappedLocation); 
+          setLocation(mappedLocation);
           console.log("Location: ", location);
           setRegion({
             latitude: mappedLocation.latitude,
@@ -75,34 +75,34 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
   };
 
   useEffect(() => {
-    fetchLocation(); 
+    fetchLocation();
     console.log("Updated Locationnnnnnnnnnnnnnnnnn: ", location);
     const interval = setInterval(() => {
       fetchLocation();
     }, 10000);
-  
-    return () => clearInterval(interval); 
+
+    return () => clearInterval(interval);
   }, []);
 
-   const fetchCoordinatesAndRoute = async () => {
+  const fetchCoordinatesAndRoute = async () => {
     if (!start || !end) {
       Alert.alert('Error', 'Please provide both start and end locations.');
       return;
     }
 
     try {
-      const [startLng, startLat] = start.coordinates; 
+      const [startLng, startLat] = start.coordinates;
       const [endLng, endLat] = end.coordinates;
-  
-      console.log("Start Coordinates:", startLat, startLng);  
-      console.log("End Coordinates:", endLat, endLng);  
-  
+
+      console.log("Start Coordinates:", startLat, startLng);
+      console.log("End Coordinates:", endLat, endLng);
+
       if (!startLat || !startLng || !endLat || !endLng) {
         throw new Error("Invalid coordinates extracted.");
       }
-  
+
       const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLat},${startLng}&destination=${endLat},${endLng}&key=${GOOGLE_API_KEY}`;
-      console.log("Fetching URL:", url); 
+      console.log("Fetching URL:", url);
       const directionsResponse = await fetch(url);
       const directionsData = await directionsResponse.json();
 
@@ -113,7 +113,7 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
         const durationInSeconds = directionsData.routes[0].legs[0].duration.value;
         const durationText = directionsData.routes[0].legs[0].duration.text;
         setEstimatedTime(durationText);
-        const distance = directionsData.routes[0].legs[0].distance.text; 
+        const distance = directionsData.routes[0].legs[0].distance.text;
         setDistance(distance);
         mapRef.current?.animateToRegion({
           latitude: startLat,
@@ -161,37 +161,37 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
     return points;
   };
 
-  
-const handleLocationSelect = (data: any, details: any | null, type: 'start' | 'end') => {
-  if (details && details.geometry && details.geometry.location) {
-    const coordinates: [number, number] = [details.geometry.location.lng, details.geometry.location.lat];
-    if (type === 'start') {
-      setStart({ type: 'Point', coordinates });
-    } else {
-      setEnd({ type: 'Point', coordinates });
-    }
-  }
-};
-useEffect(() => {
-  if (start && end) {
-    fetchCoordinatesAndRoute();
-  }
-}, [start, end]);
 
-useEffect(() => {
-  if (location && mapRef.current && !start && !end) {
-    mapRef.current.animateToRegion({
-      latitude: location.latitude,
-      longitude: location.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    });
-    console.log("Map centered on updated location:", location);
-  }
-}, [location, start, end]);
+  const handleLocationSelect = (data: any, details: any | null, type: 'start' | 'end') => {
+    if (details && details.geometry && details.geometry.location) {
+      const coordinates: [number, number] = [details.geometry.location.lng, details.geometry.location.lat];
+      if (type === 'start') {
+        setStart({ type: 'Point', coordinates });
+      } else {
+        setEnd({ type: 'Point', coordinates });
+      }
+    }
+  };
+  useEffect(() => {
+    if (start && end) {
+      fetchCoordinatesAndRoute();
+    }
+  }, [start, end]);
+
+  useEffect(() => {
+    if (location && mapRef.current && !start && !end) {
+      mapRef.current.animateToRegion({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+      console.log("Map centered on updated location:", location);
+    }
+  }, [location, start, end]);
 
   const handleConfirmRide = async () => {
-    if (!start || !end ) {
+    if (!start || !end) {
       Alert.alert('Error', 'Please fill in all the fields.');
       return;
     }
@@ -201,7 +201,7 @@ useEffect(() => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           riderID,
@@ -213,7 +213,7 @@ useEffect(() => {
 
       if (response.ok) {
         const data = await response.json();
-        onRideCreated(data.rideID); 
+        onRideCreated(data.rideID);
       } else {
         const errorData = await response.json();
         console.error('Error response:', errorData);
@@ -224,29 +224,29 @@ useEffect(() => {
       Alert.alert('Error', 'An error occurred while creating the ride.');
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <MapView
         ref={mapRef}
         style={StyleSheet.absoluteFillObject}
         region={region}
-         customMapStyle={customMapStyle} 
+        customMapStyle={customMapStyle}
       >
         {location && (
-           <Marker coordinate={location} title="Your Location">
-           {customPin}  
-         </Marker>
+          <Marker coordinate={location} title="Your Location">
+            {customPin}
+          </Marker>
         )}
-                {start && (
+        {start && (
           <Marker coordinate={{ latitude: start.coordinates[1], longitude: start.coordinates[0] }} title="Start Location">
-           {customPin}
+            {customPin}
           </Marker>
         )}
 
         {end && (
           <Marker coordinate={{ latitude: end.coordinates[1], longitude: end.coordinates[0] }} title="End Location">
-           {customPin}
+            {customPin}
           </Marker>
         )}
         {routeCoordinates.length > 0 && (
@@ -274,7 +274,7 @@ useEffect(() => {
             fetchDetails
           />
 
-   
+
 
           <Text>Estimated Time: {estimatedTime || 'N/A'}</Text>
           <Text>Distance: {distance || 'N/A'}</Text>
@@ -290,7 +290,7 @@ useEffect(() => {
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject, 
+    ...StyleSheet.absoluteFillObject,
     flex: 1,
     margin: 0,
     padding: 0,

@@ -78,7 +78,7 @@ const RideFinishedStep: React.FC<RideFinishedStepProps> = ({ rideID, token, onGo
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Animated.View style={[styles.overlayContainer, { transform: [{ scale: scaleValue }] }]}> 
+      <Animated.View style={[styles.overlayContainer, { transform: [{ scale: scaleValue }] }]}>
         <View style={styles.card}>
           {error ? (
             <Text>{error}</Text>

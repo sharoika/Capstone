@@ -59,7 +59,7 @@ export default function Settings() {
       try {
         const driverId = await getItemAsync('driverID');
         const token = await getItemAsync('driverToken');
-        
+
         console.log('Fetching driver data:', {
           driverId,
           hasToken: !!token,
@@ -72,14 +72,14 @@ export default function Settings() {
 
         const response = await fetch(`${getApiUrl()}/api/user/drivers/${driverId}`, {
           method: 'GET',
-          headers: { 
+          headers: {
             'Accept': 'application/json',
-            'Authorization': `Bearer ${token}` 
+            'Authorization': `Bearer ${token}`
           },
         });
 
         console.log('Driver data response status:', response.status);
-        
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Error response:', errorText);
@@ -166,7 +166,7 @@ export default function Settings() {
     }
 
     const token = await getItemAsync('driverToken');
-    
+
     try {
       const response = await fetch(`${getApiUrl()}/api/driver/payout-request`, {
         method: 'POST',
@@ -183,7 +183,7 @@ export default function Settings() {
       Alert.alert('Success', 'Payout request submitted successfully');
       setShowPayoutModal(false);
       setPayoutAmount('');
-      
+
       setDriver(prev => prev ? { ...prev, ledger: data.ledger } : prev);
     } catch (error) {
       Alert.alert('Error', 'Failed to submit payout request');
@@ -210,13 +210,13 @@ export default function Settings() {
       });
 
       console.log('Test earnings response status:', response.status);
-      
+
       const responseText = await response.text();
       console.log('Test earnings response:', responseText);
 
       try {
         const data = JSON.parse(responseText);
-        
+
         if (!response.ok) {
           throw new Error(data.message || `HTTP error! status: ${response.status}`);
         }
@@ -234,7 +234,7 @@ export default function Settings() {
     } catch (error) {
       console.error('Error adding test earnings:', error);
       Alert.alert(
-        'Error', 
+        'Error',
         `Failed to add test earnings: ${error.message}`
       );
     }
@@ -244,7 +244,7 @@ export default function Settings() {
     try {
       const token = await getItemAsync('driverToken');
       const driverId = await getItemAsync('driverID');
-      
+
       if (!token || !driverId) {
         Alert.alert('Error', 'You must be logged in to create a test receipt');
         return;
@@ -302,7 +302,7 @@ export default function Settings() {
     try {
       await SecureStore.deleteItemAsync('driverID');
       await SecureStore.deleteItemAsync('driverToken');
-  
+
       router.replace('/(auth)/login');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -330,14 +330,14 @@ export default function Settings() {
 
       const data = await response.json();
       console.log('Price update response:', data);
-      
+
       // Update the driver state with new prices
       setDriver(prev => prev ? {
         ...prev,
         farePrice: data.driver.farePrice,
         baseFee: data.driver.baseFee
       } : prev);
-      
+
       setShowPriceModal(false);
       Alert.alert('Success', 'Price updated successfully');
     } catch (error) {
@@ -381,18 +381,18 @@ export default function Settings() {
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.settingOption} 
+        <TouchableOpacity
+          style={styles.settingOption}
           onPress={() => Alert.alert('Coming Soon', 'Notifications feature is coming soon!')}
         >
           <View style={styles.settingOptionContent}>
-            <Bell color='#4A90E2'size={24} />
+            <Bell color='#4A90E2' size={24} />
             <Text style={styles.settingOptionText}>Notifications</Text>
           </View>
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.settingOption}
           onPress={() => Alert.alert('Coming Soon', 'Privacy settings coming soon')}
         >
@@ -403,8 +403,8 @@ export default function Settings() {
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.settingOption} 
+        <TouchableOpacity
+          style={styles.settingOption}
           onPress={() => setShowPayoutModal(true)}
         >
           <View style={styles.settingOptionContent}>
@@ -439,10 +439,10 @@ export default function Settings() {
 
       </View>
 
-<TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-  <LogOut color="#FFFFFF" size={24} />
-  <Text style={styles.logoutButtonText}>Logout</Text>
-</TouchableOpacity>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <LogOut color="#FFFFFF" size={24} />
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
 
       <Modal isVisible={isEditing} onBackdropPress={() => setIsEditing(false)}>
         <View style={styles.modalContent}>
@@ -472,7 +472,7 @@ export default function Settings() {
             value={payoutAmount}
             onChangeText={setPayoutAmount}
           />
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.button}
             onPress={handlePayoutRequest}
           >
@@ -490,7 +490,7 @@ export default function Settings() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Set Your Prices</Text>
-            
+
             <Text style={styles.label}>Base Fee ($)</Text>
             <TextInput
               style={styles.input}
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#4A90E2', 
+    color: '#4A90E2',
     marginBottom: 4,
   },
   userEmail: {
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
   driverName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4A90E2', 
+    color: '#4A90E2',
   },
   driverEmail: {
     fontSize: 16,
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
   settingsContainer: {
     padding: 24,
   },
-  
+
   settingOption: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#4A90E2', 
+    backgroundColor: '#4A90E2',
     marginHorizontal: 24,
     marginTop: 24,
     marginBottom: 40,
@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
   buttonText: { color: 'white', fontSize: 16 },
   balanceInfo: {
     fontSize: 14,
-    color: '#4A90E2', 
+    color: '#4A90E2',
     marginLeft: 8,
   },
   earningsContainer: {
@@ -710,7 +710,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   saveButton: {
-    backgroundColor: '#4A90E2', 
+    backgroundColor: '#4A90E2',
   },
   modalTitle: {
     fontSize: 20,

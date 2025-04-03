@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Modal, View, TouchableOpacity, FlatList, Text, Platform } from 'react-native';
 import { useColorScheme } from 'react-native';
 import ThemedText from '../../components/ThemedText';
@@ -81,8 +81,8 @@ export default function RidesScreen() {
     setLoading(true);
     setError('');
     try {
-      const endpoint = user.type === 'driver' 
-        ? `${apiUrl}/api/user/drivers/${user._id}/rides` 
+      const endpoint = user.type === 'driver'
+        ? `${apiUrl}/api/user/drivers/${user._id}/rides`
         : `${apiUrl}/api/user/riders/${user._id}/rides`;
 
       const response = await fetch(endpoint, {
@@ -92,9 +92,9 @@ export default function RidesScreen() {
       const data: Ride[] = await response.json();
 
       if (data.length === 0) {
-        setRides([]); 
+        setRides([]);
         setLoading(false);
-        return; 
+        return;
       }
 
       setRides(await Promise.all(data.map(async (ride) => {
@@ -113,7 +113,7 @@ export default function RidesScreen() {
     if (!coords || coords.length < 2 || coords[0] === undefined || coords[1] === undefined) {
       return "Address not available"; // Handle missing or invalid coordinates
     }
-    
+
     try {
       const { latitude, longitude } = { latitude: coords[1], longitude: coords[0] };
       const response = await Geocoder.from(latitude, longitude);
@@ -134,29 +134,29 @@ export default function RidesScreen() {
         </TouchableOpacity>
       </View>
       {loading ? (
-          <ThemedText style={styles.loadingText}>Loading...</ThemedText>
-        ) : rides.length === 0 ? (
-          <View style={styles.noRidesContainer}>
-            <ThemedText style={styles.noRidesText}>No ride history found at this time.</ThemedText>
-          </View>
-        ) : (
-          <FlatList
-            data={rides}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.rideItem}>
-                <View style={styles.cardContent}>
-                  <ThemedText style={styles.driverName}>Status: {item.status}</ThemedText>
-                  <ThemedText style={styles.details}>Distance: {item.distance ? `${item.distance} km` : 'N/A'}</ThemedText>
-                  <ThemedText style={styles.details}>Fare: ${item.fare / 100}</ThemedText>
-                  <ThemedText style={styles.details}>Start Location: {item.startAddress || 'Loading...'}</ThemedText>
-                  <ThemedText style={styles.details}>End Location: {item.endAddress || 'Loading...'}</ThemedText>
-                  <ThemedText style={styles.totalFare}>Transaction Time: {item.stripeTransactionTime ? new Date(item.stripeTransactionTime).toLocaleString() : 'N/A'}</ThemedText>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        )}
+        <ThemedText style={styles.loadingText}>Loading...</ThemedText>
+      ) : rides.length === 0 ? (
+        <View style={styles.noRidesContainer}>
+          <ThemedText style={styles.noRidesText}>No ride history found at this time.</ThemedText>
+        </View>
+      ) : (
+        <FlatList
+          data={rides}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.rideItem}>
+              <View style={styles.cardContent}>
+                <ThemedText style={styles.driverName}>Status: {item.status}</ThemedText>
+                <ThemedText style={styles.details}>Distance: {item.distance ? `${item.distance} km` : 'N/A'}</ThemedText>
+                <ThemedText style={styles.details}>Fare: ${item.fare / 100}</ThemedText>
+                <ThemedText style={styles.details}>Start Location: {item.startAddress || 'Loading...'}</ThemedText>
+                <ThemedText style={styles.details}>End Location: {item.endAddress || 'Loading...'}</ThemedText>
+                <ThemedText style={styles.totalFare}>Transaction Time: {item.stripeTransactionTime ? new Date(item.stripeTransactionTime).toLocaleString() : 'N/A'}</ThemedText>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </ThemedView>
   );
 }
@@ -262,5 +262,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
-  
+
 });

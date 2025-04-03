@@ -18,8 +18,8 @@ const AdminHeader = ({ title }) => {
             <div className="d-flex justify-content-between align-items-center">
                 <div style={{ width: '100px' }}>
                     {!isMainAdminPanel && (
-                        <Button 
-                            variant="secondary" 
+                        <Button
+                            variant="secondary"
                             onClick={() => navigate('/admin')}
                         >
                             Back
@@ -28,8 +28,8 @@ const AdminHeader = ({ title }) => {
                 </div>
                 <h4 className="mb-0 text-center flex-grow-1">{title}</h4>
                 <div style={{ width: '100px' }} className="text-end">
-                    <Button 
-                        variant="danger" 
+                    <Button
+                        variant="danger"
                         onClick={handleLogout}
                     >
                         Logout

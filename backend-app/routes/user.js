@@ -97,7 +97,7 @@ router.put('/driver/:id/offline', authenticate, async (req, res) => {
         if (!driver) {
             return res.status(404).json({ message: 'Driver not found' });
         }
-        driver.isOnline = false; 
+        driver.isOnline = false;
         await driver.save();
         res.json({ message: 'Driver status updated to offline', driver });
     } catch (error) {

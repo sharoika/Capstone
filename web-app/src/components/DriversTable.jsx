@@ -15,7 +15,7 @@ const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverCl
 
   return (
     <SortableTable columns={columns} data={drivers} tableId={tableId || "admin-drivers-table"}>
-      {(sortedDrivers) => 
+      {(sortedDrivers) =>
         sortedDrivers.map((driver) => (
           <tr key={driver._id}>
             <td>{driver.firstName} {driver.lastName}</td>
@@ -48,15 +48,15 @@ const DriverTable = ({ drivers, onApprovalChange, onDocumentDownload, onDriverCl
             </td>
             <td>
               <div className="d-flex gap-2">
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   className="admin-btn"
                   onClick={() => onDriverClick(driver)}
                 >
                   Edit
                 </Button>
-                <Button 
-                  variant="danger" 
+                <Button
+                  variant="danger"
                   className="admin-btn"
                   onClick={() => onDeleteDriver(driver._id)}
                 >

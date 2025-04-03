@@ -29,7 +29,7 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
     return () => clearInterval(interval);
   }, [rideID, token]);
 
-useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       if (currentLocation?.latitude !== undefined && currentLocation?.longitude !== undefined && mapRef.current) {
         mapRef.current.animateToRegion(
@@ -42,8 +42,8 @@ useEffect(() => {
           1000
         );
       }
-    }, 5000); 
-  
+    }, 5000);
+
     return () => clearInterval(interval);
   }, [currentLocation]);
 
@@ -86,7 +86,7 @@ useEffect(() => {
       );
 
       const directionsData = await directionsResponse.json();
-      
+
       if (directionsData.routes.length) {
         const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
         setRouteCoordinates(points);
@@ -142,21 +142,21 @@ useEffect(() => {
       Alert.alert("Error", "Missing ride ID or token");
       return;
     }
-  
+
     try {
       console.log(`Checking ride status at URL: ${apiUrl}/api/ride/rides/${rideID}/status`);
-      
+
       const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/status`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       if (!response.ok) {
         throw new Error("Error fetching ride status");
       }
-  
+
       const data = await response.json();
-      
+
       if (data.isCompleted) {
         console.log("Ride has been completed, calling onRideCompleted");
         onRideCompleted();
@@ -169,7 +169,7 @@ useEffect(() => {
       Alert.alert("Error", `Unable to check ride status: ${error.message}`);
     }
   };
-  
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -204,9 +204,9 @@ useEffect(() => {
           <Marker coordinate={routeCoordinates[routeCoordinates.length - 1]} title="End">
             {customPin}
           </Marker>
-                    <Marker coordinate={currentLocation} title="Current Location">
-                        {customPin}
-                      </Marker>
+          <Marker coordinate={currentLocation} title="Current Location">
+            {customPin}
+          </Marker>
         </MapView>
       )}
 

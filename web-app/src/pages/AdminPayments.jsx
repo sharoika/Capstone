@@ -27,7 +27,7 @@ const AdminPayments = () => {
             setReceipts(response.data);
         } catch (error) {
             console.error('Error fetching receipts:', error);
-            
+
             // Use mock data instead of showing an error
             const mockReceipts = [
                 {
@@ -109,7 +109,7 @@ const AdminPayments = () => {
                     timestamp: new Date(Date.now() - 432000000).toISOString() // 5 days ago
                 }
             ];
-            
+
             console.log('Using mock receipt data with 6 records:', mockReceipts);
             setReceipts(mockReceipts);
             console.log('Mock data set to state');
@@ -133,7 +133,7 @@ const AdminPayments = () => {
 
     const renderReceiptsContent = () => {
         console.log('Rendering receipts content. Receipt count:', receipts.length);
-        
+
         if (loading && receipts.length === 0) {
             return (
                 <div className="text-center my-5">
@@ -161,14 +161,14 @@ const AdminPayments = () => {
                             <td>{receipt.receiptNumber}</td>
                             <td>{receipt.rideID}</td>
                             <td>
-                                {receipt.riderID ? 
-                                    `${receipt.riderID.firstName} ${receipt.riderID.lastName}` : 
+                                {receipt.riderID ?
+                                    `${receipt.riderID.firstName} ${receipt.riderID.lastName}` :
                                     'Unknown'
                                 }
                             </td>
                             <td>
-                                {receipt.driverID ? 
-                                    `${receipt.driverID.firstName} ${receipt.driverID.lastName}` : 
+                                {receipt.driverID ?
+                                    `${receipt.driverID.firstName} ${receipt.driverID.lastName}` :
                                     'Unknown'
                                 }
                             </td>

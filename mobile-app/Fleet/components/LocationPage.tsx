@@ -11,7 +11,7 @@ interface Props {
   handlePreviousPage: () => void;
   styles: any;
   GOOGLE_API_KEY: string;
-  mapRef: React.RefObject<MapView>; 
+  mapRef: React.RefObject<MapView>;
 }
 
 const LocationPage: React.FC<Props> = ({
@@ -29,21 +29,21 @@ const LocationPage: React.FC<Props> = ({
       <Text style={styles.pageTitle}>Home Location</Text>
 
       <GooglePlacesAutocomplete
-  placeholder="Search for home location"
-  onPress={handleLocationSelect}
-  query={{ key: GOOGLE_API_KEY, language: 'en' }}
-  fetchDetails={true}
-  keyboardShouldPersistTaps="handled"
-  styles={{
-    container: { flex: 0 }, 
-    textInput: styles.input,
-    listView: { zIndex: 2, position: "absolute", top: 50, left: 0, right: 0 },
-  }}
-/>
+        placeholder="Search for home location"
+        onPress={handleLocationSelect}
+        query={{ key: GOOGLE_API_KEY, language: 'en' }}
+        fetchDetails={true}
+        keyboardShouldPersistTaps="handled"
+        styles={{
+          container: { flex: 0 },
+          textInput: styles.input,
+          listView: { zIndex: 2, position: "absolute", top: 50, left: 0, right: 0 },
+        }}
+      />
 
       {locationCoords && (
         <MapView
-          ref={mapRef}  
+          ref={mapRef}
           style={styles.map}
           initialRegion={{
             latitude: locationCoords.latitude,

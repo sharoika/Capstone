@@ -36,7 +36,7 @@ const AdminRiders = () => {
     };
 
     const handleRiderUpdate = (updatedRider) => {
-        setRiders(riders.map(rider => 
+        setRiders(riders.map(rider =>
             rider._id === updatedRider._id ? updatedRider : rider
         ));
     };
@@ -71,7 +71,7 @@ const AdminRiders = () => {
             <AdminHeader title="Admin Panel: Riders" />
             <Container className="py-4">
                 <SortableTable columns={columns} data={riders} tableId="admin-riders-table">
-                    {(sortedRiders) => 
+                    {(sortedRiders) =>
                         sortedRiders.map((rider) => (
                             <tr key={rider._id}>
                                 <td>{rider.firstName} {rider.lastName}</td>
@@ -81,15 +81,15 @@ const AdminRiders = () => {
                                 <td>{rider.completedRides?.length || 0}</td>
                                 <td>
                                     <div className="d-flex gap-2">
-                                        <Button 
-                                            variant="primary" 
+                                        <Button
+                                            variant="primary"
                                             className="admin-btn"
                                             onClick={() => handleRiderClick(rider)}
                                         >
                                             Edit
                                         </Button>
-                                        <Button 
-                                            variant="danger" 
+                                        <Button
+                                            variant="danger"
                                             className="admin-btn"
                                             onClick={() => handleDeleteRider(rider._id)}
                                         >

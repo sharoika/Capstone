@@ -44,7 +44,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const rideResponse = await fetch(`${apiUrl}/api/ride/rides/${rideID}`, {
         method: 'GET',
@@ -71,7 +71,7 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
 
       if (driverResponse.ok) {
         const driverList = await driverResponse.json();
-      
+
         const onlineDrivers = driverList.filter((driver: Driver) => driver.isOnline);
         setDrivers(onlineDrivers.map((driver: Driver) => ({
           ...driver,
@@ -101,17 +101,17 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
   const checkPaymentMethod = async (): Promise<boolean> => {
     try {
       const riderId = await SecureStore.getItemAsync('userObjectId');
-  
+
       if (!riderId) throw new Error('No rider ID found');
-  
+
       const response = await fetch(`${apiUrl}/api/payment/payment-method`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ riderId }),
       });
-  
+
       if (!response.ok) throw new Error('Failed to retrieve payment method');
-  
+
       const { paymentMethod } = await response.json();
       return paymentMethod !== null;
     } catch (error) {
@@ -119,9 +119,9 @@ const DriverSelection: React.FC<DriverSelectionProps> = ({
       return false;
     }
   };
-  
+
   const navigateToPayment = () => {
-    router.push('/paymentSettings'); 
+    router.push('/paymentSettings');
   };
   const handleConfirm = async () => {
     if (!selectedDriver) {

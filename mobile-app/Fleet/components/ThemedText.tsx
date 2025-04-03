@@ -16,7 +16,7 @@ export default function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const colorScheme = useColorScheme() || 'light';
-  const color = lightColor 
+  const color = lightColor
     ? colorScheme === 'light' ? lightColor : darkColor
     : colorScheme === 'light' ? Colors.light.text : Colors.dark.text;
 

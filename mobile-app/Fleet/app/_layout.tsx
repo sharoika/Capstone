@@ -42,7 +42,7 @@ export default function MainLayout() {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      router.push('/(auth)/login'); 
+      router.push('/(auth)/login');
     }
   }, [isLoggedIn, router]);
 
@@ -84,7 +84,7 @@ export default function MainLayout() {
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.High,
         });
-        
+
         if (location.coords) {
           sendLocationToBackend(location.coords.latitude, location.coords.longitude);
         }
@@ -97,7 +97,7 @@ export default function MainLayout() {
       getLocation();
     }, 50000);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [userType, token, userId]);
 
   return (

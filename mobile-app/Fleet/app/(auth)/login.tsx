@@ -65,7 +65,7 @@ export default function LoginScreen() {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image 
+          <Image
             source={require('../../assets/images/logo.png')}
             style={styles.logo}
             resizeMode="contain"
@@ -90,7 +90,7 @@ export default function LoginScreen() {
             onChangeText={setPassword}
             secureTextEntry
           />
-          
+
           <View >
             <TouchableOpacity style={[styles.button, styles.nextButton]} onPress={handleLogin}>
               <Text style={styles.buttonText}>Login</Text>
@@ -150,16 +150,16 @@ const styles = StyleSheet.create({
     color: '#000000'
   },
   buttonWrapper: {
-    marginTop: 24,  
-    alignItems: 'center', 
+    marginTop: 24,
+    alignItems: 'center',
   },
   button: {
-    width: '100%',   
+    width: '100%',
     height: 48,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,  
+    marginBottom: 12,
   },
   nextButton: {
     backgroundColor: '#4A90E2',

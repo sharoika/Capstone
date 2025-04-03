@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image, ScrollView, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
-import { ProgressBar } from 'react-native-paper'; 
+import { ProgressBar } from 'react-native-paper';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
-const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
 export default function RegisterScreen() {
   const router = useRouter();
   const [step, setStep] = useState<number>(1);
@@ -31,7 +31,7 @@ export default function RegisterScreen() {
         return;
       }
 
-     
+
       try {
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.High,
@@ -68,7 +68,7 @@ export default function RegisterScreen() {
     if (details && details.geometry && details.geometry.location) {
       const { lat, lng } = details.geometry.location;
       const newCoords = { latitude: lat, longitude: lng };
-      
+
       setLocationCoords(newCoords);
       setFormData((prevData) => ({
         ...prevData,
@@ -122,14 +122,14 @@ export default function RegisterScreen() {
 
 
   return (
-    <KeyboardAvoidingView 
-    style={{ flex: 1 }}
-  >
-    
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+    >
+
       <View style={styles.container}>
         <View style={styles.header}>
           <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
-              </View>
+        </View>
 
         <ProgressBar progress={step / 5} color="#4A90E2" style={styles.progressBar} />
 
@@ -207,9 +207,9 @@ export default function RegisterScreen() {
               }}
             />
             {locationCoords && (
-              
+
               <MapView
-              ref={mapRef} 
+                ref={mapRef}
                 style={styles.map}
                 initialRegion={{
                   latitude: locationCoords.latitude,

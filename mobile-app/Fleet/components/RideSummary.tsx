@@ -15,7 +15,7 @@ interface RideFinishedStepProps {
   token: string;
 }
 
-const RideFinishedStep: React.FC<RideFinishedStepProps> = ({ rideID, token,  onReturnHome}) => {
+const RideFinishedStep: React.FC<RideFinishedStepProps> = ({ rideID, token, onReturnHome }) => {
   const [rideDetails, setRideDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +78,7 @@ const RideFinishedStep: React.FC<RideFinishedStepProps> = ({ rideID, token,  onR
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Animated.View style={[styles.overlayContainer, { transform: [{ scale: scaleValue }] }]}> 
+      <Animated.View style={[styles.overlayContainer, { transform: [{ scale: scaleValue }] }]}>
         <View style={styles.card}>
           {error ? (
             <Text>{error}</Text>

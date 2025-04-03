@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import MapView, { Marker, Polyline, Region } from "react-native-maps";
 import Constants from "expo-constants";
-import { customMapStyle } from '../styles/customMapStyle'; 
+import { customMapStyle } from '../styles/customMapStyle';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -13,7 +13,7 @@ interface TravelToRideStepProps {
   onRideStarted: () => void;
 }
 
-const GOOGLE_API_KEY =  'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg'; 
+const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
 
 const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, token, onRideStarted }) => {
   const [rideInProgress, setRideInProgress] = useState(false);
@@ -24,11 +24,11 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
 
   const region: Region | undefined = location
     ? {
-        latitude: location.lat,
-        longitude: location.long,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }
+      latitude: location.lat,
+      longitude: location.long,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    }
     : undefined;
 
   const decodePolyline = (encoded: string) => {
@@ -136,14 +136,14 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
   };
 
   useEffect(() => {
-    fetchLocation(); 
+    fetchLocation();
     checkRideStatus();
-  
+
     const interval = setInterval(() => {
-      fetchLocation(); 
+      fetchLocation();
     }, 5000);
-  
-    return () => clearInterval(interval); 
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -171,17 +171,17 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: {
-    ...StyleSheet.absoluteFillObject, 
+    ...StyleSheet.absoluteFillObject,
   },
   overlay: {
     position: "absolute",
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)", 
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 10,
     padding: 20,
-    elevation: 5, 
+    elevation: 5,
   },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   button: { marginTop: 20, backgroundColor: "#4A90E2", padding: 15, borderRadius: 5 },

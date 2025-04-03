@@ -87,7 +87,7 @@ export default function Settings() {
     try {
       const token = await getItemAsync('userToken');
       const userId = await getItemAsync('userObjectId');
-      
+
       if (!token || !userId) {
         Alert.alert('Error', 'You must be logged in to create a test receipt');
         return;
@@ -176,8 +176,8 @@ export default function Settings() {
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.settingOption} 
+        <TouchableOpacity
+          style={styles.settingOption}
           onPress={() => Alert.alert('Coming Soon', 'Notifications feature is coming soon!')}
         >
           <View style={styles.settingOptionContent}>
@@ -187,7 +187,7 @@ export default function Settings() {
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.settingOption}
           onPress={() => Alert.alert('Coming Soon', 'Privacy settings coming soon')}
         >
