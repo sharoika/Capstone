@@ -51,9 +51,14 @@ const Home = () => {
                         <div className="row align-items-center">
                             <div className="col-lg-6 text-section">
                                 <h1 className="display-3 font-weight-bold mb-4">Fleet</h1>
-                                <p className="lead mb-4">A fair ride-share alternative. Experience reliable and affordable rides with Fleet.</p>
+                                <p className="lead mb-4">A fair and driver-driven ride-share alternative. Where drivers set the terms.</p>
                                 <div className="d-flex gap-3">
                                     <a href="#drivers" className="btn btn-outline-light btn-lg px-5 py-3 rounded-pill">Learn More</a>
+                                    <button
+                                        onClick={handleAppButtonClick}
+                                        className="btn btn-outline-light btn-lg px-5 py-3 rounded-pill">
+                                        Get Fleet
+                                    </button>
                                 </div>
                             </div>
                             <div className="col-lg-6 image-section d-none d-lg-block">
@@ -87,7 +92,7 @@ const Home = () => {
                         <div className="row">
                             {[
                                 { icon: FaClock, title: "Flexible Hours", text: "Work when you want, with the flexibility to choose your own schedule. Drive part-time, full-time, or whenever you're available." },
-                                { icon: FaMoneyBillWave, title: "Competitive Earnings", text: "Earn more with competitive rates and incentives. Your hard work deserves fair compensation." },
+                                { icon: FaMoneyBillWave, title: "Competitive Earnings", text: "Set your own rates and earn more with our driver-focused platform. You decide what your time and service are worth." },
                                 { icon: FaUsers, title: "Supportive Community", text: "Join a community of supportive drivers and a company that values your feedback. We're here to support you on and off the road." }
                             ].map((card, index) => (
                                 <div key={index} className="col-md-4 mb-4">
@@ -105,11 +110,7 @@ const Home = () => {
                         </div>
 
                         <div className="text-center mt-5 animate-on-scroll">
-                            <button
-                                onClick={handleAppButtonClick}
-                                className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
-                                Get Fleet
-                            </button>
+                            {/* Get Fleet button moved to top section */}
                         </div>
                     </div>
                 </section>
@@ -125,7 +126,7 @@ const Home = () => {
 
                         <div className="row g-4">
                             {[
-                                { icon: FaCarAlt, title: "Multiple Vehicle Options", text: "Choose from a variety of vehicle types to suit your needs and budget." },
+                                { icon: FaCarAlt, title: "Custom Driver Addons", text: "Drivers can offer personalized premium services that riders can select to enhance their journey experience." },
                                 { icon: FaMobileAlt, title: "Easy Mobile Booking", text: "Book rides with just a few taps on our intuitive mobile application." },
                                 { icon: FaRoute, title: "Optimized Routes", text: "Get to your destination faster with our smart route optimization." }
                             ].map((feature, index) => (
@@ -188,16 +189,16 @@ const Home = () => {
                 {/* Modal for app availability */}
                 <div className={`modal fade ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }} tabIndex="-1">
                     <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
+                        <div className={`modal-content ${theme === 'dark' ? 'bg-dark text-light' : ''}`}>
                             <div className="modal-header">
                                 <h5 className="modal-title">Coming Soon!</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                                <button type="button" className={`btn-close ${theme === 'dark' ? 'btn-close-white' : ''}`} onClick={() => setShowModal(false)}></button>
                             </div>
                             <div className="modal-body">
                                 <p className="mb-0">Fleet is not launched yet, but it will be coming to iOS and Android store soon!</p>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
+                                <button type="button" className={`btn ${theme === 'dark' ? 'btn-outline-light' : 'btn-secondary'}`} onClick={() => setShowModal(false)}>Close</button>
                             </div>
                         </div>
                     </div>
