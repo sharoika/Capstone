@@ -11,7 +11,6 @@ This document outlines the security measures implemented in our application.
 ## MongoDB Security
 
 - **Authentication**: MongoDB instances require authentication with strong username/password combinations.
-- **Role-Based Access Control**: Users are assigned specific roles with least privilege principles.
 - **TLS/SSL**: All connections to MongoDB use TLS/SSL encryption to secure data in transit.
 - **Data Encryption**: Sensitive data fields are encrypted at rest within MongoDB collections.
 - **Regular Updates**: Database servers are kept updated with the latest security patches.
@@ -21,8 +20,6 @@ This document outlines the security measures implemented in our application.
 
 - **TLS/SSL Certificates**: Valid certificates from trusted Certificate Authorities are implemented across all endpoints.
 - **HTTP to HTTPS Redirection**: All HTTP requests are automatically redirected to HTTPS.
-- **Modern TLS Versions**: Only TLS 1.2 and above are supported to ensure secure connections.
-- **Strong Cipher Suites**: Only strong cipher suites are enabled, with weak algorithms disabled.
 - **HSTS**: HTTP Strict Transport Security headers are implemented to prevent downgrade attacks.
 - **Certificate Monitoring**: Certificates are monitored for expiration and automatically renewed.
 

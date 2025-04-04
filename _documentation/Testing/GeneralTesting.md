@@ -3,7 +3,7 @@
 ## Test Plan: What are the goals and strategy for testing?
 - The project follows a phased testing approach focusing on both backend API testing and frontend user testing
 - Testing goals include ensuring API endpoint functionality, verifying user flows for both drivers and riders, and measuring performance under load
-- The strategy involves automated tests for backend functionality and structured usability testing with real users for the frontend experience
+- The strategy involves tests for backend functionality and structured usability testing with real users for the frontend experience
 
 ## Test Cases: What are you specifically going to test?
 - API testing covers all endpoints with test cases documented in a test matrix, covering:
@@ -25,7 +25,7 @@
   - Performance thresholds
 
 ## Test Procedure: How are you going to test this?
-- Backend testing uses automated API calls to verify endpoint functionality with specific inputs and expected outputs
+- Backend testing uses API calls to verify endpoint functionality with specific inputs and expected outputs, we used PostMan an API tool for the testing.
 - Performance testing uses k6 framework to simulate multiple concurrent users, with configurable parameters for load testing
 - User testing follows structured scenarios with real participants interacting with the application, followed by feedback collection
 - Testing routes by setting a manual route to ensure that the app would update based on location changes 
@@ -33,7 +33,7 @@
 ## Test Results and Incident Reports
 ### What are the testing results?
 - Routes worked as intended for rides, we were able to successfully go through 2 rides which had their coordinates constantly changing
-- For a server stress test, our highest capacity we could handle: 
+- For a server stress test, our highest capacity we could handle (success rate is defined as call latency under 1 second):
   - 100 Users: 100% success rate at 5-second intervals
   - 1,000 Users: ~80% success rate at 5-second intervals
   - 5,000 Users: ~50% success rate at 5-second intervals
