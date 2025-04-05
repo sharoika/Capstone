@@ -5,6 +5,8 @@ Visit Our Website: [ridefleet.ca](https://ridefleet.ca)
 
 Final Presentation Slides: [Slides](https://github.com/sharoika/Capstone/blob/main/FleetProjectDaySlides.pdf)
 
+Final Poster: [Poster](https://github.com/sharoika/Capstone/blob/main/FinalProjectPoster.png)
+
 KanBan Board: [KanBan](https://github.com/users/sharoika/projects/2/views/1)
 
 Documentation: [Documentation](https://github.com/sharoika/Capstone/tree/main/_documentation)
