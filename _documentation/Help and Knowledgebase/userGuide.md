@@ -12,10 +12,15 @@
 
 To sign up as a rider in the Fleet app, follow these steps:
 
+<img src="Images/1.1.png" alt="alt text" style="max-width: 100px;" />
+<img src="Images/1.2.png" alt="alt text" style="max-width: 100px;" />
+<img src="Images/1.3.png" alt="alt text" style="max-width: 100px;" />
+<img src="Images/1.4.png" alt="alt text" style="max-width: 100px;" />
+<img src="Images/1.5.png" alt="alt text" style="max-width: 100px;" />
+
 1. **Launch the Fleet App**
    - Open the Fleet mobile application on your device
    - Tap on "Register" on the login screen
-   ![alt text](Images/image.png)
 
 2. **Enter Personal Information (Step 1 of 3)**
    - Enter your first name
