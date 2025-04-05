@@ -25,6 +25,27 @@ function PaymentScreen() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [hasStripeId, setHasStripeId] = useState(false);
+
+  const fetchPaymentMethod = async () => {
+    try {
+      const riderId = await SecureStore.getItemAsync('userObjectId');
+      const response = await fetch(`${apiUrl}/api/payment/payment-method`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ riderId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to retrieve payment method');
+      }
+
+      const { paymentMethod } = await response.json();
+      setPaymentMethod(paymentMethod);
+    } catch (error) {
+      console.error('Error fetching payment method:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -73,27 +94,7 @@ function PaymentScreen() {
         setLoading(false);
       }
     };
-
-    const fetchPaymentMethod = async () => {
-      try {
-        const riderId = await SecureStore.getItemAsync('userObjectId');
-        const response = await fetch(`${apiUrl}/api/payment/payment-method`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ riderId }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to retrieve payment method');
-        }
-
-        const { paymentMethod } = await response.json();
-        setPaymentMethod(paymentMethod);
-      } catch (error) {
-        console.error('Error fetching payment method:', error);
-      }
-    };
-
+    fetchPaymentMethod();
     fetchUserData();
     fetchPaymentMethod();
   }, []);
@@ -155,6 +156,25 @@ function PaymentScreen() {
         console.log('Error presenting PaymentSheet:', presentError);
       } else {
         console.log('PaymentSheet presented successfully');
+      }
+
+      try {
+        const response =  await fetch(`${apiUrl}/api/payment/attach-payment-method`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ riderId }), // Send the riderId
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to attach payment method');
+        }
+
+        console.log('Payment method attached successfully');
+        fetchPaymentMethod();
+      } catch (apiError) {
+        console.error('Error calling /attach-payment-method:', apiError);
       }
 
     } catch (error) {
