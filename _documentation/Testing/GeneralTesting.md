@@ -6,7 +6,7 @@
 - The strategy involves tests for backend functionality and structured usability testing with real users for the frontend experience
 
 ## Test Cases: What are you specifically going to test?
-- API testing covers all endpoints with test cases documented in a test matrix, covering:
+- API testing covered all endpoints:
   - Ride management
   - Payment processing
   - User management
