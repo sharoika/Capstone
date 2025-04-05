@@ -56,7 +56,7 @@ For the Testing portion we have a testing directory located from (../testing in 
   - **Usability:** Ensures the software is intuitive for drivers and riders, confirmed via user testing, our users gave us feedback that has been implemented and further tests have proved to show users receptive to new designs thus **we deem this quality as achieved.**
   - **Maintainability:** The systems has a large amount of code debt due to the nature of capstone emphasising moving forward, and our scope being relativly large. In addition, the system still requires manual interventions thus **we deem this quality as a work in progress.**
   - **Reusability:** As the previous point, a lot of code was not properly encapsulated and reused, leading to code debt that should be rectified thus **we deem this quality as a work in progress.**
-  - **Portability:** The system is deployed on a VPS with NGINX and Node.JS; this is the only requirement and can be deployed within a few hours on another service. The React and React Native front ends were chosen to be cross-platform thus **we deem this quality as a work in progress.** 
+  - **Portability:** The system is deployed on a VPS with NGINX and Node.JS; this is the only requirement and can be deployed within a few hours on another service. The React and React Native front ends were chosen to be cross-platform thus **we deem this quality as achieved.**
   - **Robustness:** The system has some failure states that can cause a "lock" requiring an application refresh, these happen usually during a token expiry or device network connectivity issues thus **we deem this quality as a work in progress.**
 
 ## QA Completion Criteria

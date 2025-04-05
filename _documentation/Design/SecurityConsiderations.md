@@ -44,3 +44,4 @@ This document outlines the security measures implemented in our application.
 - **Regular Security Audits**: The application undergoes regular security reviews and penetration testing.
 - **Dependency Management**: Dependencies are regularly updated and scanned for known vulnerabilities.
 - **Secure Development Practices**: The development team follows secure coding guidelines and reviews. 
+- **Location Security**: All of our location tracking is handled by the native location services.
