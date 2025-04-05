@@ -48,6 +48,8 @@ To sign up as a rider in the Fleet app, follow these steps:
 
 To sign up as a driver in the Fleet app, follow these steps:
 
+<img src="Images/2.1.png" width="100" /><img src="Images/2.2.png" width="100" /><img src="Images/2.3.png" width="100" /><img src="Images/2.4.png" width="100" /><img src="Images/2.5.png" width="100" />
+
 1. **Launch the Fleet App**
    - Open the Fleet mobile application on your device
    - Tap on "Driver Login" on the login screen
