@@ -124,6 +124,8 @@ To set up your payment method as a rider, follow these steps:
 
 To request and complete a ride as a rider, follow these steps:
 
+<img src="Images/5.1.png" width="100" /><img src="Images/5.2.png" width="100" /><img src="Images/5.3.png" width="100" /><img src="Images/5.4.png" width="100" /><img src="Images/5.5.png" width="100" /><img src="Images/5.6.png" width="100" />
+
 1. **Create a Ride Request (Step 1)**
    - Open the Fleet app and log in
    - On the home screen, enter your destination in the "Where to?" field
@@ -169,6 +171,8 @@ To request and complete a ride as a rider, follow these steps:
 ## Driver: Accepting and Completing a Ride
 
 To accept and complete a ride as a driver, follow these steps:
+
+<img src="Images/6.1.png" width="100" /><img src="Images/6.2.png" width="100" /><img src="Images/6.3.png" width="100" /><img src="Images/6.4.png" width="100" /><img src="Images/6.5.png" width="100" />
 
 1. **Go Online (Step 1)**
    - Open the Fleet app and log in with your driver credentials
@@ -220,6 +224,8 @@ To accept and complete a ride as a driver, follow these steps:
 ## How to Get a Payout as a Driver
 
 To receive payment for your completed rides, follow these steps:
+
+<img src="Images/7.1.png" width="100" /><img src="Images/7.2.png" width="100" /><img src="Images/7.3.png" width="100" />
 
 1. **Eligibility**
    - After completing a ride, you are eligible to request a payout
