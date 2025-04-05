@@ -11,7 +11,7 @@ import PageIndicator from '../../components/PageIndicator';
 import styles from '../../styles/styles';
 import MapView from 'react-native-maps';
 
-const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+const GOOGLE_API_KEY = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 interface DocumentFile {

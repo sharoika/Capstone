@@ -20,31 +20,34 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
   const mapRef = useRef<MapView | null>(null);
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
-  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+  const previousLocation = useRef(null);
+  const GOOGLE_API_KEY = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
 
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY);
     fetchRideDetails();
-    const interval = setInterval(fetchRideDetails, 5000);
+    const interval = setInterval(fetchRideDetails, 1000); 
     return () => clearInterval(interval);
   }, [rideID, token]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (currentLocation?.latitude !== undefined && currentLocation?.longitude !== undefined && mapRef.current) {
-        mapRef.current.animateToRegion(
-          {
-            latitude: currentLocation.latitude,
-            longitude: currentLocation.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          },
-          1000
-        );
-      }
-    }, 5000);
 
-    return () => clearInterval(interval);
+  useEffect(() => {
+    if (
+      currentLocation &&
+      mapRef.current &&
+      JSON.stringify(currentLocation) !== JSON.stringify(previousLocation.current)
+    ) {
+      previousLocation.current = currentLocation;
+  
+      mapRef.current.animateToRegion(
+        {
+          ...currentLocation,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        1000
+      );
+    }
   }, [currentLocation]);
 
   const fetchRideDetails = async () => {
@@ -63,10 +66,16 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
 
       const data = await response.json();
       setRideDetails(data);
-      updateMapRoute(data.start, data.end);
+      
       if (data.rider?.currentLocation?.coordinates) {
         const [longitude, latitude] = data.rider.currentLocation.coordinates;
         setCurrentLocation({ latitude, longitude });
+      
+        const start = {
+          coordinates: [longitude, latitude]
+        };
+      
+        updateMapRoute(start, data.end);
       }
     } catch (err) {
       setError("Failed to fetch ride details");
@@ -78,32 +87,38 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
 
   const updateMapRoute = async (start, end) => {
     try {
-      const startCoords = start.coordinates;
-      const endCoords = end.coordinates;
-
+      if (!start || !end || !start.coordinates || !end.coordinates) {
+        console.error('Invalid start or end coordinates', { start, end });
+        return;
+      }
+  
+      const [startLng, startLat] = start.coordinates;
+      const [endLng, endLat] = end.coordinates;
+  
       const directionsResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${startCoords[1]},${startCoords[0]}&destination=${endCoords[1]},${endCoords[0]}&key=${GOOGLE_API_KEY}`
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${startLat},${startLng}&destination=${endLat},${endLng}&key=${GOOGLE_API_KEY}`
       );
-
+  
       const directionsData = await directionsResponse.json();
-
+  
       if (directionsData.routes.length) {
         const points = decodePolyline(directionsData.routes[0].overview_polyline.points);
         setRouteCoordinates(points);
-
+  
         const region = {
-          latitude: (startCoords[1] + endCoords[1]) / 2,
-          longitude: (startCoords[0] + endCoords[0]) / 2,
-          latitudeDelta: Math.abs(startCoords[1] - endCoords[1]) * 1.5,
-          longitudeDelta: Math.abs(startCoords[0] - endCoords[0]) * 1.5,
+          latitude: (startLat + endLat) / 2,
+          longitude: (startLng + endLng) / 2,
+          latitudeDelta: Math.abs(startLat - endLat) * 1.5,
+          longitudeDelta: Math.abs(startLng - endLng) * 1.5,
         };
-
+  
         setRegion(region);
       }
     } catch (error) {
       console.error('Error updating map route:', error);
     }
   };
+  
 
   const decodePolyline = (encoded) => {
     let points = [];
@@ -162,7 +177,7 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
         onRideCompleted();
       } else {
         console.log("Ride is still in progress, continuing to watch");
-        setTimeout(handleFinishRide, 5000); // Check again in 5 seconds
+        setTimeout(handleFinishRide, 1000); // Check again in 5 seconds
       }
     } catch (error) {
       console.error("Error checking ride status:", error);
@@ -192,20 +207,20 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
         <MapView
           ref={mapRef}
           style={styles.map}
-          region={region}
+          initialRegion={region}
           customMapStyle={customMapStyle}
         >
           {routeCoordinates.length > 0 && (
             <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2" />
           )}
           <Marker coordinate={routeCoordinates[0]} title="Start">
-            {customPin}
+           <MaterialIcons name="directions-car-filled" size={40} color="#4A90E2" />
           </Marker>
           <Marker coordinate={routeCoordinates[routeCoordinates.length - 1]} title="End">
             {customPin}
           </Marker>
           <Marker coordinate={currentLocation} title="Current Location">
-            {customPin}
+            <MaterialIcons name="directions-car-filled" size={40} color="#4A90E2" />
           </Marker>
         </MapView>
       )}

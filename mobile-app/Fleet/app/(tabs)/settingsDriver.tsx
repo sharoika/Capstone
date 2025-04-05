@@ -366,7 +366,6 @@ export default function Settings() {
               <Text style={styles.driverName}>{driver.firstName} {driver.lastName}</Text>
               <Text style={styles.driverEmail}>{driver.email}</Text>
               <Text style={styles.driverVehicle}>{driver.vehicleMake} {driver.vehicleModel}</Text>
-              <Text style={styles.driverPlate}>Plate: {driver.vehiclePlate}</Text>
             </View>
           )
         )}

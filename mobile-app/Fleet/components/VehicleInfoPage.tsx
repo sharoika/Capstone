@@ -24,6 +24,7 @@ const VehicleInfoPage: React.FC<Props> = ({
     <TextInput
       style={[styles.input, errors.vehicleMake && styles.inputError]}
       placeholder="Vehicle Make"
+        placeholderTextColor="#888"
       value={formData.vehicleMake}
       onChangeText={(value) => handleInputChange('vehicleMake', value)}
     />
@@ -31,6 +32,7 @@ const VehicleInfoPage: React.FC<Props> = ({
     <TextInput
       style={[styles.input, errors.vehicleModel && styles.inputError]}
       placeholder="Vehicle Model"
+        placeholderTextColor="#888"
       value={formData.vehicleModel}
       onChangeText={(value) => handleInputChange('vehicleModel', value)}
     />
@@ -38,6 +40,7 @@ const VehicleInfoPage: React.FC<Props> = ({
     <TextInput
       style={[styles.input, errors.vehicleYear && styles.inputError]}
       placeholder="Vehicle Year"
+        placeholderTextColor="#888"
       value={formData.vehicleYear}
       onChangeText={(value) => handleInputChange('vehicleYear', value)}
     />
@@ -45,6 +48,7 @@ const VehicleInfoPage: React.FC<Props> = ({
     <TextInput
       style={[styles.input, errors.vehicleColor && styles.inputError]}
       placeholder="Vehicle Color"
+        placeholderTextColor="#888"
       value={formData.vehicleColor}
       onChangeText={(value) => handleInputChange('vehicleColor', value)}
     />
@@ -52,6 +56,7 @@ const VehicleInfoPage: React.FC<Props> = ({
     <TextInput
       style={[styles.input, errors.licensePlate && styles.inputError]}
       placeholder="License Plate"
+        placeholderTextColor="#888"
       value={formData.licensePlate}
       onChangeText={(value) => handleInputChange('licensePlate', value)}
     />

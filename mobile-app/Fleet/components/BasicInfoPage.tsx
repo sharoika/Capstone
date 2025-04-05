@@ -16,6 +16,7 @@ const BasicInfoPage: React.FC<Props> = ({ formData, errors, handleInputChange, h
     <TextInput
       style={[styles.input, errors.firstName && styles.inputError]}
       placeholder="First Name"
+        placeholderTextColor="#888"
       value={formData.firstName}
       onChangeText={(value) => handleInputChange('firstName', value)}
     />
@@ -24,6 +25,7 @@ const BasicInfoPage: React.FC<Props> = ({ formData, errors, handleInputChange, h
     <TextInput
       style={[styles.input, errors.lastName && styles.inputError]}
       placeholder="Last Name"
+        placeholderTextColor="#888"
       value={formData.lastName}
       onChangeText={(value) => handleInputChange('lastName', value)}
     />
@@ -32,6 +34,7 @@ const BasicInfoPage: React.FC<Props> = ({ formData, errors, handleInputChange, h
     <TextInput
       style={[styles.input, errors.email && styles.inputError]}
       placeholder="Email"
+        placeholderTextColor="#888"
       value={formData.email}
       onChangeText={(value) => handleInputChange('email', value)}
       keyboardType="email-address"
@@ -41,6 +44,7 @@ const BasicInfoPage: React.FC<Props> = ({ formData, errors, handleInputChange, h
     <TextInput
       style={[styles.input, errors.phone && styles.inputError]}
       placeholder="Phone"
+        placeholderTextColor="#888"
       value={formData.phone}
       onChangeText={(value) => handleInputChange('phone', value)}
       keyboardType="phone-pad"
@@ -50,6 +54,7 @@ const BasicInfoPage: React.FC<Props> = ({ formData, errors, handleInputChange, h
     <TextInput
       style={[styles.input, errors.password && styles.inputError]}
       placeholder="Password"
+        placeholderTextColor="#888"
       value={formData.password}
       onChangeText={(value) => handleInputChange('password', value)}
       secureTextEntry

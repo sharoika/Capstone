@@ -23,7 +23,7 @@ const RidesForDriverStep: React.FC<RidesForDriverStepProps> = ({ token, driverID
   const [driverFareDetails, setDriverFareDetails] = useState<{ farePrice: number, baseFee: number }>({ farePrice: 0, baseFee: 0 });
 
   useEffect(() => {
-    Geocoder.init('AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg');
+    Geocoder.init(Constants.expoConfig?.extra?.GOOGLE_API_KEY);
     const interval = setInterval(fetchRidesForDriver, 5000);
     return () => clearInterval(interval);
   }, [token, driverID]);

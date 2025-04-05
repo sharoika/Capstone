@@ -5,8 +5,10 @@ import { ChevronRight, Edit2, Banknote, Bell, Lock, LogOut, Receipt, User } from
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import axios from 'axios';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
+const GOOGLE_API_KEY =  Constants.expoConfig?.extra?.GOOGLE_API_KEY;
 
 interface Rider {
   firstName: string;
@@ -28,6 +30,7 @@ export default function Settings() {
   const [id, setId] = useState<string | null>(null);
   const [rider, setRider] = useState<Rider | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [address, setAddress] = useState<string | null>(null);
 
   // Safe navigation helper
   const navigateTo = (path: string) => {
@@ -61,6 +64,12 @@ export default function Settings() {
 
           const data: Rider = await response.json();
           setRider(data);
+          if (data.homeLocation) {
+            const coordinates = data.homeLocation.split(',');
+            const latitude = parseFloat(coordinates[0].trim());
+            const longitude = parseFloat(coordinates[1].trim());
+            fetchAddressFromCoordinates(latitude, longitude); // Ensure this function is correctly called here
+          }
         }
       } catch (error) {
         console.error('Error fetching rider data:', error);
@@ -72,6 +81,34 @@ export default function Settings() {
     fetchUserData();
   }, []);
 
+  // Function to fetch address from coordinates
+  const fetchAddressFromCoordinates = async (latitude: number, longitude: number) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_API_KEY}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch address from coordinates');
+      }
+
+      const data = await response.json();
+
+      if (data.status === 'OK' && data.results.length > 0) {
+        const formattedAddress = data.results[0]?.formatted_address;
+        setAddress(formattedAddress); // Set the address state
+      } else {
+        console.error('Error fetching address:', data.status);
+        setAddress('Address not found'); // Provide a fallback address
+      }
+    } catch (error) {
+      console.error('Error fetching address:', error);
+      setAddress('Unable to fetch address'); // Set error message
+    }
+  };
+
+
+
   if (loading) {
     return <ActivityIndicator size="large" color="#4A90E2" style={styles.loader} />;
   }
@@ -82,6 +119,7 @@ export default function Settings() {
     await SecureStore.deleteItemAsync('userType');
     router.push('/(auth)/login');
   };
+
 
   const createTestReceipt = async () => {
     try {
@@ -156,8 +194,12 @@ export default function Settings() {
         <Text style={styles.userName}>{rider?.firstName} {rider?.lastName}</Text>
         <Text style={styles.userEmail}>{rider?.email}</Text>
         {rider?.phone && <Text style={styles.userPhone}>{rider.phone}</Text>}
-        {rider?.homeLocation && <Text style={styles.userHomeLocation}>{rider.homeLocation}</Text>}
-      </View>
+        {address ? (
+          <Text style={styles.userHomeLocation}>{address}</Text> // Display the fetched address
+        ) : (
+          <Text style={styles.userHomeLocation}>Loading address...</Text> // Show loading message until address is fetched
+        )}
+         </View>
 
       <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingOption} onPress={() => navigateTo('/editProfile')}>
@@ -198,6 +240,16 @@ export default function Settings() {
           <ChevronRight color="#6D6D6D" size={24} />
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.settingOption}
+          onPress={() => Alert.alert('Coming Soon', 'You can contact support at support@ridefleet.ca')}
+        >
+          <View style={styles.settingOptionContent}>
+          <MaterialIcons name="help-outline" color='#4A90E2' size={24} />
+            <Text style={styles.settingOptionText}>Contact Support</Text>
+          </View>
+          <ChevronRight color="#6D6D6D" size={24} />
+        </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

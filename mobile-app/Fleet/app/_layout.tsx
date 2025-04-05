@@ -95,7 +95,7 @@ export default function MainLayout() {
 
     const interval = setInterval(() => {
       getLocation();
-    }, 50000000000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [userType, token, userId]);
