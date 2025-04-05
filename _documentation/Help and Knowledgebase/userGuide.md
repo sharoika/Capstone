@@ -93,6 +93,8 @@ To sign up as a driver in the Fleet app, follow these steps:
 
 To set up your payment method as a rider, follow these steps:
 
+<img src="Images/3.1.png" width="100" /><img src="Images/3.2.png" width="100" /><img src="Images/3.3.png" width="100" /><img src="Images/3.4.png" width="100" />
+
 1. **Access Payment Settings**
    - Navigate to the "Settings" tab in the app
    - Tap on "Payment Methods"
