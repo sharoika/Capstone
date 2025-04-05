@@ -187,7 +187,7 @@ function PaymentScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.push('/(tabs)/settings')} style={styles.backButton}>
           <ArrowLeft color="#173252" size={24} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payment Settings</Text>
@@ -224,7 +224,7 @@ function PaymentScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F7FA' },
   header: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  backButton: { padding: 8 },
+  backButton: { padding: 8, marginTop: 16, },
   headerTitle: { fontSize: 20, fontWeight: '600', color: '#173252', marginLeft: 16 },
   content: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   creditCardIcon: { marginBottom: 16 },
