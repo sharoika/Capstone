@@ -12,8 +12,8 @@
 
 To sign up as a rider in the Fleet app, follow these steps:
 
-<img src="Images/1.1.png" alt="alt text" style="max-width: 100px;" />
-<img src="Images/1.2.png" alt="alt text" style="max-width: 100px;" />
+<img src="Images/1.1.png" alt="alt text" style="max-width: 5px;" />
+<img src="Images/1.2.png" alt="alt text" style="max-width: 5px;" />
 <img src="Images/1.3.png" alt="alt text" style="max-width: 100px;" />
 <img src="Images/1.4.png" alt="alt text" style="max-width: 100px;" />
 <img src="Images/1.5.png" alt="alt text" style="max-width: 100px;" />
