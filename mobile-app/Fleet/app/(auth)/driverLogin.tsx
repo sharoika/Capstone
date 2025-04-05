@@ -34,7 +34,6 @@ export default function DriverLoginScreen() {
         email,
         password,
       });
-      console.log(response.data);
      
       const { token, driver, message } = response.data;
       console.log("driver token", token);

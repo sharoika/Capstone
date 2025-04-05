@@ -67,7 +67,6 @@ export default function MainLayout() {
         });
 
         const data = await response.json();
-        console.log('Location update response:', data);
       } catch (error) {
         console.error('Error sending location:', error);
       }

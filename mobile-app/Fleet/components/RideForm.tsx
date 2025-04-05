@@ -44,16 +44,13 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
 
       if (response.ok) {
         const data = await response.json();
-        console.log("response dataaaa", data.location);
 
         if (data.location && data.location.lat && data.location.long) {
           const mappedLocation = {
             latitude: data.location.lat,
             longitude: data.location.long,
           };
-          console.log("mapped: ", mappedLocation);
           setLocation(mappedLocation);
-          console.log("Location: ", location);
           setRegion({
             latitude: mappedLocation.latitude,
             longitude: mappedLocation.longitude,
@@ -76,7 +73,6 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
 
   useEffect(() => {
     fetchLocation();
-    console.log("Updated Locationnnnnnnnnnnnnnnnnn: ", location);
     const interval = setInterval(() => {
       fetchLocation();
     }, 1000);
@@ -94,15 +90,13 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
       const [startLng, startLat] = start.coordinates;
       const [endLng, endLat] = end.coordinates;
 
-      console.log("Start Coordinates:", startLat, startLng);
-      console.log("End Coordinates:", endLat, endLng);
-
+ 
       if (!startLat || !startLng || !endLat || !endLng) {
         throw new Error("Invalid coordinates extracted.");
       }
 
       const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLat},${startLng}&destination=${endLat},${endLng}&key=${GOOGLE_API_KEY}`;
-      console.log("Fetching URL:", url);
+
       const directionsResponse = await fetch(url);
       const directionsData = await directionsResponse.json();
 
@@ -186,7 +180,6 @@ const RideForm: React.FC<RideFormProps> = ({ token, riderID, onRideCreated }) =>
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
-      console.log("Map centered on updated location:", location);
     }
   }, [location, start, end]);
 

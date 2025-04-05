@@ -9,7 +9,6 @@ import axios from 'axios';
 
 const getApiUrl = () => {
   const url = Constants.expoConfig?.extra?.API_URL;
-  console.log('API URL:', url);
   return url;
 };
 
@@ -78,8 +77,6 @@ export default function Settings() {
           },
         });
 
-        console.log('Driver data response status:', response.status);
-
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Error response:', errorText);
@@ -87,7 +84,6 @@ export default function Settings() {
         }
 
         const data: Driver = await response.json();
-        console.log('Driver data received:', data);
         setDriver(data);
       } catch (error) {
         console.error('Error fetching driver data:', error);
@@ -198,7 +194,6 @@ export default function Settings() {
       }
 
       const url = `${getApiUrl()}/api/driver/test/add-earnings`;
-      console.log('Making test earnings request to:', url);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -209,10 +204,8 @@ export default function Settings() {
         }
       });
 
-      console.log('Test earnings response status:', response.status);
 
       const responseText = await response.text();
-      console.log('Test earnings response:', responseText);
 
       try {
         const data = JSON.parse(responseText);
@@ -275,8 +268,6 @@ export default function Settings() {
         dropoffLocation: "456 Oak Ave, City"
       };
 
-      console.log('Sending test receipt data (driver):', testReceiptData);
-      console.log('API URL:', `${getApiUrl()}/api/receipt/receipts/generate`);
 
       const response = await axios.post(`${getApiUrl()}/api/receipt/receipts/generate`, testReceiptData, {
         headers: {
@@ -284,8 +275,6 @@ export default function Settings() {
           'Content-Type': 'application/json',
         },
       });
-
-      console.log('Receipt creation response (driver):', response.data);
 
       if (response.status === 201 || response.status === 200) {
         Alert.alert('Success', 'Test receipt created successfully!');
@@ -329,8 +318,6 @@ export default function Settings() {
       }
 
       const data = await response.json();
-      console.log('Price update response:', data);
-
       // Update the driver state with new prices
       setDriver(prev => prev ? {
         ...prev,

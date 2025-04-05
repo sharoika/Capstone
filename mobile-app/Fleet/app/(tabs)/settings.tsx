@@ -156,8 +156,6 @@ export default function Settings() {
         dropoffLocation: "456 Oak Ave, City"
       };
 
-      console.log('Sending test receipt data:', testReceiptData);
-      console.log('API URL:', `${apiUrl}/api/receipt/receipts/generate`);
 
       const response = await axios.post(`${apiUrl}/api/receipt/receipts/generate`, testReceiptData, {
         headers: {
@@ -166,7 +164,6 @@ export default function Settings() {
         },
       });
 
-      console.log('Receipt creation response:', response.data);
 
       if (response.status === 201 || response.status === 200) {
         Alert.alert('Success', 'Test receipt created successfully!');

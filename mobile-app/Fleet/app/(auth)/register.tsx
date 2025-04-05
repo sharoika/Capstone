@@ -100,7 +100,6 @@ export default function RegisterScreen() {
     }
 
     try {
-      console.log(apiUrl);
       const response = await fetch(`${apiUrl}/api/auth/rider/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

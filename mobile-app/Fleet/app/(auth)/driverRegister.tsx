@@ -185,8 +185,7 @@ const DriverRegisterScreen = () => {
         body: formDataToSend,
       });
 
-      const responseText = await response.text(); // Log response
-      console.log('Raw Response:', responseText);
+      const responseText = await response.text(); 
 
       let errorData;
       try {
@@ -194,7 +193,6 @@ const DriverRegisterScreen = () => {
       } catch (parseError) {
         throw new Error('Invalid JSON response from server');
       }
-      console.log(response);
       if (!response.ok) {
         throw new Error(errorData.message || 'An error occurred during registration.');
       }

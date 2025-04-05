@@ -159,7 +159,6 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
     }
 
     try {
-      console.log(`Checking ride status at URL: ${apiUrl}/api/ride/rides/${rideID}/status`);
 
       const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/status`, {
         method: "GET",
@@ -173,10 +172,8 @@ const RideInProgress = ({ rideID, token, onRideCompleted }) => {
       const data = await response.json();
 
       if (data.isCompleted) {
-        console.log("Ride has been completed, calling onRideCompleted");
         onRideCompleted();
       } else {
-        console.log("Ride is still in progress, continuing to watch");
         setTimeout(handleFinishRide, 1000); // Check again in 5 seconds
       }
     } catch (error) {
