@@ -6,7 +6,7 @@ import Geocoder from 'react-native-geocoding';
 
 const { width, height } = Dimensions.get('window');
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
-const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+const GOOGLE_API_KEY = Constants.expoConfig?.extra?.GOOGLE_API_KEY;;
 Geocoder.init(GOOGLE_API_KEY);
 
 interface RideFinishedStepProps {

@@ -8,7 +8,7 @@ import MapView, { Marker } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
-const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+const GOOGLE_API_KEY = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
 export default function RegisterScreen() {
   const router = useRouter();
   const [step, setStep] = useState<number>(1);
@@ -100,7 +100,6 @@ export default function RegisterScreen() {
     }
 
     try {
-      console.log(apiUrl);
       const response = await fetch(`${apiUrl}/api/auth/rider/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

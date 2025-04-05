@@ -14,7 +14,7 @@ interface TravelToRideStepProps {
   onRideStarted: () => void;
 }
 
-const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+const GOOGLE_API_KEY = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
 const customPin = <MaterialIcons name="location-pin" size={40} color="#8EC3FF" />; 
 
 const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, token, onRideStarted }) => {
@@ -23,7 +23,7 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
   const [startLocation, setStartLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [routeCoordinates, setRouteCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
   const mapRef = useRef<MapView | null>(null);
-
+  const [startLocationAddress, setStartLocationAddress] = useState<string>("");
   const region: Region | undefined = location
     ? {
       latitude: location.lat,
@@ -114,7 +114,19 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
       console.error("Error fetching route:", error);
     }
   };
-
+  const fetchStartLocationAddress = async (latitude: number, longitude: number) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_API_KEY}`
+      );
+      const data = await response.json();
+      if (data.results.length > 0) {
+        setStartLocationAddress(data.results[0].formatted_address);
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    }
+  };
   const checkRideStatus = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/ride/rides/${rideID}/status`, {
@@ -141,27 +153,48 @@ const TravelToRideStep: React.FC<TravelToRideStepProps> = ({ rideID, driverID, t
     fetchLocation();
     checkRideStatus();
 
-    const interval = setInterval(() => {
+    const locationInterval = setInterval(() => {
       fetchLocation();
-    }, 5000);
-
-    return () => clearInterval(interval);
+    }, 1000);
+  
+    const statusInterval = setInterval(() => {
+      checkRideStatus();
+    }, 1000);
+  
+    return () => {
+      clearInterval(locationInterval);
+      clearInterval(statusInterval);
+    };
   }, []);
 
   useEffect(() => {
     if (location && startLocation) fetchRoute();
+    if (startLocation) fetchStartLocationAddress(startLocation.latitude, startLocation.longitude);
   }, [location, startLocation]);
 
   return (
     <View style={styles.container}>
       <MapView ref={mapRef} style={styles.map} region={region} customMapStyle={customMapStyle}>
-        {location && <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver" > {customPin} </Marker>}
-        {startLocation && <Marker coordinate={startLocation} title="Start Location" > {customPin} </Marker>}
+      {location && (
+  <Marker coordinate={{ latitude: location.lat, longitude: location.long }} title="Driver">
+   <MaterialIcons name="directions-car-filled" size={40} color="#4A90E2" />
+  </Marker>
+)}
+
+{startLocation && (
+  <Marker coordinate={startLocation} title="Start Location">
+    {customPin} 
+  </Marker>
+)}
         {routeCoordinates.length > 0 && <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2" />}
       </MapView>
 
       <View style={styles.overlay}>
         <Text style={styles.title}>Travel to Ride</Text>
+        <Text style={styles.label}>Start Location Address:</Text>
+        {startLocationAddress ? (
+                  <Text style={styles.value}>{startLocationAddress}</Text>
+        ) : null}
         <TouchableOpacity style={styles.button} onPress={checkRideStatus}>
           <Text style={styles.buttonText}>Refresh Status</Text>
         </TouchableOpacity>
@@ -184,6 +217,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     elevation: 5,
+  },
+ label: {
+    fontSize: 14,
+    color: "#6d6d6d",
+    marginTop: 8,
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#173252",
   },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   button: { marginTop: 20, backgroundColor: "#4A90E2", padding: 15, borderRadius: 5 },

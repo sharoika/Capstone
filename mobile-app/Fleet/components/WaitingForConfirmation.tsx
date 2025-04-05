@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Animated, Dimensions } from 'react-native';
 import Constants from 'expo-constants';
 import MapView from 'react-native-maps';
+import { customMapStyle } from "../styles/customMapStyle";
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 interface WaitingForConfirmationProps {
@@ -16,8 +17,8 @@ const WaitingForConfirmation: React.FC<WaitingForConfirmationProps> = ({ rideID,
   const fadeAnim = new Animated.Value(0);
 
   const [region, setRegion] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: 50.78825,
+    longitude: -104.4324,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
@@ -74,6 +75,7 @@ const WaitingForConfirmation: React.FC<WaitingForConfirmationProps> = ({ rideID,
         style={StyleSheet.absoluteFillObject}
         region={region}
         onRegionChangeComplete={setRegion}
+         customMapStyle={customMapStyle}
       >
       </MapView>
 

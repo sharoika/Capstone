@@ -11,7 +11,7 @@ import PageIndicator from '../../components/PageIndicator';
 import styles from '../../styles/styles';
 import MapView from 'react-native-maps';
 
-const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+const GOOGLE_API_KEY = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 interface DocumentFile {
@@ -185,8 +185,7 @@ const DriverRegisterScreen = () => {
         body: formDataToSend,
       });
 
-      const responseText = await response.text(); // Log response
-      console.log('Raw Response:', responseText);
+      const responseText = await response.text(); 
 
       let errorData;
       try {
@@ -194,7 +193,6 @@ const DriverRegisterScreen = () => {
       } catch (parseError) {
         throw new Error('Invalid JSON response from server');
       }
-      console.log(response);
       if (!response.ok) {
         throw new Error(errorData.message || 'An error occurred during registration.');
       }

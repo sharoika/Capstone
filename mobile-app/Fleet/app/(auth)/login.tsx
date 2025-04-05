@@ -33,7 +33,6 @@ export default function LoginScreen() {
         email,
         password,
       });
-      console.log(response.data);
       const { token, user, message } = response.data;
       if (token && user?.id) {
         router.push('/(tabs)/home');
@@ -44,7 +43,6 @@ export default function LoginScreen() {
           saveToStorage('userObjectId', user.id),
           saveToStorage('userType', "rider"),
         ]);
-        console.log("usertype saved");
       } else {
         Alert.alert('Error', 'Login failed. Please try again.');
       }

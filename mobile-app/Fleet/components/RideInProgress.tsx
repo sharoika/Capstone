@@ -21,7 +21,7 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
 
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
-  const GOOGLE_API_KEY = 'AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg';
+  const GOOGLE_API_KEY = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
 
   useEffect(() => {
     Geocoder.init(GOOGLE_API_KEY);
@@ -65,7 +65,11 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
 
       const data = await response.json();
       setRideDetails(data);
-      updateMapRoute(data.start, data.end);
+      const startCoords = data.rider?.currentLocation?.coordinates || data.start.coordinates;
+        updateMapRoute(
+          { coordinates: startCoords },
+          data.end
+        );
       if (data.rider?.currentLocation?.coordinates) {
         const [longitude, latitude] = data.rider.currentLocation.coordinates;
         setCurrentLocation({ latitude, longitude });
@@ -182,20 +186,19 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
         <MapView
           ref={mapRef}
           style={styles.map}
-          region={region}
           customMapStyle={customMapStyle}
         >
           {routeCoordinates.length > 0 && (
             <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="#4A90E2" />
           )}
           <Marker coordinate={routeCoordinates[0]} title="Start">
-            {customPin}
+          <MaterialIcons name="directions-car-filled" size={40} color="#4A90E2" />
           </Marker>
           <Marker coordinate={routeCoordinates[routeCoordinates.length - 1]} title="End">
             {customPin}
           </Marker>
           <Marker coordinate={currentLocation} title="Current Location">
-            {customPin}
+         <MaterialIcons name="directions-car-filled" size={40} color="#4A90E2" />
           </Marker>
 
         </MapView>
@@ -206,6 +209,8 @@ const RideInProgress = ({ rideID, token, onRideFinished }) => {
           <Text style={styles.cardTitle}>Ride Details</Text>
           <Text style={styles.label}>Distance:</Text>
           <Text style={styles.value}>{rideDetails?.distance?.toFixed(2)} km</Text>
+          <Text style={styles.label}>Total Fare:</Text>
+          <Text style={styles.value}>${rideDetails?.fare?.toFixed(2)}</Text>
           <TouchableOpacity style={styles.endRideButton} onPress={handleFinishRide}>
             <Text style={styles.endRideButtonText}>End Ride</Text>
           </TouchableOpacity>

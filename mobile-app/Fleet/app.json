@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "config": {
-        "googleMapsApiKey": "AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg"
+        "googleMapsApiKey": "AIzaSyBl8oP1q33RHBckiYGkYCfLnyU-01u9SIU"
       },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We need access to your location for fleet tracking.",
@@ -25,7 +25,7 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBkmAjYL9HmHSBtxxI0j3LB1tYEwoCnZXg"
+          "apiKey": "AIzaSyBl8oP1q33RHBckiYGkYCfLnyU-01u9SIU"
         }
       },
       "permissions": [
@@ -63,7 +63,8 @@
       "typedRoutes": true
     },
     "extra": {
-      "API_URL": "https://server.ridefleet.ca"
+      "API_URL": "https://server.ridefleet.ca",
+      "GOOGLE_API_KEY": "AIzaSyBl8oP1q33RHBckiYGkYCfLnyU-01u9SIU"
     }
   }
 }

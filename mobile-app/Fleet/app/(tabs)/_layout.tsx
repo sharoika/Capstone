@@ -77,7 +77,7 @@ const TabNavigator = () => {
           }} />
           <Tab.Screen name="History" component={ReceiptsScreen} />
           <Tab.Screen name="Drive" component={DriverHomeScreen} options={{
-            tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10, paddingTop: 8, },
+            tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10, paddingTop: 8,  height: 70},
             tabBarLabelStyle: { color: "white", fontSize: 12, },
           }} />
 
@@ -93,7 +93,7 @@ const TabNavigator = () => {
           <Tab.Screen name="History" component={ReceiptsScreen} />
 
           <Tab.Screen name="Ride" component={HomeScreen} options={{
-            tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10, paddingTop: 8, },
+            tabBarItemStyle: { backgroundColor: '#4A90E2', borderRadius: 10, paddingTop: 8, height: 70},
             tabBarLabelStyle: { color: "white", fontSize: 12, },
           }}
 

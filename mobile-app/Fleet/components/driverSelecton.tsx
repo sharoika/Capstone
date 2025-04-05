@@ -55,7 +55,6 @@ const ConfirmTripScreen = ({ rideID }) => {
     }
 
     try {
-      console.log(selectedDriver);
       const token = await getItemAsync('userToken');
       const response = await fetch(
         `${apiUrl}/api/rides/${rideID}/confirm`,

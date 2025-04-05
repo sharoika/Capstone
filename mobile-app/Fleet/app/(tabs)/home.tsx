@@ -103,7 +103,6 @@ const HomeScreen: React.FC = () => {
           rideID={rideID}
           token={token}
           onReturnHome={() => {
-            console.log('Returning to home...');
             setCurrentStep(1);
             setRideID('');
             setRideDetails(null);
