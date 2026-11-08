@@ -3,3 +3,4 @@
 mobile-app/Fleet/.env
 web-app/.env
 backend-app/.env
+.DS_Store
